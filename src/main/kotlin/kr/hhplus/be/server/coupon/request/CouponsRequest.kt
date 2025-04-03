@@ -1,5 +1,5 @@
 package kr.hhplus.be.server.coupon.request
 
-data class CouponRequest(
+data class CouponsRequest(
     val userId: Long
 )
