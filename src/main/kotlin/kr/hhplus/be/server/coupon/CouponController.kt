@@ -1,12 +1,12 @@
 package kr.hhplus.be.server.coupon
 
 import jakarta.validation.Valid
-import kr.hhplus.be.server.coupon.request.CouponsRequest
 import kr.hhplus.be.server.coupon.request.FirstComeCouponRequest
 import kr.hhplus.be.server.coupon.response.CouponsResponse
 import kr.hhplus.be.server.coupon.response.FirstComeCouponResponse
 import kr.hhplus.be.server.swagger.CouponApi
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -30,9 +30,9 @@ class CouponController : CouponApi {
         )
     }
 
-    @GetMapping("/coupons")
+    @GetMapping("/coupons/{id}")
     override fun findCoupons(
-        @RequestBody @Valid request: CouponsRequest
+        @PathVariable id: Long
     ): List<CouponsResponse> {
         return listOf(
             CouponsResponse(

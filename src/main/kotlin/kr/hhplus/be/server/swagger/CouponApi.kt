@@ -1,13 +1,13 @@
 package kr.hhplus.be.server.swagger
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.coupon.request.CouponsRequest
 import kr.hhplus.be.server.coupon.request.FirstComeCouponRequest
 import kr.hhplus.be.server.coupon.response.CouponsResponse
 import kr.hhplus.be.server.coupon.response.FirstComeCouponResponse
@@ -87,6 +87,7 @@ interface CouponApi {
     ): FirstComeCouponResponse
 
     @Operation(summary = "쿠폰 목록 조회", description = "발급된 쿠폰 목록을 조회합니다.")
+    @Parameter(name = "id", description = "사용자 ID", example = "1")
     @ApiResponses(
         value = [
             ApiResponse(
@@ -149,22 +150,6 @@ interface CouponApi {
             )
         ]
     )
-    fun findCoupons(
-        @RequestBody(
-            description = "사용자 ID 정보",
-            required = true,
-            content = [
-                Content(
-                    mediaType = "application/json",
-                    schema = Schema(
-                        implementation = CouponsRequest::class,
-                        example = """{
-                            "userId": 1
-                        }"""
-                    )
-                )
-            ]
-        ) request: CouponsRequest
-    ): List<CouponsResponse>
+    fun findCoupons(id: Long): List<CouponsResponse>
 
 }
