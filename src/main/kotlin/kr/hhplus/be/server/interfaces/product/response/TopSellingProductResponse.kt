@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.product.response
+package kr.hhplus.be.server.interfaces.product.response
 
 data class TopSellingProductResponse(
     val rank: Int,
