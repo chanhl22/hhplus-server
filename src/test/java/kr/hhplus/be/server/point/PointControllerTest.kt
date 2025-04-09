@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.point
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import kr.hhplus.be.server.interfaces.user.PointController
 import kr.hhplus.be.server.point.request.ChargePointRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
