@@ -12,14 +12,13 @@ import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 
-
 @ExtendWith(MockitoExtension::class)
 class ProductServiceTest {
 
     @Mock
     private lateinit var productRepository: ProductRepository
 
-    @DisplayName("유저가 가지고 있는 포인트를 조회한다.")
+    @DisplayName("상품을 조회한다.")
     @Test
     fun find() {
         //given
