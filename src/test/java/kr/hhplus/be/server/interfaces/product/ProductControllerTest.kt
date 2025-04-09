@@ -1,6 +1,5 @@
-package kr.hhplus.be.server.product
+package kr.hhplus.be.server.interfaces.product
 
-import kr.hhplus.be.server.interfaces.product.ProductController
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

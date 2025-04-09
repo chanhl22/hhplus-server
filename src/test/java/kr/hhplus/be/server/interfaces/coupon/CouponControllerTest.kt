@@ -1,8 +1,8 @@
-package kr.hhplus.be.server.order
+package kr.hhplus.be.server.interfaces.coupon
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.order.request.OrderProductRequest
-import kr.hhplus.be.server.order.request.OrderRequest
+import kr.hhplus.be.server.coupon.CouponController
+import kr.hhplus.be.server.coupon.request.FirstComeCouponRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,33 +13,43 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-@WebMvcTest(OrderController::class)
-class OrderControllerTest {
+@WebMvcTest(CouponController::class)
+class CouponControllerTest {
+
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
-    @DisplayName("사용자가 요청한 상품들을 주문하고 결제합니다.")
+    @DisplayName("선착순으로 쿠폰을 발급합니다.")
     @Test
-    fun placeOrder() {
+    fun issueCouponFirstCome() {
         //given
-        val request = OrderRequest(
-            1L,
-            listOf(
-                OrderProductRequest(1, 2),
-                OrderProductRequest(2, 1)
-            )
-        )
+        val request = FirstComeCouponRequest(1L, 1L)
 
         //when //then
         mockMvc.perform(
-            MockMvcRequestBuilders.post("/order")
+            MockMvcRequestBuilders.post("/coupon/issue")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())
     }
+
+    @DisplayName("발급된 쿠폰 목록을 조회합니다.")
+    @Test
+    fun findCoupons() {
+        //given
+        val requestId = 1L
+
+        //when //then
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/coupons/${requestId}")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(MockMvcResultMatchers.status().isOk())
+    }
+
 }

@@ -9,9 +9,15 @@ class PointFacade(
     private val pointService: PointService,
     private val userService: UserService
 ) {
-    fun find(pointCriteria: PointCriteria): PointResult {
-        val user = userService.find(pointCriteria.userId)
+    fun find(userId: Long): PointResults.PointResult {
+        val user = userService.find(userId)
         val point = pointService.find(user.point.id)
-        return PointResult.of(user, point)
+        return PointResults.PointResult.of(user, point)
+    }
+
+    fun charge(criterion: PointCriteria.ChargePointCriterion): PointResults.ChargePointResult {
+        val user = userService.find(criterion.userId)
+        val point = pointService.charge(criterion.toCommand())
+        return PointResults.ChargePointResult.of(user, point)
     }
 }

@@ -34,8 +34,8 @@ class UserServiceTest {
 
         //then
         assertThat(result)
-            .extracting("id", "name", "point.amount")
-            .containsExactly(user.id, user.name, user.point.amount)
+            .extracting("id", "name", "point.balance")
+            .containsExactly(user.id, user.name, user.point.balance)
         Mockito.verify(userRepository, times(1))
             .find(anyLong())
     }

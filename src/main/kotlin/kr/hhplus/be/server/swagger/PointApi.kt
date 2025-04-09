@@ -8,9 +8,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import kr.hhplus.be.server.interfaces.user.PointRequests
 import kr.hhplus.be.server.interfaces.user.PointResponses
-import kr.hhplus.be.server.point.request.ChargePointRequest
-import kr.hhplus.be.server.point.response.ChargePointResponse
 
 @Tag(name = "Point API", description = "포인트 API")
 interface PointApi {
@@ -123,7 +122,7 @@ interface PointApi {
                 Content(
                     mediaType = "application/json",
                     schema = Schema(
-                        implementation = ChargePointRequest::class,
+                        implementation = PointRequests.ChargePointRequest::class,
                         example = """{
                             "amount": 10000
                         }"""
@@ -131,7 +130,7 @@ interface PointApi {
                 )
             ]
         )
-        request: ChargePointRequest
-    ): ChargePointResponse
+        request: PointRequests.ChargePointRequest
+    ): PointResponses.ChargePointResponse
 
 }

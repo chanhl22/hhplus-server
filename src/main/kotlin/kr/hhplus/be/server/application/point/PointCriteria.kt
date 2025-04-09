@@ -1,13 +1,24 @@
 package kr.hhplus.be.server.application.point
 
-data class PointCriteria (
-    val userId: Long
-) {
-    companion object {
-        fun of(userId: Long): PointCriteria {
-            return PointCriteria(
-                userId = userId
-            )
+import kr.hhplus.be.server.domain.point.PointCommands
+
+class PointCriteria {
+    data class ChargePointCriterion(
+        val userId: Long,
+        val amount: Int
+    ) {
+        companion object {
+            fun of(userId: Long, amount: Int): ChargePointCriterion {
+                return ChargePointCriterion(
+                    userId = userId,
+                    amount = amount
+                )
+            }
+        }
+
+        fun toCommand(): PointCommands.PointCommand {
+            return PointCommands.PointCommand.of(userId, amount)
         }
     }
+
 }

@@ -9,4 +9,11 @@ class PointService(
     fun find(pointId: Long): Point {
         return pointRepository.find(pointId)
     }
+
+    fun charge(command: PointCommands.PointCommand): Point {
+        val point = pointRepository.find(command.pointId)
+        point.charge(command.amount)
+
+        return pointRepository.update(point)
+    }
 }
