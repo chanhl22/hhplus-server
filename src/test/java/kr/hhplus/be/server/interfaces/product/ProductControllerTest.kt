@@ -1,9 +1,14 @@
 package kr.hhplus.be.server.interfaces.product
 
+import kr.hhplus.be.server.domain.product.ProductService
+import kr.hhplus.be.server.fixture.product.ProductDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers
+import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
@@ -15,11 +20,18 @@ class ProductControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
+    @MockitoBean
+    private lateinit var productService: ProductService
+
     @DisplayName("상품 정보를 조회합니다.")
     @Test
     fun find() {
         //given
         val requestId = 1L
+
+        val fakeResult = ProductDomainFixture.create()
+        BDDMockito.given(productService.find(ArgumentMatchers.anyLong()))
+            .willReturn(fakeResult)
 
         //when //then
         mockMvc.perform(

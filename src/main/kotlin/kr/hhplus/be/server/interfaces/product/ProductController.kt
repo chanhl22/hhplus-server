@@ -16,7 +16,8 @@ class ProductController(
     override fun find(
         @PathVariable id: Long
     ): ProductResponse.FoundProduct {
-        return ProductResponse.FoundProduct.from(productService.find(id))
+        val domain = productService.find(id)
+        return ProductResponse.FoundProduct.from(domain)
     }
 
     @GetMapping("/products/top")
