@@ -7,4 +7,6 @@ interface UserRepository {
 
     fun find(userId: Long): User
 
+    fun findUserWithPoint(userId: Long): User?
+
 }

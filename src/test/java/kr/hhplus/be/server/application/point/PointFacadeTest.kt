@@ -58,12 +58,12 @@ class PointFacadeTest {
         val pointFacade = PointFacade(pointService, userService)
 
         val user = User(1L, "이찬희B", Point(1L, 100000))
-        BDDMockito.given(userService.find(ArgumentMatchers.anyLong()))
+        BDDMockito.given(userService.findUserWithPoint(ArgumentMatchers.anyLong()))
             .willReturn(user)
 
         val criterion = PointCriteria.ChargePointCriterion.of(1L, 10000)
         val updatedPoint = Point(1L, 110000)
-        BDDMockito.given(pointService.charge(criterion.toCommand()))
+        BDDMockito.given(pointService.charge(criterion.toCommand(user.point.id)))
             .willReturn(updatedPoint)
 
         //when
@@ -74,9 +74,9 @@ class PointFacadeTest {
             .extracting("user.id", "point.balance")
             .containsExactly(user.id, updatedPoint.balance)
         Mockito.verify(userService, times(1))
-            .find(anyLong())
+            .findUserWithPoint(anyLong())
         Mockito.verify(pointService, times(1))
-            .charge(criterion.toCommand())
+            .charge(criterion.toCommand(user.point.id))
     }
 
 }

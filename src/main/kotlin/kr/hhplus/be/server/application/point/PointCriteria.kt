@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.application.point
 
-import kr.hhplus.be.server.domain.point.PointCommands
+import kr.hhplus.be.server.domain.point.PointCommands.PointCommand
 
 class PointCriteria {
     data class ChargePointCriterion(
@@ -16,8 +16,8 @@ class PointCriteria {
             }
         }
 
-        fun toCommand(): PointCommands.PointCommand {
-            return PointCommands.PointCommand.of(userId, amount)
+        fun toCommand(pointId: Long): PointCommand {
+            return PointCommand.of(pointId, amount)
         }
     }
 

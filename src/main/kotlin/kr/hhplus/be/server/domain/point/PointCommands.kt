@@ -6,9 +6,9 @@ class PointCommands {
         val amount: Int
     ) {
         companion object {
-            fun of(userId: Long, amount: Int): PointCommand {
+            fun of(pointId: Long, amount: Int): PointCommand {
                 return PointCommand(
-                    pointId = userId,
+                    pointId = pointId,
                     amount = amount
                 )
             }

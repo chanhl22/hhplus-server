@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.order.request.OrderRequest
-import kr.hhplus.be.server.order.response.OrderResponse
+import kr.hhplus.be.server.interfaces.order.OrderRequests.OrderRequest
+import kr.hhplus.be.server.interfaces.order.OrderResponses.OrderResponse
 
 @Tag(name = "Order API", description = "주문 API")
 interface OrderApi {
@@ -62,7 +62,7 @@ interface OrderApi {
             )
         ]
     )
-    fun placeOrder(
+    fun order(
         @RequestBody(
             description = "주문 생성 정보",
             required = true,

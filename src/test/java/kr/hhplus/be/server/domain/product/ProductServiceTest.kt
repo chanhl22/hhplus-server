@@ -39,4 +39,29 @@ class ProductServiceTest {
             .find(anyLong())
     }
 
+    @DisplayName("주문 가능한 상품들을 조회한다.")
+    @Test
+    fun findAll() {
+        //given
+        val productService = ProductService(productRepository)
+
+        val product1 = Product(1L, "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", Stock(1L, 25))
+        val product2 = Product(2L, "무선 키보드", 375000, "적축 키보드.", Stock(2L, 10))
+        BDDMockito.given(productRepository.findAllWithStockByIdIn(listOf(1L, 2L)))
+            .willReturn(listOf(product1, product2))
+
+        //when
+        val productCommand = ProductCommands.ProductsCommand.of(
+            listOf(
+                ProductCommands.ProductCommand(1L, 2),
+                ProductCommands.ProductCommand(2L, 1),
+            )
+        )
+        productService.findAll(productCommand)
+
+        //then
+        Mockito.verify(productRepository, times(1))
+            .findAllWithStockByIdIn(listOf(1L, 2L))
+    }
+
 }

@@ -40,4 +40,25 @@ class UserServiceTest {
             .find(anyLong())
     }
 
+    @DisplayName("사용자와 가지고 있는 포인트를 조회한다.")
+    @Test
+    fun findUserWithPointForOrder() {
+        //given
+        val userService = UserService(userRepository)
+
+        val user = User(1L, "이찬희B", Point(1L, 100000))
+        BDDMockito.given(userRepository.findUserWithPoint(ArgumentMatchers.anyLong()))
+            .willReturn(user)
+
+        //when
+        val result = userService.findUserWithPointForOrder(1)
+
+        //then
+        assertThat(result)
+            .extracting("id", "name", "point.balance")
+            .containsExactly(user.id, user.name, user.point.balance)
+        Mockito.verify(userRepository, times(1))
+            .findUserWithPoint(anyLong())
+    }
+
 }

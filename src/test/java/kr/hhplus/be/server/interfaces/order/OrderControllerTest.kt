@@ -1,14 +1,17 @@
 package kr.hhplus.be.server.interfaces.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.order.OrderController
-import kr.hhplus.be.server.order.request.OrderProductRequest
-import kr.hhplus.be.server.order.request.OrderRequest
+import kr.hhplus.be.server.application.order.OrderCriteria.OrderCriterion
+import kr.hhplus.be.server.application.order.OrderCriteria.OrderProductCriterion
+import kr.hhplus.be.server.application.order.OrderFacade
+import kr.hhplus.be.server.fixture.order.OrderResultFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
@@ -22,17 +25,24 @@ class OrderControllerTest {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
+    @MockitoBean
+    private lateinit var orderFacade: OrderFacade
+
     @DisplayName("사용자가 요청한 상품들을 주문하고 결제합니다.")
     @Test
-    fun placeOrder() {
+    fun order() {
         //given
-        val request = OrderRequest(
+        val request = OrderCriterion(
             1L,
             listOf(
-                OrderProductRequest(1, 2),
-                OrderProductRequest(2, 1)
+                OrderProductCriterion(1, 2),
+                OrderProductCriterion(2, 1)
             )
         )
+
+        val fakeResult = OrderResultFixture.create()
+        BDDMockito.given(orderFacade.order(request))
+            .willReturn(fakeResult)
 
         //when //then
         mockMvc.perform(

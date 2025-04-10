@@ -67,4 +67,31 @@ class PointServiceTest {
             .update(point)
     }
 
+    @DisplayName("유저의 포인트를 차감한다.")
+    @Test
+    fun pay() {
+        //given
+        val pointService = PointService(pointRepository)
+
+        val point = Point(1L, 100000)
+        BDDMockito.given(pointRepository.find(ArgumentMatchers.anyLong()))
+            .willReturn(point)
+
+        val updatedPoint = Point(1L, 110000)
+        BDDMockito.given(pointRepository.update(point))
+            .willReturn(updatedPoint)
+
+        //when
+        val result = pointService.pay(1L, 10000)
+
+        //then
+        assertThat(result)
+            .extracting("id", "balance")
+            .containsExactly(updatedPoint.id, updatedPoint.balance)
+        Mockito.verify(pointRepository, times(1))
+            .find(anyLong())
+        Mockito.verify(pointRepository, times(1))
+            .update(point)
+    }
+
 }

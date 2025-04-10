@@ -23,4 +23,12 @@ object ProductDomainFixture {
             )
         )
     }
+
+    fun createProducts(): List<Product> {
+        return listOf(
+            Product(1L, "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", Stock(1L, 25)),
+            Product(2L, "무선 키보드", 375000, "적축 키보드.", Stock(2L, 10))
+        )
+    }
+
 }

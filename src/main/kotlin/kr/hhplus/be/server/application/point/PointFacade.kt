@@ -3,6 +3,7 @@ package kr.hhplus.be.server.application.point
 import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.user.UserService
 import org.springframework.stereotype.Component
+import kr.hhplus.be.server.application.point.PointCriteria.ChargePointCriterion
 
 @Component
 class PointFacade(
@@ -15,9 +16,9 @@ class PointFacade(
         return PointResults.PointResult.of(user, point)
     }
 
-    fun charge(criterion: PointCriteria.ChargePointCriterion): PointResults.ChargePointResult {
-        val user = userService.find(criterion.userId)
-        val point = pointService.charge(criterion.toCommand())
+    fun charge(criterion: ChargePointCriterion): PointResults.ChargePointResult {
+        val user = userService.findUserWithPoint(criterion.userId)
+        val point = pointService.charge(criterion.toCommand(user.point.id))
         return PointResults.ChargePointResult.of(user, point)
     }
 }

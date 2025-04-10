@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.point
 
+import kr.hhplus.be.server.domain.point.PointCommands.PointCommand
 import org.springframework.stereotype.Service
 
 @Service
@@ -10,10 +11,18 @@ class PointService(
         return pointRepository.find(pointId)
     }
 
-    fun charge(command: PointCommands.PointCommand): Point {
+    fun charge(command: PointCommand): Point {
         val point = pointRepository.find(command.pointId)
         point.charge(command.amount)
 
         return pointRepository.update(point)
     }
+
+    fun pay(pointId: Long, amount: Int): Point {
+        val point = pointRepository.find(pointId)
+        point.deduct(amount)
+
+        return pointRepository.update(point)
+    }
+
 }
