@@ -13,7 +13,14 @@ enum class DiscountType(
 class Coupon(
     val id: Long = 0L,
     val user: User,
+    val name: String,
     val discountType: DiscountType,
     val discountValue: Int,
+    var remainingQuantity: Int,
     val expiresAt: LocalDateTime
-)
+) {
+    fun isLessThanZero(): Boolean {
+        return this.remainingQuantity <= 0
+    }
+
+}

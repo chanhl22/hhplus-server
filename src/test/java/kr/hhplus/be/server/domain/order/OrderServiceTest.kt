@@ -37,7 +37,7 @@ class OrderServiceTest {
         val user = UserFixture.create()
         val products = ProductDomainFixture.createProducts()
         val order = Order.create(user, products)
-        val coupon = Coupon(1L, user, DiscountType.AMOUNT, 1000, LocalDateTime.now().plusMonths(1))
+        val coupon = Coupon(1L, user, "1000원 할인 쿠폰", DiscountType.AMOUNT, 1000, 100, LocalDateTime.now().plusMonths(1))
         BDDMockito.given(orderFactory.create(user, products, coupon))
             .willReturn(order)
         BDDMockito.given(orderRepository.save(order))

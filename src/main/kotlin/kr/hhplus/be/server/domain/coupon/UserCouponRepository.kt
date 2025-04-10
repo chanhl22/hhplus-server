@@ -7,4 +7,6 @@ interface UserCouponRepository {
 
     fun findByCouponIdAndUserId(couponId: Long, userId: Long): List<UserCoupon>
 
+    fun save(userCoupon: UserCoupon): UserCoupon
+
 }

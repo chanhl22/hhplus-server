@@ -1,8 +1,6 @@
 package kr.hhplus.be.server.application.order
 
-import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.coupon.CouponService
-import kr.hhplus.be.server.domain.coupon.DiscountType
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderCommands
 import kr.hhplus.be.server.domain.order.OrderService
@@ -17,6 +15,7 @@ import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.domain.product.Stock
 import kr.hhplus.be.server.domain.user.User
 import kr.hhplus.be.server.domain.user.UserService
+import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -27,7 +26,6 @@ import org.mockito.Mockito
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
-import java.time.LocalDateTime
 
 @ExtendWith(MockitoExtension::class)
 class OrderFacadeTest {
@@ -71,7 +69,7 @@ class OrderFacadeTest {
         BDDMockito.given(productService.findAll(productCommand))
             .willReturn(listOf(product1, product2))
 
-        val coupon = Coupon(1L, user, DiscountType.AMOUNT, 1000, LocalDateTime.now().plusMonths(1))
+        val coupon = CouponDomainFixture.create(user = user)
         BDDMockito.given(couponService.find(coupon.id, user.id))
             .willReturn(coupon)
 
