@@ -3,6 +3,9 @@ package kr.hhplus.be.server.interfaces.user
 import jakarta.validation.Valid
 import kr.hhplus.be.server.application.point.PointFacade
 import kr.hhplus.be.server.interfaces.swagger.PointApi
+import kr.hhplus.be.server.interfaces.user.PointRequests.ChargePointRequest
+import kr.hhplus.be.server.interfaces.user.PointResponses.ChargePointResponse
+import kr.hhplus.be.server.interfaces.user.PointResponses.PointResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -17,18 +20,18 @@ class PointController(
     @GetMapping("/point/{id}")
     override fun find(
         @PathVariable id: Long
-    ): PointResponses.PointResponse {
+    ): PointResponse {
         val result = pointFacade.find(id)
-        return PointResponses.PointResponse.from(result)
+        return PointResponse.from(result)
     }
 
     @PatchMapping("/point/{id}/charge")
     override fun charge(
         @PathVariable id: Long,
-        @RequestBody @Valid request: PointRequests.ChargePointRequest
-    ): PointResponses.ChargePointResponse {
+        @RequestBody @Valid request: ChargePointRequest
+    ): ChargePointResponse {
         val result = pointFacade.charge(request.toCriterion(id))
-        return PointResponses.ChargePointResponse.of(result, request.amount)
+        return ChargePointResponse.of(result, request.amount)
     }
 
 }
