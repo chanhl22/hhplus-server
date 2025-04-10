@@ -28,7 +28,7 @@ class OrderFacade(
 
         val coupon = couponService.find(criterion.couponId, user.id)
 
-        val order = orderService.createOrder(OrderCommand.of(user, products, coupon))
+        val order = orderService.order(OrderCommand.of(user, products, coupon))
 
         pointService.pay(user.point.id, order.totalPrice)
         val payment = paymentService.save(PaymentCommand.of(order))
