@@ -7,5 +7,16 @@ class UserCoupon(
     val user: User,
     val coupon: Coupon
 ) {
+    companion object {
+        fun create(
+            user: User,
+            coupon: Coupon
+        ): UserCoupon {
+            return UserCoupon(
+                user = user,
+                coupon = coupon,
+            )
+        }
+    }
 
 }
