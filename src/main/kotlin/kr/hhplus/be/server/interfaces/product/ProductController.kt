@@ -6,6 +6,7 @@ import kr.hhplus.be.server.interfaces.swagger.ProductApi
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
+import kr.hhplus.be.server.interfaces.product.ProductResponses.ProductResponse
 
 @RestController
 class ProductController(
@@ -15,9 +16,9 @@ class ProductController(
     @GetMapping("/product/{id}")
     override fun find(
         @PathVariable id: Long
-    ): ProductResponse.FoundProduct {
+    ): ProductResponse {
         val domain = productService.find(id)
-        return ProductResponse.FoundProduct.from(domain)
+        return ProductResponse.from(domain)
     }
 
     @GetMapping("/products/top")

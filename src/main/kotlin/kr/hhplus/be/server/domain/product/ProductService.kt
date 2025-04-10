@@ -18,13 +18,7 @@ class ProductService(
         return command.products.map { commandProduct ->
             val product = productMap[commandProduct.productId]
                 ?: throw IllegalArgumentException("존재하지 않는 상품입니다. id: ${commandProduct.productId}")
-
-            val stock = product.stock
-            val commandQuantity = commandProduct.quantity
-            if (stock.isQuantityLessThan(commandQuantity)) {
-                throw IllegalArgumentException("재고가 부족한 상품이 있습니다.")
-            }
-
+            product.validateStockEnough(commandProduct.quantity)
             product
         }
     }
