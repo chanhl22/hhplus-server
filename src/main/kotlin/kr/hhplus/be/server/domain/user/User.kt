@@ -1,11 +1,13 @@
 package kr.hhplus.be.server.domain.user
 
+import kr.hhplus.be.server.domain.coupon.UserCoupon
 import kr.hhplus.be.server.domain.point.Point
 
 class User(
     val id: Long,
     val name: String,
-    val point: Point
+    val point: Point,
+    val userCoupons: MutableList<UserCoupon> = mutableListOf()
 ) {
     fun validatePointUsable() {
         if (isEmptyBalance()) {

@@ -1,5 +1,8 @@
 package kr.hhplus.be.server.application.order
 
+import kr.hhplus.be.server.domain.coupon.Coupon
+import kr.hhplus.be.server.domain.coupon.CouponService
+import kr.hhplus.be.server.domain.coupon.DiscountType
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderCommands
 import kr.hhplus.be.server.domain.order.OrderService
@@ -24,6 +27,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import java.time.LocalDateTime
 
 @ExtendWith(MockitoExtension::class)
 class OrderFacadeTest {
@@ -43,11 +47,14 @@ class OrderFacadeTest {
     @Mock
     private lateinit var pointService: PointService
 
+    @Mock
+    private lateinit var couponService: CouponService
+
     @DisplayName("상품을 주문하고 결제한다.")
     @Test
     fun order() {
         //given
-        val orderFacade = OrderFacade(productService, orderService, userService, paymentService, pointService)
+        val orderFacade = OrderFacade(productService, orderService, userService, paymentService, pointService, couponService)
 
         val user = User(1L, "이찬희B", Point(1L, 100000))
         BDDMockito.given(userService.findUserWithPointForOrder(ArgumentMatchers.anyLong()))
@@ -64,8 +71,12 @@ class OrderFacadeTest {
         BDDMockito.given(productService.findAll(productCommand))
             .willReturn(listOf(product1, product2))
 
-        val orderCommand = OrderCommands.OrderCommand.of(user, listOf(product1, product2))
-        val order = Order.create(user, listOf(product1, product2))
+        val coupon = Coupon(1L, user, DiscountType.AMOUNT, 1000, LocalDateTime.now().plusMonths(1))
+        BDDMockito.given(couponService.find(coupon.id, user.id))
+            .willReturn(coupon)
+
+        val orderCommand = OrderCommands.OrderCommand.of(user, listOf(product1, product2), coupon)
+        val order = Order.create(user, listOf(product1, product2), coupon)
         BDDMockito.given(orderService.createOrder(orderCommand))
             .willReturn(order)
 
@@ -83,7 +94,8 @@ class OrderFacadeTest {
             listOf(
                 OrderCriteria.OrderProductCriterion(1L, 2),
                 OrderCriteria.OrderProductCriterion(2L, 1),
-            )
+            ),
+            coupon.id
         )
         orderFacade.order(of)
 
@@ -92,6 +104,8 @@ class OrderFacadeTest {
             .findUserWithPointForOrder(anyLong())
         Mockito.verify(productService, times(1))
             .findAll(productCommand)
+        Mockito.verify(couponService, times(1))
+            .find(coupon.id, user.id)
         Mockito.verify(orderService, times(1))
             .createOrder(orderCommand)
         Mockito.verify(pointService, times(1))

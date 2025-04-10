@@ -10,7 +10,7 @@ class OrderService(
     private val orderFactory: OrderFactory
 ) {
     fun createOrder(command: OrderCommand): Order {
-        val order = orderFactory.create(command.user, command.products)
+        val order = orderFactory.create(command.user, command.products, command.coupon)
         orderRepository.save(order)
         orderProductRepository.saveAll(order.orderProducts)
         return order

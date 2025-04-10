@@ -2,6 +2,7 @@ package kr.hhplus.be.server.application.order
 
 import kr.hhplus.be.server.application.order.OrderCriteria.OrderCriterion
 import kr.hhplus.be.server.application.order.OrderResults.OrderResult
+import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.order.OrderCommands.OrderCommand
 import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.payment.PaymentCommands.PaymentCommand
@@ -17,14 +18,17 @@ class OrderFacade(
     private val orderService: OrderService,
     private val userService: UserService,
     private val paymentService: PaymentService,
-    private val pointService: PointService
+    private val pointService: PointService,
+    private val couponService: CouponService
 ) {
     fun order(criterion: OrderCriterion): OrderResult {
         val user = userService.findUserWithPointForOrder(criterion.userId)
 
         val products = productService.findAll(criterion.toProductCommand())
 
-        val order = orderService.createOrder(OrderCommand.of(user, products))
+        val coupon = couponService.find(criterion.couponId, user.id)
+
+        val order = orderService.createOrder(OrderCommand.of(user, products, coupon))
 
         pointService.pay(user.point.id, order.totalPrice)
         val payment = paymentService.save(PaymentCommand.of(order))

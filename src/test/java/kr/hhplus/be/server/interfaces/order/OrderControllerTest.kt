@@ -37,7 +37,8 @@ class OrderControllerTest {
             listOf(
                 OrderProductCriterion(1, 2),
                 OrderProductCriterion(2, 1)
-            )
+            ),
+            1L
         )
 
         val fakeResult = OrderResultFixture.create()

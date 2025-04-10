@@ -6,11 +6,12 @@ import kr.hhplus.be.server.domain.product.ProductCommands.ProductsCommand
 class OrderCriteria {
     data class OrderCriterion(
         val userId: Long,
-        val products: List<OrderProductCriterion>
+        val products: List<OrderProductCriterion>,
+        val couponId: Long
     ) {
         companion object {
-            fun of(userId: Long, products: List<OrderProductCriterion>): OrderCriterion {
-                return OrderCriterion(userId, products)
+            fun of(userId: Long, products: List<OrderProductCriterion>, couponId: Long): OrderCriterion {
+                return OrderCriterion(userId, products, couponId)
             }
         }
 

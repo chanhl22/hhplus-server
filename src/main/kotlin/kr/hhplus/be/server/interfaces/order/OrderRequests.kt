@@ -7,7 +7,8 @@ import kr.hhplus.be.server.application.order.OrderCriteria.OrderProductCriterion
 class OrderRequests {
     data class OrderRequest(
         val userId: Long,
-        val products: List<OrderProductRequest>
+        val products: List<OrderProductRequest>,
+        val couponId: Long
     ) {
         fun toCriterion(): OrderCriterion {
             return OrderCriterion.of(
@@ -17,7 +18,8 @@ class OrderRequests {
                         productId = product.productId,
                         quantity = product.quantity
                     )
-                }
+                },
+                couponId = couponId
             )
         }
     }
