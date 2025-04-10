@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.coupon.request
+package kr.hhplus.be.server.interfaces.coupon.request
 
 data class FirstComeCouponRequest(
     val userId: Long,

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.swagger
+package kr.hhplus.be.server.interfaces.swagger
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.coupon.request.FirstComeCouponRequest
-import kr.hhplus.be.server.coupon.response.CouponsResponse
-import kr.hhplus.be.server.coupon.response.FirstComeCouponResponse
+import kr.hhplus.be.server.interfaces.coupon.request.FirstComeCouponRequest
+import kr.hhplus.be.server.interfaces.coupon.response.CouponsResponse
+import kr.hhplus.be.server.interfaces.coupon.response.FirstComeCouponResponse
 
 @Tag(name = "Coupon API", description = "쿠폰 API")
 interface CouponApi {

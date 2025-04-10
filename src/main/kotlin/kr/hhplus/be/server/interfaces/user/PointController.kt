@@ -2,7 +2,7 @@ package kr.hhplus.be.server.interfaces.user
 
 import jakarta.validation.Valid
 import kr.hhplus.be.server.application.point.PointFacade
-import kr.hhplus.be.server.swagger.PointApi
+import kr.hhplus.be.server.interfaces.swagger.PointApi
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable

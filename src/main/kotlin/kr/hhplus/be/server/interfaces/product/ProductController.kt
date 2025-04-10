@@ -2,7 +2,7 @@ package kr.hhplus.be.server.interfaces.product
 
 import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.interfaces.product.response.TopSellingProductResponse
-import kr.hhplus.be.server.swagger.ProductApi
+import kr.hhplus.be.server.interfaces.swagger.ProductApi
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController

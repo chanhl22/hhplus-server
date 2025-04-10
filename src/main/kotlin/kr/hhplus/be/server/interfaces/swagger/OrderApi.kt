@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.swagger
+package kr.hhplus.be.server.interfaces.swagger
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content

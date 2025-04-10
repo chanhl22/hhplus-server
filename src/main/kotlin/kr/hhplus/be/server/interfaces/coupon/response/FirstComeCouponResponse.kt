@@ -1,13 +1,13 @@
-package kr.hhplus.be.server.coupon.response
+package kr.hhplus.be.server.interfaces.coupon.response
 
 import java.time.LocalDateTime
 
-data class CouponsResponse(
+data class FirstComeCouponResponse(
+    val success: Boolean,
     val couponId: Long,
     val name: String,
     val discountType: String,
     val discountValue: Int,
     val expiresAt: LocalDateTime,
     val issuedAt: LocalDateTime,
-    val isUsed: Boolean
 )

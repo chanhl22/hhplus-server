@@ -1,10 +1,10 @@
-package kr.hhplus.be.server.coupon
+package kr.hhplus.be.server.interfaces.coupon
 
 import jakarta.validation.Valid
-import kr.hhplus.be.server.coupon.request.FirstComeCouponRequest
-import kr.hhplus.be.server.coupon.response.CouponsResponse
-import kr.hhplus.be.server.coupon.response.FirstComeCouponResponse
-import kr.hhplus.be.server.swagger.CouponApi
+import kr.hhplus.be.server.interfaces.coupon.request.FirstComeCouponRequest
+import kr.hhplus.be.server.interfaces.coupon.response.CouponsResponse
+import kr.hhplus.be.server.interfaces.coupon.response.FirstComeCouponResponse
+import kr.hhplus.be.server.interfaces.swagger.CouponApi
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping

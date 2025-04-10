@@ -1,8 +1,7 @@
 package kr.hhplus.be.server.interfaces.coupon
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.coupon.CouponController
-import kr.hhplus.be.server.coupon.request.FirstComeCouponRequest
+import kr.hhplus.be.server.interfaces.coupon.request.FirstComeCouponRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

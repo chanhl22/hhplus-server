@@ -3,7 +3,7 @@ package kr.hhplus.be.server.interfaces.order
 import kr.hhplus.be.server.application.order.OrderFacade
 import kr.hhplus.be.server.interfaces.order.OrderRequests.OrderRequest
 import kr.hhplus.be.server.interfaces.order.OrderResponses.OrderResponse
-import kr.hhplus.be.server.swagger.OrderApi
+import kr.hhplus.be.server.interfaces.swagger.OrderApi
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
