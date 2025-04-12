@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.hhplus.be.server.interfaces.product.ProductResponses.ProductResponse
-import kr.hhplus.be.server.interfaces.product.response.TopSellingProductResponse
+import kr.hhplus.be.server.interfaces.product.ProductResponses.TopSellingProductResponse
 
 @Tag(name = "Product API", description = "상품 API")
 interface ProductApi {

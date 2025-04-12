@@ -1,16 +1,21 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.fixture.product.ProductCommandFixture
+import kr.hhplus.be.server.fixture.product.ProductDomainFixture
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyList
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.BDDMockito
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.anyLong
+
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
 
 @ExtendWith(MockitoExtension::class)
 class ProductServiceTest {
@@ -18,14 +23,18 @@ class ProductServiceTest {
     @Mock
     private lateinit var productRepository: ProductRepository
 
+    @Mock
+    private lateinit var productStatisticsRepository: ProductStatisticsRepository
+
+    @InjectMocks
+    private lateinit var productService: ProductService
+
     @DisplayName("상품을 조회한다.")
     @Test
     fun find() {
         //given
-        val productService = ProductService(productRepository)
-
-        val product = Product(1L, "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰. 최대 20시간 사용 가능.", Stock(1L, 25))
-        BDDMockito.given(productRepository.find(ArgumentMatchers.anyLong()))
+        val product = ProductDomainFixture.create()
+        BDDMockito.given(productRepository.find(anyLong()))
             .willReturn(product)
 
         //when
@@ -43,25 +52,33 @@ class ProductServiceTest {
     @Test
     fun findAll() {
         //given
-        val productService = ProductService(productRepository)
-
-        val product1 = Product(1L, "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", Stock(1L, 25))
-        val product2 = Product(2L, "무선 키보드", 375000, "적축 키보드.", Stock(2L, 10))
-        BDDMockito.given(productRepository.findAllWithStockByIdIn(listOf(1L, 2L)))
-            .willReturn(listOf(product1, product2))
+        val products = ProductDomainFixture.createProducts()
+        BDDMockito.given(productRepository.findAllWithStockByIdIn(any()))
+            .willReturn(products)
 
         //when
-        val productCommand = ProductCommands.ProductsCommand.of(
-            listOf(
-                ProductCommands.ProductCommand(1L, 2),
-                ProductCommands.ProductCommand(2L, 1),
-            )
-        )
+        val productCommand = ProductCommandFixture.createProducts()
         productService.findAll(productCommand)
 
         //then
         Mockito.verify(productRepository, times(1))
-            .findAllWithStockByIdIn(listOf(1L, 2L))
+            .findAllWithStockByIdIn(anyList())
+    }
+
+    @DisplayName("최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회한다.")
+    @Test
+    fun findTopSellingProducts() {
+        //given
+        val productsStatistics = ProductDomainFixture.createProductsStatistics()
+        BDDMockito.given(productStatisticsRepository.findAllByCreatedAtBetween(any(), any()))
+            .willReturn(productsStatistics)
+
+        //when
+        productService.findTopSellingProducts()
+
+        //then
+        Mockito.verify(productStatisticsRepository, times(1))
+            .findAllByCreatedAtBetween(any(), any())
     }
 
 }

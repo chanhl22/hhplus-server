@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.interfaces.product
 
 import kr.hhplus.be.server.domain.product.Product
+import kr.hhplus.be.server.domain.product.ProductDomains.ProductSalesInfo
 
 @Suppress("unused")
 class ProductResponses {
@@ -23,4 +24,29 @@ class ProductResponses {
             }
         }
     }
+
+    data class TopSellingProductResponse(
+        val rank: Int,
+        val productId: Long,
+        val name: String,
+        val price: Int,
+        val soldQuantity: Int,
+        val stock: Int
+    ) {
+        companion object {
+            fun from(info: ProductSalesInfo): TopSellingProductResponse {
+                val product = info.product
+                val stock = product.stock
+                return TopSellingProductResponse(
+                    rank = info.rank,
+                    productId = product.id,
+                    name = product.name,
+                    price = product.price,
+                    soldQuantity = info.totalSales,
+                    stock = stock.quantity
+                )
+            }
+        }
+    }
+
 }

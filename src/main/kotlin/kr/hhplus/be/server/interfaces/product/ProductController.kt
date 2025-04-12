@@ -1,12 +1,12 @@
 package kr.hhplus.be.server.interfaces.product
 
 import kr.hhplus.be.server.domain.product.ProductService
-import kr.hhplus.be.server.interfaces.product.response.TopSellingProductResponse
+import kr.hhplus.be.server.interfaces.product.ProductResponses.ProductResponse
+import kr.hhplus.be.server.interfaces.product.ProductResponses.TopSellingProductResponse
 import kr.hhplus.be.server.interfaces.swagger.ProductApi
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
-import kr.hhplus.be.server.interfaces.product.ProductResponses.ProductResponse
 
 @RestController
 class ProductController(
@@ -23,10 +23,13 @@ class ProductController(
 
     @GetMapping("/products/top")
     override fun findTopSellingProducts(): List<TopSellingProductResponse> {
-        return listOf(
-            TopSellingProductResponse(1, 10L, "무선 블루투스 이어폰", 129000, 350, 25),
-            TopSellingProductResponse(2, 5L, "게이밍 키보드", 89000, 280, 50),
-        )
+        val domain = productService.findTopSellingProducts()
+        return domain.map { product -> TopSellingProductResponse.from(product) }
+
+//        return listOf(
+//            TopSellingProductResponse(1, 10L, "무선 블루투스 이어폰", 129000, 350, 25),
+//            TopSellingProductResponse(2, 5L, "게이밍 키보드", 89000, 280, 50),
+//        )
     }
 
 }
