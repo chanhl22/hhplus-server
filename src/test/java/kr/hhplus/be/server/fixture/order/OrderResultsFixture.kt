@@ -4,6 +4,7 @@ import kr.hhplus.be.server.application.order.OrderResults
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderProduct
 import kr.hhplus.be.server.domain.payment.Payment
+import kr.hhplus.be.server.domain.payment.PaymentStatus
 import kr.hhplus.be.server.domain.point.Point
 import kr.hhplus.be.server.domain.user.User
 import java.time.LocalDateTime
@@ -44,6 +45,7 @@ object OrderResultFixture {
                 id = paymentId,
                 order = order,
                 amount = paymentAmount,
+                paymentStatus = PaymentStatus.SUCCEEDED
             )
         )
     }
