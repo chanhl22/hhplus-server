@@ -19,4 +19,5 @@ class CouponCriteria {
             return IssueCouponCommand.of(user, couponId)
         }
     }
+
 }

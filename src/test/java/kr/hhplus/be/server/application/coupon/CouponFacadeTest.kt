@@ -2,6 +2,7 @@ package kr.hhplus.be.server.application.coupon
 
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.user.UserService
+import kr.hhplus.be.server.fixture.coupon.CouponCriterionFixture
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import kr.hhplus.be.server.fixture.user.UserFixture
 import org.junit.jupiter.api.DisplayName
@@ -37,11 +38,11 @@ class CouponFacadeTest {
             .willReturn(user)
 
         val coupon = CouponDomainFixture.create()
-        val couponCriterion = CouponCriteria.CouponCriterion.of(user.id, coupon.id)
         BDDMockito.given(couponService.issueCoupon(any()))
             .willReturn(coupon)
 
         //when
+        val couponCriterion = CouponCriterionFixture.create()
         orderFacade.issueCouponFirstCome(couponCriterion)
 
         //then
