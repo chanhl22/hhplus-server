@@ -15,7 +15,7 @@ class OrderResponses {
                 return OrderResponse(
                     orderId = orderResult.order.id,
                     totalAmount = orderResult.order.totalPrice,
-                    paymentId = orderResult.payment.id,
+                    paymentId = orderResult.payment.id!!,
                     remainBalance = orderResult.user.point.balance
                 )
             }

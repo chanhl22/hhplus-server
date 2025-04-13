@@ -30,8 +30,10 @@ class OrderFacade(
 
         val order = orderService.order(OrderCommand.of(user, products, coupon))
 
-        pointService.pay(user.point.id, order.totalPrice)
-        val payment = paymentService.save(PaymentCommand.of(order))
+        val payment = paymentService.process(PaymentCommand.of(user, order))
+        if (payment.isSuccess()) {
+            pointService.pay(user.point.id, order.totalPrice)
+        }
 
         return OrderResult.of(user, order, payment)
     }

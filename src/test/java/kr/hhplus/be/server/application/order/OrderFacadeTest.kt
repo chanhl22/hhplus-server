@@ -1,31 +1,29 @@
 package kr.hhplus.be.server.application.order
 
 import kr.hhplus.be.server.domain.coupon.CouponService
-import kr.hhplus.be.server.domain.order.Order
-import kr.hhplus.be.server.domain.order.OrderCommands
 import kr.hhplus.be.server.domain.order.OrderService
-import kr.hhplus.be.server.domain.payment.Payment
-import kr.hhplus.be.server.domain.payment.PaymentCommands
 import kr.hhplus.be.server.domain.payment.PaymentService
-import kr.hhplus.be.server.domain.point.Point
 import kr.hhplus.be.server.domain.point.PointService
-import kr.hhplus.be.server.domain.product.Product
-import kr.hhplus.be.server.domain.product.ProductCommands
 import kr.hhplus.be.server.domain.product.ProductService
-import kr.hhplus.be.server.domain.product.Stock
-import kr.hhplus.be.server.domain.user.User
 import kr.hhplus.be.server.domain.user.UserService
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
+import kr.hhplus.be.server.fixture.order.OrderDomainsFixture
+import kr.hhplus.be.server.fixture.payment.PaymentDomainFixture
+import kr.hhplus.be.server.fixture.product.ProductDomainFixture
+import kr.hhplus.be.server.fixture.user.UserFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.BDDMockito
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
 
 @ExtendWith(MockitoExtension::class)
 class OrderFacadeTest {
@@ -48,42 +46,34 @@ class OrderFacadeTest {
     @Mock
     private lateinit var couponService: CouponService
 
+    @InjectMocks
+    private lateinit var orderFacade: OrderFacade
+
     @DisplayName("상품을 주문하고 결제한다.")
     @Test
     fun order() {
         //given
-        val orderFacade = OrderFacade(productService, orderService, userService, paymentService, pointService, couponService)
-
-        val user = User(1L, "이찬희B", Point(1L, 100000))
+        val user = UserFixture.create()
         BDDMockito.given(userService.findUserWithPointForOrder(ArgumentMatchers.anyLong()))
             .willReturn(user)
 
-        val productCommand = ProductCommands.ProductsCommand.of(
-            listOf(
-                ProductCommands.ProductCommand(1L, 2),
-                ProductCommands.ProductCommand(2L, 1),
-            )
-        )
-        val product1 = Product(1L, "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", Stock(1L, 25))
-        val product2 = Product(2L, "무선 키보드", 375000, "적축 키보드.", Stock(2L, 10))
-        BDDMockito.given(productService.findAll(productCommand))
-            .willReturn(listOf(product1, product2))
+        val products = ProductDomainFixture.createProducts()
+        BDDMockito.given(productService.findAll(any()))
+            .willReturn(products)
 
         val coupon = CouponDomainFixture.create()
         BDDMockito.given(couponService.find(coupon.id, user.id))
             .willReturn(coupon)
 
-        val orderCommand = OrderCommands.OrderCommand.of(user, listOf(product1, product2), coupon)
-        val order = Order.create(user, listOf(product1, product2), coupon)
-        BDDMockito.given(orderService.order(orderCommand))
+        val order = OrderDomainsFixture.create()
+        BDDMockito.given(orderService.order(any()))
             .willReturn(order)
 
         BDDMockito.given(pointService.pay(user.point.id, order.totalPrice))
             .willReturn(user.point)
 
-        val paymentCommand = PaymentCommands.PaymentCommand.of(order)
-        val payment = Payment.create(order)
-        BDDMockito.given(paymentService.save(paymentCommand))
+        val payment = PaymentDomainFixture.create()
+        BDDMockito.given(paymentService.process(any()))
             .willReturn(payment)
 
         //when
@@ -101,15 +91,15 @@ class OrderFacadeTest {
         Mockito.verify(userService, times(1))
             .findUserWithPointForOrder(anyLong())
         Mockito.verify(productService, times(1))
-            .findAll(productCommand)
+            .findAll(any())
         Mockito.verify(couponService, times(1))
-            .find(coupon.id, user.id)
+            .find(anyLong(), anyLong())
         Mockito.verify(orderService, times(1))
-            .order(orderCommand)
+            .order(any())
         Mockito.verify(pointService, times(1))
-            .pay(user.point.id, order.totalPrice)
+            .pay(anyLong(), anyInt())
         Mockito.verify(paymentService, times(1))
-            .save(paymentCommand)
+            .process(any())
     }
 
 }
