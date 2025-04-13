@@ -7,10 +7,6 @@ import java.time.LocalDateTime
 
 object CouponResultFixture {
     fun create(
-        userId: Long = 1L,
-        username: String = "이찬희B",
-        pointId: Long = 1L,
-        balance: Int = 100000,
         couponId: Long = 1L,
         name: String = "1000원 할인 쿠폰",
         discountType: DiscountType = DiscountType.AMOUNT,

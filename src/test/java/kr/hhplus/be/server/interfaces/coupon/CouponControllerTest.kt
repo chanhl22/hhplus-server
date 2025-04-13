@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.interfaces.coupon
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.application.coupon.CouponCriteria.CouponCriterion
 import kr.hhplus.be.server.application.coupon.CouponFacade
+import kr.hhplus.be.server.fixture.coupon.CouponCriterionFixture
 import kr.hhplus.be.server.fixture.coupon.CouponResultFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -33,11 +33,11 @@ class CouponControllerTest {
     @Test
     fun issueCouponFirstCome() {
         //given
-        val request = CouponCriterion(1L, 1L)
+        val request = CouponCriterionFixture.create()
 
-        val fakeResult = CouponResultFixture.create()
+        val result = CouponResultFixture.create()
         BDDMockito.given(couponFacade.issueCouponFirstCome(any()))
-            .willReturn(fakeResult)
+            .willReturn(result)
 
         //when //then
         mockMvc.perform(
