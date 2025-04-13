@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
-import kr.hhplus.be.server.fixture.user.UserFixture
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -15,8 +14,7 @@ class CouponTest {
     @Test
     fun publish() {
         //given
-        val user = UserFixture.create()
-        val coupon = CouponDomainFixture.create(user = user)
+        val coupon = CouponDomainFixture.create()
 
         //when //then
         assertThatCode { coupon.publish() }
@@ -27,8 +25,7 @@ class CouponTest {
     @Test
     fun isSoldOut() {
         //given
-        val user = UserFixture.create()
-        val coupon = CouponDomainFixture.create(user = user, remainingQuantity = 0)
+        val coupon = CouponDomainFixture.create(remainingQuantity = 0)
 
         //when //then
         assertThatThrownBy { coupon.publish() }
@@ -40,8 +37,7 @@ class CouponTest {
     @Test
     fun isExpired() {
         //given
-        val user = UserFixture.create()
-        val coupon = CouponDomainFixture.create(user = user, expiresAt = LocalDateTime.now().minusDays(1))
+        val coupon = CouponDomainFixture.create(expiresAt = LocalDateTime.now().minusDays(1))
 
         //when //then
         assertThatThrownBy { coupon.publish() }
@@ -53,8 +49,7 @@ class CouponTest {
     @Test
     fun deduct() {
         //given
-        val user = UserFixture.create()
-        val coupon = CouponDomainFixture.create(user = user, remainingQuantity = 10)
+        val coupon = CouponDomainFixture.create(remainingQuantity = 10)
 
         //when
         coupon.deduct()
@@ -67,8 +62,7 @@ class CouponTest {
     @Test
     fun deductIfSoldOut() {
         //given
-        val user = UserFixture.create()
-        val coupon = CouponDomainFixture.create(user = user, remainingQuantity = 0)
+        val coupon = CouponDomainFixture.create(remainingQuantity = 0)
 
         //when //then
         assertThatThrownBy { coupon.publish() }
