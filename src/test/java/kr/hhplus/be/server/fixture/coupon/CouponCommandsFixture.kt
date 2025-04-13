@@ -4,8 +4,8 @@ import kr.hhplus.be.server.domain.coupon.CouponCommands.IssueCouponCommand
 import kr.hhplus.be.server.domain.user.User
 import kr.hhplus.be.server.fixture.user.UserFixture
 
-object CouponCommandsFixture {
-    fun createIssueCouponCommand(
+object IssueCouponCommandFixture {
+    fun create(
         user: User = UserFixture.create(),
         couponId: Long = 1L
     ): IssueCouponCommand {

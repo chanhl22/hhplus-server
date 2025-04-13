@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.coupon
 
-import kr.hhplus.be.server.fixture.coupon.CouponCommandsFixture
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
+import kr.hhplus.be.server.fixture.coupon.IssueCouponCommandFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -58,7 +58,7 @@ class CouponServiceTest {
             .willReturn(userCoupon)
 
         //when
-        val command = CouponCommandsFixture.createIssueCouponCommand()
+        val command = IssueCouponCommandFixture.create()
         couponService.issueCoupon(command)
 
         //then
