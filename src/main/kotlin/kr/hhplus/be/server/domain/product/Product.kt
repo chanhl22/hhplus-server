@@ -6,4 +6,10 @@ class Product(
     val price: Int,
     val description: String,
     val stock: Stock
-)
+) {
+    fun validateStockEnough(orderQuantity: Int) {
+        if (this.stock.isQuantityLessThan(orderQuantity)) {
+            throw IllegalArgumentException("재고가 부족한 상품이 있습니다. id: $id")
+        }
+    }
+}

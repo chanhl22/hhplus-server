@@ -75,7 +75,7 @@ class OrderFacadeTest {
 
         val orderCommand = OrderCommands.OrderCommand.of(user, listOf(product1, product2), coupon)
         val order = Order.create(user, listOf(product1, product2), coupon)
-        BDDMockito.given(orderService.createOrder(orderCommand))
+        BDDMockito.given(orderService.order(orderCommand))
             .willReturn(order)
 
         BDDMockito.given(pointService.pay(user.point.id, order.totalPrice))
@@ -105,7 +105,7 @@ class OrderFacadeTest {
         Mockito.verify(couponService, times(1))
             .find(coupon.id, user.id)
         Mockito.verify(orderService, times(1))
-            .createOrder(orderCommand)
+            .order(orderCommand)
         Mockito.verify(pointService, times(1))
             .pay(user.point.id, order.totalPrice)
         Mockito.verify(paymentService, times(1))

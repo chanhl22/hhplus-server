@@ -7,11 +7,13 @@ object UserFixture {
     fun create(
         userId: Long = 1L,
         name: String = "이찬희B",
+        pointId: Long = 1L,
+        balance: Int = 100000
     ): User {
         return User(
             id = userId,
             name = name,
-            point = Point(1L, 100000)
+            point = Point(pointId, balance)
         )
     }
 

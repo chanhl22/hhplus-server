@@ -30,7 +30,7 @@ class OrderServiceTest {
 
     @DisplayName("주문을 생성한다.")
     @Test
-    fun createOrder() {
+    fun order() {
         //given
         val orderService = OrderService(orderRepository, orderProductRepository, orderFactory)
 
@@ -49,7 +49,7 @@ class OrderServiceTest {
 
         //when
         val orderCommand = OrderCommandFixture.create(user, products, coupon)
-        val result = orderService.createOrder(orderCommand)
+        val result = orderService.order(orderCommand)
 
         //then
         assertThat(result)
