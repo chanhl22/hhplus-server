@@ -3,8 +3,6 @@ package kr.hhplus.be.server.fixture.coupon
 import kr.hhplus.be.server.application.coupon.CouponResults.CouponResult
 import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.coupon.DiscountType
-import kr.hhplus.be.server.domain.point.Point
-import kr.hhplus.be.server.domain.user.User
 import java.time.LocalDateTime
 
 object CouponResultFixture {
@@ -22,14 +20,6 @@ object CouponResultFixture {
     ): CouponResult {
         val coupon = Coupon(
             id = couponId,
-            user = User(
-                id = userId,
-                name = username,
-                point = Point(
-                    id = pointId,
-                    balance = balance
-                )
-            ),
             name = name,
             discountType = discountType,
             discountValue = discountValue,

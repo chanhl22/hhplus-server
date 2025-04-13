@@ -10,22 +10,23 @@ import java.time.LocalDateTime
 object CouponDomainFixture {
     fun create(
         couponId: Long = 1L,
-        user: User = UserFixture.create(),
+        userCoupons: List<UserCoupon> = emptyList(),
         name: String = "1000원 할인 쿠폰",
         discountType: DiscountType = DiscountType.AMOUNT,
         discountValue: Int = 1000,
         remainingQuantity: Int = 20,
         expiresAt: LocalDateTime = LocalDateTime.now().plusMonths(1)
     ): Coupon {
-        return Coupon(
+        val coupon = Coupon(
             id = couponId,
-            user = user,
             name = name,
             discountType = discountType,
             discountValue = discountValue,
             remainingQuantity = remainingQuantity,
             expiredAt = expiresAt
         )
+        userCoupons.map { userCoupon -> coupon.userCoupons.add(userCoupon) }
+        return coupon
     }
 
     fun createUserCoupon(
@@ -33,11 +34,12 @@ object CouponDomainFixture {
         user: User = UserFixture.create(),
         coupon: Coupon = create()
     ): UserCoupon {
-        return UserCoupon(
+        val userCoupon = UserCoupon(
             id = userCouponId,
-            user = user,
-            coupon = coupon
+            user = user
         )
+        userCoupon.changeCoupon(coupon)
+        return userCoupon
     }
 
 }

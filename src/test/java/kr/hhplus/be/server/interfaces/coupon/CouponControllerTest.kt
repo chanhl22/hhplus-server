@@ -7,6 +7,7 @@ import kr.hhplus.be.server.fixture.coupon.CouponResultFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
+import org.mockito.kotlin.any
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
@@ -35,7 +36,7 @@ class CouponControllerTest {
         val request = CouponCriterion(1L, 1L)
 
         val fakeResult = CouponResultFixture.create()
-        BDDMockito.given(couponFacade.issueCouponFirstCome(request))
+        BDDMockito.given(couponFacade.issueCouponFirstCome(any()))
             .willReturn(fakeResult)
 
         //when //then

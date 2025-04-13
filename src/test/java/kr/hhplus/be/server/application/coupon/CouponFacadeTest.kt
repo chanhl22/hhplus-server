@@ -1,20 +1,20 @@
 package kr.hhplus.be.server.application.coupon
 
 import kr.hhplus.be.server.domain.coupon.CouponService
-import kr.hhplus.be.server.domain.point.Point
-import kr.hhplus.be.server.domain.user.User
 import kr.hhplus.be.server.domain.user.UserService
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
+import kr.hhplus.be.server.fixture.user.UserFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
 
 @ExtendWith(MockitoExtension::class)
 class CouponFacadeTest {
@@ -25,19 +25,20 @@ class CouponFacadeTest {
     @Mock
     private lateinit var userService: UserService
 
+    @InjectMocks
+    private lateinit var orderFacade: CouponFacade
+
     @DisplayName("선착순 쿠폰을 발급한다.")
     @Test
     fun issueCouponFirstCome() {
         //given
-        val orderFacade = CouponFacade(couponService, userService)
-
-        val user = User(1L, "이찬희B", Point(1L, 100000))
-        BDDMockito.given(userService.find(ArgumentMatchers.anyLong()))
+        val user = UserFixture.create()
+        BDDMockito.given(userService.find(anyLong()))
             .willReturn(user)
 
-        val coupon = CouponDomainFixture.create(user = user)
+        val coupon = CouponDomainFixture.create()
         val couponCriterion = CouponCriteria.CouponCriterion.of(user.id, coupon.id)
-        BDDMockito.given(couponService.issueCoupon(couponCriterion.toCommand(user)))
+        BDDMockito.given(couponService.issueCoupon(any()))
             .willReturn(coupon)
 
         //when
@@ -47,7 +48,7 @@ class CouponFacadeTest {
         Mockito.verify(userService, times(1))
             .find(anyLong())
         Mockito.verify(couponService, times(1))
-            .issueCoupon(couponCriterion.toCommand(user))
+            .issueCoupon(any())
     }
 
 }

@@ -12,7 +12,7 @@ enum class DiscountType(
 
 class Coupon(
     val id: Long = 0L,
-    val user: User,
+    val userCoupons: MutableList<UserCoupon> = mutableListOf(),
     val name: String,
     val discountType: DiscountType,
     val discountValue: Int,

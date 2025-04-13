@@ -69,7 +69,7 @@ class OrderFacadeTest {
         BDDMockito.given(productService.findAll(productCommand))
             .willReturn(listOf(product1, product2))
 
-        val coupon = CouponDomainFixture.create(user = user)
+        val coupon = CouponDomainFixture.create()
         BDDMockito.given(couponService.find(coupon.id, user.id))
             .willReturn(coupon)
 
