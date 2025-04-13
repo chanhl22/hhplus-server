@@ -17,10 +17,33 @@ class Coupon(
     val discountType: DiscountType,
     val discountValue: Int,
     var remainingQuantity: Int,
-    val expiresAt: LocalDateTime
+    val expiredAt: LocalDateTime
 ) {
-    fun isLessThanZero(): Boolean {
+    fun publish(): Coupon {
+        if (isSoldOut()) {
+            throw IllegalStateException("쿠폰이 모두 소진되었습니다.")
+        }
+
+        if (isExpired()) {
+            throw IllegalStateException("쿠폰이 만료되었습니다.")
+        }
+
+        return this
+    }
+
+    fun deduct() {
+        if (isSoldOut()) {
+            throw IllegalStateException("쿠폰이 모두 소진되었습니다.")
+        }
+        remainingQuantity -= 1
+    }
+
+    private fun isSoldOut(): Boolean {
         return this.remainingQuantity <= 0
+    }
+
+    private fun isExpired(): Boolean {
+        return expiredAt.isBefore(LocalDateTime.now())
     }
 
 }

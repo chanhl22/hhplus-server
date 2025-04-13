@@ -16,13 +16,8 @@ class CouponService(
     }
 
     fun issueCoupon(command: IssueCouponCommand): Coupon {
-        val coupon = couponRepository.find(command.couponId)
-
-        if (coupon.isLessThanZero()) {
-            throw IllegalStateException("쿠폰이 모두 소진되었습니다.")
-        }
-
-        coupon.remainingQuantity -= 1
+        val coupon = couponRepository.find(command.couponId).publish()
+        coupon.deduct()
         couponRepository.save(coupon)
         userCouponRepository.save(couponFactory.create(command.user, coupon))
         return coupon

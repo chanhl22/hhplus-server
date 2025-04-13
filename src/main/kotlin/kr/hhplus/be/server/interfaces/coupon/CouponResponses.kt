@@ -19,7 +19,7 @@ class CouponResponses {
                     name = result.coupon.name,
                     discountType = result.coupon.name,
                     discountValue = result.coupon.discountValue,
-                    expiresAt = result.coupon.expiresAt
+                    expiresAt = result.coupon.expiredAt
                 )
             }
         }

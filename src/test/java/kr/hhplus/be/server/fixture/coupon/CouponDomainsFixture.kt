@@ -22,7 +22,7 @@ object CouponDomainFixture {
             discountType = discountType,
             discountValue = discountValue,
             remainingQuantity = remainingQuantity,
-            expiresAt = expiresAt
+            expiredAt = expiresAt
         )
     }
 

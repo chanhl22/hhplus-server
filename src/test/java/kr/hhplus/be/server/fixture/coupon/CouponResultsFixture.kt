@@ -34,7 +34,7 @@ object CouponResultFixture {
             discountType = discountType,
             discountValue = discountValue,
             remainingQuantity = remainingQuantity,
-            expiresAt = expiresAt
+            expiredAt = expiresAt
         )
 
         return CouponResult(
