@@ -31,11 +31,16 @@ class Coupon(
         return this
     }
 
-    fun deduct() {
+    fun deduct(): Coupon {
         if (isSoldOut()) {
             throw IllegalStateException("쿠폰이 모두 소진되었습니다.")
         }
         remainingQuantity -= 1
+        return this
+    }
+
+    fun issueTo(user: User): UserCoupon {
+        return UserCoupon.create(user, this)
     }
 
     private fun isSoldOut(): Boolean {
