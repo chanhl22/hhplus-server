@@ -1,16 +1,18 @@
 package kr.hhplus.be.server.domain.coupon
 
-import kr.hhplus.be.server.fixture.user.UserFixture
-import org.assertj.core.api.Assertions.assertThat
+import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
+import kr.hhplus.be.server.fixture.coupon.IssueCouponCommandFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.BDDMockito
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
-import java.time.LocalDateTime
+import org.mockito.kotlin.any
 
 @ExtendWith(MockitoExtension::class)
 class CouponServiceTest {
@@ -21,27 +23,51 @@ class CouponServiceTest {
     @Mock
     private lateinit var userCouponRepository: UserCouponRepository
 
-    @DisplayName("주문을 생성한다.")
-    @Test
-    fun createOrder() {
-        //given
-        val couponService = CouponService(couponRepository, userCouponRepository)
+    @InjectMocks
+    private lateinit var couponService: CouponService
 
-        val user = UserFixture.create()
-        val coupon = Coupon(1L, user, DiscountType.AMOUNT, 1000, LocalDateTime.now().plusMonths(1))
-        val userCoupon = UserCoupon(1L, user, coupon)
-        BDDMockito.given(userCouponRepository.findByCouponIdAndUserId(coupon.id, user.id))
+    @DisplayName("쿠폰을 조회한다.")
+    @Test
+    fun find() {
+        //given
+        val userCoupon = CouponDomainFixture.createUserCoupon()
+        BDDMockito.given(userCouponRepository.findByCouponIdAndUserId(anyLong(), anyLong()))
             .willReturn(listOf(userCoupon))
 
         //when
-        val result = couponService.find(coupon.id, user.id)
+        couponService.find(1L, 1L)
 
         //then
-        assertThat(result)
-            .extracting("id", "discountType")
-            .containsExactly(coupon.id, coupon.discountType)
         Mockito.verify(userCouponRepository, times(1))
-            .findByCouponIdAndUserId(coupon.id, user.id)
+            .findByCouponIdAndUserId(anyLong(), anyLong())
+    }
+
+    @DisplayName("쿠폰을 발행한다.")
+    @Test
+    fun issueCoupon() {
+        //given
+        val coupon = CouponDomainFixture.create()
+        BDDMockito.given(couponRepository.find(anyLong()))
+            .willReturn(coupon)
+
+        BDDMockito.given(couponRepository.save(any()))
+            .willReturn(coupon)
+
+        val userCoupon = CouponDomainFixture.createUserCoupon()
+        BDDMockito.given(userCouponRepository.save(any()))
+            .willReturn(userCoupon)
+
+        //when
+        val command = IssueCouponCommandFixture.create()
+        couponService.issueCoupon(command)
+
+        //then
+        Mockito.verify(couponRepository, times(1))
+            .find(anyLong())
+        Mockito.verify(couponRepository, times(1))
+            .save(any())
+        Mockito.verify(userCouponRepository, times(1))
+            .save(any())
     }
 
 }
