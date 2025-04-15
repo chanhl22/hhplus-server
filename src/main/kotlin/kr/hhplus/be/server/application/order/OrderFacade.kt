@@ -22,7 +22,8 @@ class OrderFacade(
     private val couponService: CouponService
 ) {
     fun order(criterion: OrderCriterion): OrderResult {
-        val user = userService.findUserWithPointForOrder(criterion.userId)
+        val user = userService.find(criterion.userId)
+        val point = pointService.find(user.pointId)
 
         val products = productService.findAll(criterion.toProductCommand())
 
@@ -32,7 +33,7 @@ class OrderFacade(
 
         val payment = paymentService.process(PaymentCommand.of(user, order))
         if (payment.isSuccess()) {
-            pointService.pay(user.point.id, order.totalPrice)
+            pointService.pay(point.id, order.totalPrice)
         }
 
         return OrderResult.of(user, order, payment)

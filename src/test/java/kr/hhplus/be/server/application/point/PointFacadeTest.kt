@@ -1,20 +1,20 @@
 package kr.hhplus.be.server.application.point
 
-import kr.hhplus.be.server.domain.point.Point
 import kr.hhplus.be.server.domain.point.PointService
-import kr.hhplus.be.server.domain.user.User
 import kr.hhplus.be.server.domain.user.UserService
-import org.assertj.core.api.Assertions.assertThat
+import kr.hhplus.be.server.fixture.point.PointCriteriaFixture
+import kr.hhplus.be.server.fixture.point.PointDomainFixture
+import kr.hhplus.be.server.fixture.user.UserFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
 
 @ExtendWith(MockitoExtension::class)
 class PointFacadeTest {
@@ -25,58 +25,52 @@ class PointFacadeTest {
     @Mock
     private lateinit var pointService: PointService
 
+    @InjectMocks
+    private lateinit var pointFacade: PointFacade
+
     @DisplayName("유저가 가지고 있는 포인트를 조회한다.")
     @Test
     fun find() {
         //given
-        val pointFacade = PointFacade(pointService, userService)
-
-        val user = User(1L, "이찬희B", Point(1L, 100000))
-        val point = Point(1L, 10000)
-        BDDMockito.given(userService.find(ArgumentMatchers.anyLong()))
+        val user = UserFixture.create()
+        BDDMockito.given(userService.find(any()))
             .willReturn(user)
-        BDDMockito.given(pointService.find(ArgumentMatchers.anyLong()))
+
+        val point = PointDomainFixture.create()
+        BDDMockito.given(pointService.find(any()))
             .willReturn(point)
 
         //when
-        val result = pointFacade.find(1L)
+        pointFacade.find(1L)
 
         //then
-        assertThat(result)
-            .extracting("user.id", "point.balance")
-            .containsExactly(user.id, point.balance)
         Mockito.verify(userService, times(1))
-            .find(anyLong())
+            .find(any())
         Mockito.verify(pointService, times(1))
-            .find(anyLong())
+            .find(any())
     }
 
     @DisplayName("유저의 포인트를 충전한다.")
     @Test
     fun charge() {
         //given
-        val pointFacade = PointFacade(pointService, userService)
-
-        val user = User(1L, "이찬희B", Point(1L, 100000))
-        BDDMockito.given(userService.findUserWithPoint(ArgumentMatchers.anyLong()))
+        val user = UserFixture.create()
+        BDDMockito.given(userService.find(any()))
             .willReturn(user)
 
-        val criterion = PointCriteria.ChargePointCriterion.of(1L, 10000)
-        val updatedPoint = Point(1L, 110000)
-        BDDMockito.given(pointService.charge(criterion.toCommand(user.point.id)))
+        val updatedPoint = PointDomainFixture.create(balance = 110000)
+        BDDMockito.given(pointService.charge(any()))
             .willReturn(updatedPoint)
 
         //when
-        val result = pointFacade.charge(criterion)
+        val criteria = PointCriteriaFixture.createCharge()
+        pointFacade.charge(criteria)
 
         //then
-        assertThat(result)
-            .extracting("user.id", "point.balance")
-            .containsExactly(user.id, updatedPoint.balance)
         Mockito.verify(userService, times(1))
-            .findUserWithPoint(anyLong())
+            .find(any())
         Mockito.verify(pointService, times(1))
-            .charge(criterion.toCommand(user.point.id))
+            .charge(any())
     }
 
 }

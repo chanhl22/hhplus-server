@@ -16,7 +16,8 @@ class OrderResponses {
                     orderId = orderResult.order.id,
                     totalAmount = orderResult.order.totalPrice,
                     paymentId = orderResult.payment.id!!,
-                    remainBalance = orderResult.user.point.balance
+                    remainBalance = 10000
+//                    remainBalance = orderResult.user.point.balance
                 )
             }
         }

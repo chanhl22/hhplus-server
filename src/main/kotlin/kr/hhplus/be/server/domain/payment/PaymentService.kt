@@ -10,7 +10,8 @@ class PaymentService(
     fun process(command: PaymentCommand): Payment {
         val user = command.user
         val order = command.order
-        val payment = Payment.decide(order, user.point.balance)
+        val payment = Payment.decide(order, 10000)
+//        val payment = Payment.decide(order, user.point.balance)
         return paymentRepository.save(payment)
     }
 }

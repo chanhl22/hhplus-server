@@ -5,7 +5,6 @@ import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderProduct
 import kr.hhplus.be.server.domain.payment.Payment
 import kr.hhplus.be.server.domain.payment.PaymentStatus
-import kr.hhplus.be.server.domain.point.Point
 import kr.hhplus.be.server.domain.user.User
 import java.time.LocalDateTime
 
@@ -25,10 +24,7 @@ object OrderResultFixture {
         val user = User(
             id = userId,
             name = username,
-            point = Point(
-                id = pointId,
-                balance = balance
-            )
+            pointId = pointId
         )
         val order = Order(
             id = orderId,

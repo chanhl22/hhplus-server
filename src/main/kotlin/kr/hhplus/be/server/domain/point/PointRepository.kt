@@ -7,6 +7,6 @@ interface PointRepository {
 
     fun find(pointId: Long): Point
 
-    fun update(point: Point): Point
+    fun save(point: Point): Point
 
 }
