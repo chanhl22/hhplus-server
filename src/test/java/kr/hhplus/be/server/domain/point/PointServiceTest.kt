@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.point
 
-import kr.hhplus.be.server.fixture.point.PointCommandFixture
 import kr.hhplus.be.server.fixture.point.PointDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -51,8 +50,7 @@ class PointServiceTest {
             .willReturn(updatedPoint)
 
         //when
-        val command = PointCommandFixture.createCharge()
-        pointService.charge(command)
+        pointService.charge(1L, 10000)
 
         //then
         Mockito.verify(pointRepository, times(1))
@@ -63,9 +61,9 @@ class PointServiceTest {
 
     @DisplayName("유저의 포인트를 차감한다.")
     @Test
-    fun pay() {
+    fun use() {
         //given
-        val point = Point(1L, 100000)
+        val point = PointDomainFixture.create()
         BDDMockito.given(pointRepository.find(any()))
             .willReturn(point)
 
@@ -74,7 +72,7 @@ class PointServiceTest {
             .willReturn(updatedPoint)
 
         //when
-        pointService.pay(1L, 10000)
+        pointService.use(1L, 10000)
 
         //then
         Mockito.verify(pointRepository, times(1))
