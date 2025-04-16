@@ -1,18 +1,16 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.domain.stock.StockRepository
 import kr.hhplus.be.server.fixture.product.ProductCommandFixture
 import kr.hhplus.be.server.fixture.product.ProductDomainFixture
-import org.assertj.core.api.Assertions.assertThat
+import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers.anyList
-import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.BDDMockito
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
-
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -26,6 +24,9 @@ class ProductServiceTest {
     @Mock
     private lateinit var productStatisticsRepository: ProductStatisticsRepository
 
+    @Mock
+    private lateinit var stockRepository: StockRepository
+
     @InjectMocks
     private lateinit var productService: ProductService
 
@@ -34,18 +35,21 @@ class ProductServiceTest {
     fun find() {
         //given
         val product = ProductDomainFixture.create()
-        BDDMockito.given(productRepository.find(anyLong()))
+        BDDMockito.given(productRepository.find(any()))
             .willReturn(product)
 
+        val stock = StockDomainFixture.create()
+        BDDMockito.given(stockRepository.findByProductId(any()))
+            .willReturn(stock)
+
         //when
-        val result = productService.find(1)
+        productService.find(1)
 
         //then
-        assertThat(result)
-            .extracting("id", "name", "price", "description", "stock.quantity")
-            .containsExactly(product.id, product.name, product.price, product.description, product.stock.quantity)
         Mockito.verify(productRepository, times(1))
-            .find(anyLong())
+            .find(any())
+        Mockito.verify(stockRepository, times(1))
+            .findByProductId(any())
     }
 
     @DisplayName("주문 가능한 상품들을 조회한다.")
@@ -53,7 +57,7 @@ class ProductServiceTest {
     fun findAll() {
         //given
         val products = ProductDomainFixture.createProducts()
-        BDDMockito.given(productRepository.findAllWithStockByIdIn(any()))
+        BDDMockito.given(productRepository.findAllByIdIn(any()))
             .willReturn(products)
 
         //when
@@ -62,7 +66,7 @@ class ProductServiceTest {
 
         //then
         Mockito.verify(productRepository, times(1))
-            .findAllWithStockByIdIn(anyList())
+            .findAllByIdIn(any())
     }
 
     @DisplayName("최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회한다.")

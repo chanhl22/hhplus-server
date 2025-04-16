@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.interfaces.product
 
-import kr.hhplus.be.server.domain.product.Product
 import kr.hhplus.be.server.domain.product.ProductDomains.ProductSalesInfo
+import kr.hhplus.be.server.domain.product.ProductInfo
 
 @Suppress("unused")
 class ProductResponses {
@@ -13,13 +13,13 @@ class ProductResponses {
         val description: String
     ) {
         companion object {
-            fun from(product: Product): ProductResponse {
+            fun from(info: ProductInfo.Find): ProductResponse {
                 return ProductResponse(
-                    productId = product.id,
-                    name = product.name,
-                    price = product.price,
-                    quantity = product.stock.quantity,
-                    description = product.description
+                    productId = info.productId,
+                    name = info.name,
+                    price = info.price,
+                    quantity = info.quantity,
+                    description = info.description
                 )
             }
         }
@@ -31,19 +31,15 @@ class ProductResponses {
         val name: String,
         val price: Int,
         val soldQuantity: Int,
-        val stock: Int
     ) {
         companion object {
             fun from(info: ProductSalesInfo): TopSellingProductResponse {
-                val product = info.product
-                val stock = product.stock
                 return TopSellingProductResponse(
                     rank = info.rank,
-                    productId = product.id,
-                    name = product.name,
-                    price = product.price,
-                    soldQuantity = info.totalSales,
-                    stock = stock.quantity
+                    productId = info.productId,
+                    name = info.name,
+                    price = info.price,
+                    soldQuantity = info.soldQuantity,
                 )
             }
         }

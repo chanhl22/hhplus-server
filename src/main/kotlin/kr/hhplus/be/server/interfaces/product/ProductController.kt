@@ -25,11 +25,6 @@ class ProductController(
     override fun findTopSellingProducts(): List<TopSellingProductResponse> {
         val domain = productService.findTopSellingProducts()
         return domain.map { product -> TopSellingProductResponse.from(product) }
-
-//        return listOf(
-//            TopSellingProductResponse(1, 10L, "무선 블루투스 이어폰", 129000, 350, 25),
-//            TopSellingProductResponse(2, 5L, "게이밍 키보드", 89000, 280, 50),
-//        )
     }
 
 }

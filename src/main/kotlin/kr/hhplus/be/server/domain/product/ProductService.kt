@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
-import kr.hhplus.be.server.domain.product.ProductCommand.OrderProducts
 import kr.hhplus.be.server.domain.product.ProductDomains.ProductSalesInfo
+import kr.hhplus.be.server.domain.stock.StockRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -10,22 +10,18 @@ import java.time.LocalTime
 @Service
 class ProductService(
     private val productRepository: ProductRepository,
+    private val stockRepository: StockRepository,
     private val productStatisticsRepository: ProductStatisticsRepository
 ) {
-    fun find(productId: Long): Product {
-        return productRepository.find(productId)
+    fun find(productId: Long): ProductInfo.Find {
+        val product = productRepository.find(productId)
+        val stock = stockRepository.findByProductId(product.id)
+
+        return ProductInfo.of(product, stock)
     }
 
-    fun findAll(command: OrderProducts): List<Product> {
-        val products = productRepository.findAllWithStockByIdIn(command.getProductIds())
-
-        val productMap: Map<Long, Product> = products.associateBy { it.id }
-        return command.products.map { commandProduct ->
-            val product = productMap[commandProduct.productId]
-                ?: throw IllegalArgumentException("존재하지 않는 상품입니다. id: ${commandProduct.productId}")
-            product.validateStockEnough(commandProduct.quantity)
-            product
-        }
+    fun findAll(command: ProductCommand.OrderProducts): List<Product> {
+        return productRepository.findAllByIdIn(command.getProductIds())
     }
 
     fun findTopSellingProducts(): List<ProductSalesInfo> {

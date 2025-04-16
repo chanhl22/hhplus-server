@@ -7,6 +7,6 @@ interface ProductRepository {
 
     fun find(productId: Long): Product
 
-    fun findAllWithStockByIdIn(productIds: List<Long>): List<Product>
+    fun findAllByIdIn(productIds: List<Long>): List<Product>
 
 }
