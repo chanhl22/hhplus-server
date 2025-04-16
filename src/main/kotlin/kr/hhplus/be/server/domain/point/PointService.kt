@@ -1,7 +1,9 @@
 package kr.hhplus.be.server.domain.point
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
+@Transactional(readOnly = true)
 @Service
 class PointService(
     private val pointRepository: PointRepository
@@ -10,6 +12,7 @@ class PointService(
         return pointRepository.find(pointId)
     }
 
+    @Transactional
     fun charge(pointId: Long, amount: Int): Point {
         val point = find(pointId)
             .charge(amount)
@@ -17,6 +20,7 @@ class PointService(
         return pointRepository.save(point)
     }
 
+    @Transactional
     fun use(pointId: Long, amount: Int) {
         val point = find(pointId)
             .deduct(amount)
