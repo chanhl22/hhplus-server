@@ -58,6 +58,10 @@ class PointFacadeTest {
         BDDMockito.given(userService.find(any()))
             .willReturn(user)
 
+        val point = PointDomainFixture.create()
+        BDDMockito.given(pointService.find(any()))
+            .willReturn(point)
+
         val updatedPoint = PointDomainFixture.create(balance = 110000)
         BDDMockito.given(pointService.charge(any(), any()))
             .willReturn(updatedPoint)

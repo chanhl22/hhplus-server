@@ -9,6 +9,11 @@ class ProductInfo {
         val quantity: Int
     )
 
+    data class FindAll(
+        val products: List<Product>,
+        val stocks: List<Stock>,
+    )
+
     companion object {
         fun of(product: Product, stock: Stock): Find {
             return Find(
@@ -19,5 +24,13 @@ class ProductInfo {
                 quantity = stock.quantity
             )
         }
+
+        fun of(products: List<Product>, stocks: List<Stock>): FindAll {
+            return FindAll(
+                products = products,
+                stocks = stocks
+            )
+        }
     }
+
 }

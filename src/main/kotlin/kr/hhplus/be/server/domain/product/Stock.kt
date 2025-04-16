@@ -1,9 +1,18 @@
 package kr.hhplus.be.server.domain.product
 
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+
+@Entity
 class Stock(
-    val id: Long,
     val productId: Long,
-    var quantity: Int
+    var quantity: Int,
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0L
 ) {
     fun validateQuantity() {
         if (quantity < 0) {

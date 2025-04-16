@@ -1,13 +1,14 @@
 package kr.hhplus.be.server.domain.product
 
 import kr.hhplus.be.server.domain.product.ProductDomains.ProductSalesInfo
-import kr.hhplus.be.server.domain.stock.StockRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Service
+@Transactional(readOnly = true)
 class ProductService(
     private val productRepository: ProductRepository,
     private val stockRepository: StockRepository,
@@ -20,8 +21,11 @@ class ProductService(
         return ProductInfo.of(product, stock)
     }
 
-    fun findAll(command: ProductCommand.OrderProducts): List<Product> {
-        return productRepository.findAllByIdIn(command.getProductIds())
+    fun findAll(productIds: List<Long>): ProductInfo.FindAll {
+        val products = productRepository.findAllByIdIn(productIds)
+        val stocks = stockRepository.findByProductIdIn(products.map { it.id })
+
+        return ProductInfo.of(products, stocks)
     }
 
     fun findTopSellingProducts(): List<ProductSalesInfo> {

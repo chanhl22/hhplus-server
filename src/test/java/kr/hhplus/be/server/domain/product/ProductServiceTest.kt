@@ -1,7 +1,5 @@
 package kr.hhplus.be.server.domain.product
 
-import kr.hhplus.be.server.domain.stock.StockRepository
-import kr.hhplus.be.server.fixture.product.ProductCommandFixture
 import kr.hhplus.be.server.fixture.product.ProductDomainFixture
 import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import org.junit.jupiter.api.DisplayName
@@ -61,8 +59,7 @@ class ProductServiceTest {
             .willReturn(products)
 
         //when
-        val productCommand = ProductCommandFixture.createProducts()
-        productService.findAll(productCommand)
+        productService.findAll(products.map { it.id })
 
         //then
         Mockito.verify(productRepository, times(1))

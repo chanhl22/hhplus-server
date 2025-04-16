@@ -15,14 +15,17 @@ object StockDomainFixture {
         )
     }
 
-    fun createStocks(): List<Stock> {
+    fun createStocks(
+        stockId1: Long = 1L,
+        stockId2: Long = 2L,
+    ): List<Stock> {
         return listOf(
-            createStockFixture1(),
-            createStockFixture2()
+            createStockFixture1(stockId1),
+            createStockFixture2(stockId2)
         )
     }
 
-    private fun createStockFixture1() = Stock(1L, 1L, 25)
+    private fun createStockFixture1(stockId: Long) = Stock(1L, 25, stockId)
 
-    private fun createStockFixture2() = Stock(2L, 2L, 10)
+    private fun createStockFixture2(stockId: Long) = Stock(2L, 10, stockId)
 }
