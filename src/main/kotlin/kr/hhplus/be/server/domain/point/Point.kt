@@ -1,8 +1,17 @@
 package kr.hhplus.be.server.domain.point
 
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+
+@Entity
 class Point(
-    val id: Long,
-    val balance: Int
+    val balance: Int,
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0L
 ) {
     companion object {
         private const val MAX_POINT = 1000000000L
@@ -14,7 +23,7 @@ class Point(
         }
 
         val deductedPoint = balance - amount
-        return Point(id, deductedPoint)
+        return Point(deductedPoint, id)
     }
 
     fun charge(amount: Int): Point {
@@ -23,7 +32,7 @@ class Point(
         }
 
         val chargedPoint = balance + amount
-        return Point(id, chargedPoint)
+        return Point(chargedPoint, id)
     }
 
     fun validateBalance() {

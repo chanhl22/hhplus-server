@@ -59,7 +59,7 @@ class PointFacadeTest {
             .willReturn(user)
 
         val updatedPoint = PointDomainFixture.create(balance = 110000)
-        BDDMockito.given(pointService.charge(any()))
+        BDDMockito.given(pointService.charge(any(), any()))
             .willReturn(updatedPoint)
 
         //when
@@ -70,7 +70,7 @@ class PointFacadeTest {
         Mockito.verify(userService, times(1))
             .find(any())
         Mockito.verify(pointService, times(1))
-            .charge(any())
+            .charge(any(), any())
     }
 
 }

@@ -18,10 +18,10 @@ class PointFacade(
 
     fun charge(criteria: PointCriteria.Charge): PointResult.Charge {
         val user = userService.find(criteria.userId)
+        val point = pointService.find(user.pointId)
 
-        val command = criteria.toCommand(user.pointId)
-        val point = pointService.charge(command)
+        val chargedPoint = pointService.charge(point.id, criteria.amount)
 
-        return PointResult.of(user, point, criteria.amount)
+        return PointResult.of(user, chargedPoint, criteria.amount)
     }
 }
