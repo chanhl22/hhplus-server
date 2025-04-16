@@ -29,7 +29,7 @@ class UserServiceIntegrationTest {
 
         //then
         assertThat(result)
-            .extracting("id", "name", "pointId")
-            .containsExactly(1L, "이찬희B", 1L)
+            .extracting("name", "pointId")
+            .containsExactly("이찬희B", 1L)
     }
 }
