@@ -1,22 +1,15 @@
 package kr.hhplus.be.server.application.order
 
-import kr.hhplus.be.server.domain.product.ProductCommand
-
 class OrderCriteria {
     data class Order(
         val userId: Long,
         val products: List<OrderProduct>,
         val couponId: Long?
     ) {
-        fun toProductCommand(): ProductCommand.OrderProducts {
-            return ProductCommand.of(
-                products = products.map { product ->
-                    ProductCommand.OrderProduct(
-                        productId = product.productId,
-                        quantity = product.quantity,
-                    )
-                }
-            )
+        fun getProductIds() : List<Long> {
+            return products.map { product ->
+                product.productId
+            }
         }
 
         fun createOrderProductQuantityCountMap(): Map<Long, Int> {

@@ -5,15 +5,13 @@ import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.product.ProductService
-import kr.hhplus.be.server.domain.stock.StockService
 import kr.hhplus.be.server.domain.user.UserService
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import kr.hhplus.be.server.fixture.order.OrderCriteriaFixture
 import kr.hhplus.be.server.fixture.order.OrderDomainFixture
 import kr.hhplus.be.server.fixture.payment.PaymentDomainFixture
 import kr.hhplus.be.server.fixture.point.PointDomainFixture
-import kr.hhplus.be.server.fixture.product.ProductDomainFixture
-import kr.hhplus.be.server.fixture.stock.StockDomainFixture
+import kr.hhplus.be.server.fixture.product.ProductInfoFixture
 import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -31,9 +29,6 @@ class OrderFacadeTest {
 
     @Mock
     private lateinit var productService: ProductService
-
-    @Mock
-    private lateinit var stockService: StockService
 
     @Mock
     private lateinit var orderService: OrderService
@@ -65,13 +60,9 @@ class OrderFacadeTest {
         BDDMockito.given(pointService.find(any()))
             .willReturn(point)
 
-        val products = ProductDomainFixture.createProducts()
+        val products = ProductInfoFixture.createProducts()
         BDDMockito.given(productService.findAll(any()))
             .willReturn(products)
-
-        val stocks = StockDomainFixture.createStocks()
-        BDDMockito.given(stockService.findAll(any()))
-            .willReturn(stocks)
 
         val coupon = CouponDomainFixture.create()
         BDDMockito.given(couponService.find(any(), any()))
@@ -91,7 +82,7 @@ class OrderFacadeTest {
 
         BDDMockito.willDoNothing()
             .given(pointService)
-            .pay(any(), any())
+            .use(any(), any())
 
         //when
         val criteria = OrderCriteriaFixture.create()
@@ -109,7 +100,7 @@ class OrderFacadeTest {
         Mockito.verify(orderService, times(1))
             .order(any())
         Mockito.verify(pointService, times(1))
-            .pay(any(), any())
+            .use(any(), any())
         Mockito.verify(paymentService, times(1))
             .process(any())
     }
