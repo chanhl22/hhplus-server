@@ -15,7 +15,7 @@ class CouponResponses {
         companion object {
             fun of(result: CouponResult): FirstComeCouponResponse {
                 return FirstComeCouponResponse(
-                    couponId = result.coupon.id,
+                    couponId = result.coupon.id!!,
                     name = result.coupon.name,
                     discountType = result.coupon.name,
                     discountValue = result.coupon.discountValue,

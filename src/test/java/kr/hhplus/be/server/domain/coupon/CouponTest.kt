@@ -37,7 +37,7 @@ class CouponTest {
     @Test
     fun isExpired() {
         //given
-        val coupon = CouponDomainFixture.create(expiresAt = LocalDateTime.now().minusDays(1))
+        val coupon = CouponDomainFixture.create(expiredAt = LocalDateTime.now().minusDays(1))
 
         //when //then
         assertThatThrownBy { coupon.publish() }

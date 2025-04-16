@@ -11,8 +11,7 @@ enum class DiscountType(
 }
 
 class Coupon(
-    val id: Long = 0L,
-    val userCoupons: MutableList<UserCoupon> = mutableListOf(),
+    val id: Long? = null,
     val name: String,
     val discountType: DiscountType,
     val discountValue: Int,
@@ -41,6 +40,12 @@ class Coupon(
 
     fun issueTo(user: User): UserCoupon {
         return UserCoupon.create(user, this)
+    }
+
+    fun validateRemainingQuantity() {
+        if (remainingQuantity < 0) {
+            throw IllegalArgumentException("남은 쿠폰의 수량은 0보다 작을 수 없습니다.")
+        }
     }
 
     private fun isSoldOut(): Boolean {

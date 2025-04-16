@@ -1,34 +1,38 @@
 package kr.hhplus.be.server.application.order
 
-import kr.hhplus.be.server.domain.product.ProductCommands.ProductCommand
-import kr.hhplus.be.server.domain.product.ProductCommands.ProductsCommand
+import kr.hhplus.be.server.domain.product.ProductCommand
 
 class OrderCriteria {
-    data class OrderCriterion(
+    data class Order(
         val userId: Long,
-        val products: List<OrderProductCriterion>,
-        val couponId: Long
+        val products: List<OrderProduct>,
+        val couponId: Long?
     ) {
-        companion object {
-            fun of(userId: Long, products: List<OrderProductCriterion>, couponId: Long): OrderCriterion {
-                return OrderCriterion(userId, products, couponId)
-            }
-        }
-
-        fun toProductCommand(): ProductsCommand {
-            return ProductsCommand.of(
+        fun toProductCommand(): ProductCommand.OrderProducts {
+            return ProductCommand.of(
                 products = products.map { product ->
-                    ProductCommand(
+                    ProductCommand.OrderProduct(
                         productId = product.productId,
                         quantity = product.quantity,
                     )
                 }
             )
         }
+
+        fun createOrderProductQuantityCountMap(): Map<Long, Int> {
+            return products.associate { it.productId to it.quantity }
+        }
     }
 
-    data class OrderProductCriterion(
+    data class OrderProduct(
         val productId: Long,
         val quantity: Int
     )
+
+    companion object {
+        fun of(userId: Long, products: List<OrderProduct>, couponId: Long?): Order {
+            return Order(userId, products, couponId)
+        }
+    }
+
 }

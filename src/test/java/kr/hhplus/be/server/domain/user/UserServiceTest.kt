@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.user
 
-import kr.hhplus.be.server.fixture.user.UserFixture
+import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -25,7 +25,7 @@ class UserServiceTest {
     @Test
     fun find() {
         //given
-        val user = UserFixture.create()
+        val user = UserDomainFixture.create()
         BDDMockito.given(userRepository.find(any()))
             .willReturn(user)
 
@@ -36,26 +36,5 @@ class UserServiceTest {
         Mockito.verify(userRepository, times(1))
             .find(any())
     }
-
-//    @DisplayName("사용자와 가지고 있는 포인트를 조회한다.")
-//    @Test
-//    fun findUserWithPointForOrder() {
-//        //given
-//        val userService = UserService(userRepository)
-//
-//        val user = User(1L, "이찬희B", Point(1L, 100000))
-//        BDDMockito.given(userRepository.findUserWithPoint(ArgumentMatchers.anyLong()))
-//            .willReturn(user)
-//
-//        //when
-//        val result = userService.findUserWithPointForOrder(1)
-//
-//        //then
-//        assertThat(result)
-//            .extracting("id", "name", "point.balance")
-//            .containsExactly(user.id, user.name, user.point.balance)
-//        Mockito.verify(userRepository, times(1))
-//            .findUserWithPoint(anyLong())
-//    }
 
 }

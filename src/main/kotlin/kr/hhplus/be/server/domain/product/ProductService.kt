@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
-import kr.hhplus.be.server.domain.product.ProductCommands.ProductsCommand
+import kr.hhplus.be.server.domain.product.ProductCommand.OrderProducts
 import kr.hhplus.be.server.domain.product.ProductDomains.ProductSalesInfo
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -16,7 +16,7 @@ class ProductService(
         return productRepository.find(productId)
     }
 
-    fun findAll(command: ProductsCommand): List<Product> {
+    fun findAll(command: OrderProducts): List<Product> {
         val products = productRepository.findAllWithStockByIdIn(command.getProductIds())
 
         val productMap: Map<Long, Product> = products.associateBy { it.id }

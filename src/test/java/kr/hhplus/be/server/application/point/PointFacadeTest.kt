@@ -4,7 +4,7 @@ import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.user.UserService
 import kr.hhplus.be.server.fixture.point.PointCriteriaFixture
 import kr.hhplus.be.server.fixture.point.PointDomainFixture
-import kr.hhplus.be.server.fixture.user.UserFixture
+import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,7 +32,7 @@ class PointFacadeTest {
     @Test
     fun find() {
         //given
-        val user = UserFixture.create()
+        val user = UserDomainFixture.create()
         BDDMockito.given(userService.find(any()))
             .willReturn(user)
 
@@ -54,7 +54,7 @@ class PointFacadeTest {
     @Test
     fun charge() {
         //given
-        val user = UserFixture.create()
+        val user = UserDomainFixture.create()
         BDDMockito.given(userService.find(any()))
             .willReturn(user)
 

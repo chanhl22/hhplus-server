@@ -1,11 +1,18 @@
 package kr.hhplus.be.server.domain.product
 
 class Stock(
-    var id: Long,
+    val id: Long,
+    val productId: Long,
     var quantity: Int
 ) {
     fun isQuantityLessThan(quantity: Int): Boolean {
         return this.quantity < quantity
+    }
+
+    fun validateQuantity() {
+        if (quantity < 0) {
+            throw IllegalArgumentException("상품 재고는 0보다 작을 수 없습니다.")
+        }
     }
 
 }

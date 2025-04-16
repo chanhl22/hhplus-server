@@ -26,6 +26,12 @@ class Point(
         return Point(id, chargedPoint)
     }
 
+    fun validateBalance() {
+        if (balance < 0) {
+            throw IllegalArgumentException("포인트는 0보다 작을 수 없습니다.")
+        }
+    }
+
     private fun isPointLessThan(amount: Int): Boolean {
         return balance < amount
     }

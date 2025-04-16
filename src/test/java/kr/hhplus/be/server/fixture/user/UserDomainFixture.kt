@@ -12,7 +12,7 @@ object UserFixtureDefault {
     const val DEFAULT_NAME = "이찬희B"
 }
 
-object UserFixture {
+object UserDomainFixture {
     fun create(
         userId: Long = DEFAULT_USER_ID,
         name: String = DEFAULT_NAME,

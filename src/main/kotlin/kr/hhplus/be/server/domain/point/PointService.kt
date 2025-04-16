@@ -18,11 +18,11 @@ class PointService(
         return pointRepository.save(point)
     }
 
-    fun pay(pointId: Long, amount: Int): Point {
+    fun pay(pointId: Long, amount: Int) {
         val point = pointRepository.find(pointId)
             .deduct(amount)
 
-        return pointRepository.save(point)
+        pointRepository.save(point)
     }
 
 }

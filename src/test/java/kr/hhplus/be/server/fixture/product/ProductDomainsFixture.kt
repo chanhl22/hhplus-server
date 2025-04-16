@@ -21,6 +21,7 @@ object ProductDomainFixture {
             description = description,
             stock = Stock(
                 id = stockId,
+                productId = productId,
                 quantity = quantity
             )
         )
@@ -40,8 +41,8 @@ object ProductDomainFixture {
         )
     }
 
-    private fun createProductFixture1() = Product(1L, "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", Stock(1L, 25))
+    private fun createProductFixture1() = Product(1L, "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", Stock(1L, 1L, 25))
 
-    private fun createProductFixture2() = Product(2L, "무선 키보드", 375000, "적축 키보드.", Stock(2L, 10))
+    private fun createProductFixture2() = Product(2L, "무선 키보드", 375000, "적축 키보드.", Stock(2L, 2L, 10))
 
 }

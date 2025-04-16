@@ -1,14 +1,15 @@
 package kr.hhplus.be.server.fixture.product
 
-import kr.hhplus.be.server.domain.product.ProductCommands.ProductCommand
-import kr.hhplus.be.server.domain.product.ProductCommands.ProductsCommand
+import kr.hhplus.be.server.domain.product.ProductCommand
+import kr.hhplus.be.server.domain.product.ProductCommand.OrderProduct
+import kr.hhplus.be.server.domain.product.ProductCommand.OrderProducts
 
 object ProductCommandFixture {
-    fun createProducts(): ProductsCommand {
-        return ProductsCommand.of(
+    fun createProducts(): OrderProducts {
+        return ProductCommand.of(
             listOf(
-                ProductCommand(1L, 25),
-                ProductCommand(2L, 10)
+                OrderProduct(1L, 25),
+                OrderProduct(2L, 10)
             )
         )
     }
