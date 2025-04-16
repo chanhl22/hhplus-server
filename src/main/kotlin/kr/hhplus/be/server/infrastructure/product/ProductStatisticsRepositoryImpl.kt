@@ -10,7 +10,7 @@ class ProductStatisticsRepositoryImpl(
     private val productStatisticsJpaRepository: ProductStatisticsJpaRepository
 ) : ProductStatisticsRepository {
     override fun findAllByCreatedAtBetween(start: LocalDateTime, end: LocalDateTime): List<ProductStatistics> {
-        TODO("Not yet implemented")
+        return productStatisticsJpaRepository.findAllByCreatedAtBetween(start, end)
     }
 
 

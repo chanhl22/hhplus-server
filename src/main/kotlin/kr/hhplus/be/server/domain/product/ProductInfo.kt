@@ -14,6 +14,14 @@ class ProductInfo {
         val stocks: List<Stock>,
     )
 
+    data class FindTopSales(
+        val productId: Long,
+        val name: String,
+        val price: Int,
+        val soldQuantity: Int,
+        val rank: Int
+    )
+
     companion object {
         fun of(product: Product, stock: Stock): Find {
             return Find(
@@ -29,6 +37,16 @@ class ProductInfo {
             return FindAll(
                 products = products,
                 stocks = stocks
+            )
+        }
+
+        fun of(product: Product, totalSales: Int, rank: Int): FindTopSales {
+            return FindTopSales(
+                productId = product.id,
+                name = product.name,
+                price = product.price,
+                soldQuantity = totalSales,
+                rank = rank
             )
         }
     }

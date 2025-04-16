@@ -33,17 +33,27 @@ object ProductDomainFixture {
 
     fun createProductsStatistics(
         productId1: Long = 1L,
-        productId2: Long = 2L
+        productId2: Long = 2L,
+        productStatisticsId1: Long = 1L,
+        productStatisticsId2: Long = 2L,
+        productStatisticsId3: Long = 3L,
+        productStatisticsId4: Long = 4L,
+        productStatisticsId5: Long = 5L,
+        productStatisticsId6: Long = 6L
     ): List<ProductStatistics> {
         return listOf(
-            ProductStatistics(createProductFixture1(productId1), 350, LocalDateTime.now(), 1L),
-            ProductStatistics(createProductFixture2(productId2), 280, LocalDateTime.now(), 2L)
+            ProductStatistics(productId1, 300, LocalDateTime.now(), productStatisticsId1),
+            ProductStatistics(productId1, 200, LocalDateTime.now().minusDays(1), productStatisticsId2),
+            ProductStatistics(productId2, 300, LocalDateTime.now().minusDays(1), productStatisticsId3),
+            ProductStatistics(productId2, 400, LocalDateTime.now().minusDays(2), productStatisticsId4),
+            ProductStatistics(productId2, 100, LocalDateTime.now().minusDays(2), productStatisticsId5),
+            ProductStatistics(productId2, 100, LocalDateTime.now().minusDays(3), productStatisticsId6)
         )
     }
 
-    private fun createProductFixture1(productId: Long) = Product( "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", productId)
+    private fun createProductFixture1(productId: Long) = Product("무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", productId)
 
-    private fun createProductFixture2(productId: Long) = Product("무선 키보드", 375000, "적축 키보드.",productId)
+    private fun createProductFixture2(productId: Long) = Product("무선 키보드", 375000, "적축 키보드.", productId)
 
 }
 
@@ -88,9 +98,9 @@ object ProductInfoFixture {
         )
     }
 
-    private fun createProductFixture1() = Product( "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", 1L)
+    private fun createProductFixture1() = Product("무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", 1L)
 
-    private fun createProductFixture2() = Product("무선 키보드", 375000, "적축 키보드.",2L)
+    private fun createProductFixture2() = Product("무선 키보드", 375000, "적축 키보드.", 2L)
 
     private fun createStockFixture1() = Stock(1L, 25, 1L)
 

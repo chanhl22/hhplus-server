@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domain.product
 import kr.hhplus.be.server.fixture.product.ProductDomainFixture
 import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import kr.hhplus.be.server.infrastructure.product.ProductJpaRepository
+import kr.hhplus.be.server.infrastructure.product.ProductStatisticsJpaRepository
 import kr.hhplus.be.server.infrastructure.product.StockJpaRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.groups.Tuple
@@ -15,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @SpringBootTest
 class ProductServiceIntegrationTest {
+
+    @Autowired
+    private lateinit var productStatisticsJpaRepository: ProductStatisticsJpaRepository
 
     @Autowired
     private lateinit var productService: ProductService
@@ -42,7 +46,7 @@ class ProductServiceIntegrationTest {
         assertThat(result)
             .extracting("name", "price", "description", "quantity")
             .containsExactly(
-               "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", 20
+                "무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰.", 20
             )
     }
 
@@ -71,6 +75,38 @@ class ProductServiceIntegrationTest {
             .containsExactly(
                 Tuple.tuple(1L, 25),
                 Tuple.tuple(2L, 10)
+            )
+    }
+
+    @DisplayName("최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회한다.")
+    @Test
+    fun findTopSellingProducts() {
+        //given
+        val products = ProductDomainFixture.createProducts(productId1 = 0L, productId2 = 0L)
+        val savedProducts = productJpaRepository.saveAll(products)
+
+        val productStatistics =
+            ProductDomainFixture.createProductsStatistics(
+                productStatisticsId1 = 0L,
+                productStatisticsId2 = 0L,
+                productStatisticsId3 = 0L,
+                productStatisticsId4 = 0L,
+                productStatisticsId5 = 0L,
+                productStatisticsId6 = 0L,
+                productId1 = savedProducts[0].id,
+                productId2 = savedProducts[1].id,
+            )
+        productStatisticsJpaRepository.saveAll(productStatistics)
+
+        //when
+        val result = productService.findTopSellingProducts()
+
+        //then
+        assertThat(result).hasSize(2)
+            .extracting("name", "price", "soldQuantity", "rank")
+            .containsExactly(
+                Tuple.tuple("무선 키보드", 375000, 900, 1),
+                Tuple.tuple("무선 블루투스 이어폰", 129000, 500, 2)
             )
     }
 

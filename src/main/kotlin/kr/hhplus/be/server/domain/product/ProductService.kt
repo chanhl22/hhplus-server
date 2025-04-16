@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.product
 
-import kr.hhplus.be.server.domain.product.ProductDomains.ProductSalesInfo
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -28,13 +27,16 @@ class ProductService(
         return ProductInfo.of(products, stocks)
     }
 
-    fun findTopSellingProducts(): List<ProductSalesInfo> {
+    fun findTopSellingProducts(): List<ProductInfo.FindTopSales> {
         val startDatetime = startThreeDaysAgoDate()
         val endDatetime = endCurrentDate()
         val productsStatistics =
             productStatisticsRepository.findAllByCreatedAtBetween(startDatetime, endDatetime)
 
-        return extractTop5Product(productsStatistics)
+        val products = productRepository.findAllByIdIn(productsStatistics.map { it.id })
+        val productMap: Map<Long, Product> = products.associateBy { it.id }
+
+        return extractTop5Product(productsStatistics, productMap)
     }
 
     private fun startThreeDaysAgoDate(): LocalDateTime {
@@ -45,16 +47,21 @@ class ProductService(
         return LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59))
     }
 
-    private fun extractTop5Product(productsStatistics: List<ProductStatistics>): List<ProductSalesInfo> {
+    private fun extractTop5Product(
+        productsStatistics: List<ProductStatistics>,
+        productMap: Map<Long, Product>
+    ): List<ProductInfo.FindTopSales> {
         return productsStatistics
-            .groupBy { it.product }
-            .map { (product, stats) ->
-                product to stats.sumOf { it.totalSales }
+            .groupBy { it.productId }
+            .map { (productId, stats) ->
+                productId to stats.sumOf { it.totalSales }
             }
             .sortedByDescending { (_, totalSales) -> totalSales }
             .take(5)
-            .mapIndexed { index, (product, totalSales) ->
-                ProductSalesInfo.of(
+            .mapIndexed { index, (productId, totalSales) ->
+                val product = productMap[productId]
+                    ?: throw IllegalArgumentException("존재하지 않는 상품입니다. productId=${productId}")
+                ProductInfo.of(
                     product = product,
                     totalSales = totalSales,
                     rank = index + 1
