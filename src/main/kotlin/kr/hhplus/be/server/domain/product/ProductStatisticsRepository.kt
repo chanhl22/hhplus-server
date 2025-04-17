@@ -6,6 +6,4 @@ interface ProductStatisticsRepository {
 
     fun findAllByCreatedAtBetween(start: LocalDateTime, end: LocalDateTime): List<ProductStatistics>
 
-    fun findStatsWithProductInfo(start: LocalDateTime, end: LocalDateTime): List<ProductWithStatDto>
-
 }

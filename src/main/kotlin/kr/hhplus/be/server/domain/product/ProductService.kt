@@ -82,11 +82,5 @@ class ProductService(
             }
     }
 
-    fun test(): List<ProductWithStatDto> {
-        val startDatetime = startThreeDaysAgoDate()
-        val endDatetime = endCurrentDate()
-        return productStatisticsRepository.findStatsWithProductInfo(startDatetime, endDatetime)
-    }
-
 }
 
