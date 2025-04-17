@@ -1,8 +1,10 @@
 package kr.hhplus.be.server.domain.coupon
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class CouponService(
     private val couponRepository: CouponRepository,
     private val userCouponRepository: UserCouponRepository
@@ -15,6 +17,7 @@ class CouponService(
         return null
     }
 
+    @Transactional
     fun issueCoupon(couponId: Long, userId: Long): Coupon {
         val coupon = couponRepository.find(couponId)
             .publish()
@@ -26,6 +29,7 @@ class CouponService(
         return issuedCoupon
     }
 
+    @Transactional
     fun isUsed(couponId: Long?, userId: Long) {
         if (couponId == null) {
             return
