@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.interfaces.product
 
 import kr.hhplus.be.server.domain.product.ProductService
+import kr.hhplus.be.server.domain.product.ProductWithStatDto
 import kr.hhplus.be.server.interfaces.swagger.ProductApi
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,4 +26,9 @@ class ProductController(
         return domain.map { product -> ProductResponse.from(product) }
     }
 
+    @GetMapping("/products/test")
+    fun test(): List<ProductWithStatDto> {
+        val test = productService.test()
+        return test
+    }
 }
