@@ -57,7 +57,12 @@ class ProductServiceIntegrationTest {
         val products = ProductDomainFixture.createProducts(productId1 = 0L, productId2 = 0L)
         val savedProducts = productJpaRepository.saveAll(products)
 
-        val stocks = StockDomainFixture.createStocks(stockId1 = 0L, stockId2 = 0L, productId1 = savedProducts[0].id, productId2 = savedProducts[1].id)
+        val stocks = StockDomainFixture.createStocks(
+            stockId1 = 0L,
+            stockId2 = 0L,
+            productId1 = savedProducts[0].id,
+            productId2 = savedProducts[1].id
+        )
         stockJpaRepository.saveAll(stocks)
 
         //when
@@ -82,24 +87,31 @@ class ProductServiceIntegrationTest {
     @Test
     fun deduct() {
         //given
-        val products = ProductDomainFixture.createProducts(productId1 = 0L, productId2 = 0L)
-        val savedProducts = productJpaRepository.saveAll(products)
+        val product1 = ProductDomainFixture.create(0L)
+        val savedProduct1 = productJpaRepository.save(product1)
+        val product2 = ProductDomainFixture.create(0L)
+        val savedProduct2 = productJpaRepository.save(product2)
 
-        val stocks = StockDomainFixture.createStocks(stockId1 = 0L, stockId2 = 0L, quantity1 = 25, quantity2 = 10)
-        stockJpaRepository.saveAll(stocks)
+        val stock1 = StockDomainFixture.create(0L)
+        val savedStock1 = stockJpaRepository.save(stock1)
+        val stock2 = StockDomainFixture.create(0L)
+        val savedStock2 = stockJpaRepository.save(stock2)
 
         //when
-        val command = ProductCommand.Deduct(savedProducts.map { product ->
-            ProductCommand.OrderProduct(productId = product.id, 2)
-        })
+        val command = ProductCommand.Deduct(
+            listOf(
+                ProductCommand.OrderProduct(productId = savedProduct1.id, 2),
+                ProductCommand.OrderProduct(productId = savedProduct2.id, 2)
+            )
+        )
         productService.deduct(command)
 
         //then
-        val stock1 = stockJpaRepository.findById(stocks[0].id)
-        assertThat(stock1.get().quantity).isEqualTo(23)
+        val findStock1 = stockJpaRepository.findById(savedStock1.id)
+        assertThat(findStock1.get().quantity).isEqualTo(9998)
 
-        val stock2 = stockJpaRepository.findById(stocks[1].id)
-        assertThat(stock2.get().quantity).isEqualTo(8)
+        val findStock2 = stockJpaRepository.findById(savedStock2.id)
+        assertThat(findStock2.get().quantity).isEqualTo(9998)
     }
 
     @DisplayName("최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회한다.")
