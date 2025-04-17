@@ -1,0 +1,3 @@
+### 상위 상품 조회
+GET localhost:8080/products/top
+Content-Type: application/json
