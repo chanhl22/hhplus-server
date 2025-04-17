@@ -57,7 +57,7 @@ class ProductServiceIntegrationTest {
         val products = ProductDomainFixture.createProducts(productId1 = 0L, productId2 = 0L)
         val savedProducts = productJpaRepository.saveAll(products)
 
-        val stocks = StockDomainFixture.createStocks(stockId1 = 0L, stockId2 = 0L)
+        val stocks = StockDomainFixture.createStocks(stockId1 = 0L, stockId2 = 0L, productId1 = savedProducts[0].id, productId2 = savedProducts[1].id)
         stockJpaRepository.saveAll(stocks)
 
         //when
@@ -73,8 +73,8 @@ class ProductServiceIntegrationTest {
         assertThat(result.stocks).hasSize(2)
             .extracting("productId", "quantity")
             .containsExactly(
-                Tuple.tuple(1L, 25),
-                Tuple.tuple(2L, 10)
+                Tuple.tuple(savedProducts[0].id, 25),
+                Tuple.tuple(savedProducts[1].id, 10)
             )
     }
 

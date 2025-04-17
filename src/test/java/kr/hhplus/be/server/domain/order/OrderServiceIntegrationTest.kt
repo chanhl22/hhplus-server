@@ -28,7 +28,7 @@ class OrderServiceIntegrationTest {
         val orderPoint = OrderPoint.create(user, point)
 
         val products = ProductDomainFixture.createProducts(productId1 = 1L, productId2 = 2L)
-        val stocks = StockDomainFixture.createStocks(stockId1 = 1L, stockId2 = 2L)
+        val stocks = StockDomainFixture.createStocks(stockId1 = 1L, stockId2 = 2L, productId1 = 1L, productId2 = 2L)
         val orderedProducts = OrderedProducts.create(products, stocks, mapOf(1L to 3, 2L to 2))
 
         val orderCoupon = EmptyOrderCoupon

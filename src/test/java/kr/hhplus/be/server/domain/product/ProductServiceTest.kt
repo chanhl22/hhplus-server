@@ -74,12 +74,18 @@ class ProductServiceTest {
         BDDMockito.given(productStatisticsRepository.findAllByCreatedAtBetween(any(), any()))
             .willReturn(productsStatistics)
 
+        val products = ProductDomainFixture.createProducts()
+        BDDMockito.given(productRepository.findAllByIdIn(any()))
+            .willReturn(products)
+
         //when
         productService.findTopSellingProducts()
 
         //then
         Mockito.verify(productStatisticsRepository, times(1))
             .findAllByCreatedAtBetween(any(), any())
+        Mockito.verify(productRepository, times(1))
+            .findAllByIdIn(any())
     }
 
 }

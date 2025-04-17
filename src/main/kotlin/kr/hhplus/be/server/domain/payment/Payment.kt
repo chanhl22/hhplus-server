@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToOne
+import jakarta.persistence.Table
 import kr.hhplus.be.server.domain.order.Order
 
 enum class PaymentStatus(
@@ -16,6 +17,7 @@ enum class PaymentStatus(
 }
 
 @Entity
+@Table(name = "payment")
 class Payment(
 
     @OneToOne
