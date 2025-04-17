@@ -58,12 +58,6 @@ class Coupon(
         return UserCoupon.create(userId, this.id)
     }
 
-    fun validateRemainingQuantity() {
-        if (remainingQuantity < 0) {
-            throw IllegalArgumentException("남은 쿠폰의 수량은 0보다 작을 수 없습니다.")
-        }
-    }
-
     private fun isSoldOut(): Boolean {
         return this.remainingQuantity <= 0
     }
