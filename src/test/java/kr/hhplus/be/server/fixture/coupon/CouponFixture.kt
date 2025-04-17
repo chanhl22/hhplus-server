@@ -5,6 +5,7 @@ import kr.hhplus.be.server.application.coupon.CouponResult
 import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.coupon.DiscountType
 import kr.hhplus.be.server.domain.coupon.UserCoupon
+import kr.hhplus.be.server.domain.order.coupon.RealOrderCoupon
 import java.time.LocalDateTime
 
 object CouponCriterionFixture {
@@ -75,6 +76,26 @@ object UserCouponDomainFixture {
             userId = userId,
             couponId = couponId,
             isUsed = isUsed
+        )
+    }
+}
+
+object RealOrderCouponFixture {
+    fun create(
+        couponId: Long = 1L,
+        name: String = "1000원 할인 쿠폰",
+        discountType: DiscountType = DiscountType.AMOUNT,
+        discountValue: Int = 1000,
+        remainingQuantity: Int = 20,
+        expiredAt: LocalDateTime = LocalDateTime.now().plusMonths(1)
+    ): RealOrderCoupon {
+        return RealOrderCoupon(
+            id = couponId,
+            name = name,
+            discountType = discountType,
+            discountValue = discountValue,
+            remainingQuantity = remainingQuantity,
+            expiredAt = expiredAt
         )
     }
 }

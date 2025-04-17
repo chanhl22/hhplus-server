@@ -62,4 +62,19 @@ class PointTest {
             .hasMessage("차감할 포인트가 없습니다.")
     }
 
+    @DisplayName("포인트가 0보다 작다면 예외가 발생한다.")
+    @Test
+    fun validateBalance() {
+        //given
+        val point = PointDomainFixture.create(
+            pointId = 1L,
+            balance = -1
+        )
+
+        //when //then
+        assertThatThrownBy { point.validateBalance() }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("포인트는 0보다 작을 수 없습니다.")
+    }
+
 }

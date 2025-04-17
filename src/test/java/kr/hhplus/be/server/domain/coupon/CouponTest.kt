@@ -70,4 +70,17 @@ class CouponTest {
             .hasMessage("쿠폰이 모두 소진되었습니다.")
     }
 
+    @DisplayName("쿠폰을 발행하면 UserCoupon에 기록한다.")
+    @Test
+    fun issueTo() {
+        //given
+        val coupon = CouponDomainFixture.create()
+
+        //when
+        val userCoupon = coupon.issueTo(coupon.id)
+
+        //then
+        assertThat(userCoupon.couponId).isEqualTo(coupon.id)
+    }
+
 }
