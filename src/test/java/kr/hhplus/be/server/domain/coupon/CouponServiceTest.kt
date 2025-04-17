@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import kr.hhplus.be.server.fixture.coupon.UserCouponDomainFixture
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -88,6 +89,62 @@ class CouponServiceTest {
         Mockito.verify(couponRepository, times(1))
             .save(any())
         Mockito.verify(userCouponRepository, times(1))
+            .save(any())
+    }
+
+    @DisplayName("쿠폰을 사용한다.")
+    @Test
+    fun isUsed() {
+        //given
+        val userCoupons = listOf(
+            UserCouponDomainFixture.create(),
+            UserCouponDomainFixture.create()
+        )
+        BDDMockito.given(userCouponRepository.findByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
+            .willReturn(userCoupons)
+
+        val userCoupon = UserCouponDomainFixture.create()
+        BDDMockito.given(userCouponRepository.save(any()))
+            .willReturn(userCoupon)
+
+        //when
+        couponService.isUsed(1L, 1L)
+
+        //then
+        Mockito.verify(userCouponRepository, times(1))
+            .findByCouponIdAndUserIdAndIsUsed(any(), any(), any())
+        Mockito.verify(userCouponRepository, times(1))
+            .save(any())
+    }
+
+    @DisplayName("쿠폰이 없으면 null을 반환한다.")
+    @Test
+    fun noCoupon() {
+        //when
+        couponService.isUsed(null, 1L)
+
+        //then
+        Mockito.verify(userCouponRepository, never())
+            .findByCouponIdAndUserIdAndIsUsed(any(), any(), any())
+        Mockito.verify(userCouponRepository, never())
+            .save(any())
+    }
+
+    @DisplayName("쿠폰은 존재하지만 사용자가 발행하지 않았다면 예외가 발생한다.")
+    @Test
+    fun doesNotUserCoupon() {
+        //given
+        BDDMockito.given(userCouponRepository.findByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
+            .willReturn(emptyList())
+
+        //when //then
+        assertThatThrownBy { couponService.isUsed(1L, 1L) }
+            .isInstanceOf(IllegalStateException::class.java)
+            .hasMessage("해당 쿠폰을 사용할 수 없습니다. 쿠폰이 존재하지 않거나 이미 사용되었습니다.")
+
+        Mockito.verify(userCouponRepository, times(1))
+            .findByCouponIdAndUserIdAndIsUsed(any(), any(), any())
+        Mockito.verify(userCouponRepository, never())
             .save(any())
     }
 
