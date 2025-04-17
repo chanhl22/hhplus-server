@@ -27,6 +27,19 @@ class ProductService(
         return ProductInfo.of(products, stocks)
     }
 
+    fun deduct(command: ProductCommand.Deduct) {
+        val stocks = stockRepository.findByProductIdIn(command.getProductIds())
+
+        val orderProductQuantityMap = command.products.associate { it.productId to it.quantity }
+        stocks.map { stock ->
+            val orderQuantity = orderProductQuantityMap[stock.productId]
+                ?: throw IllegalArgumentException("존재하지 않는 상품입니다. productId=${stock.productId}")
+            stock.deduct(orderQuantity)
+        }
+
+        stockRepository.saveAll(stocks)
+    }
+
     fun findTopSellingProducts(): List<ProductInfo.FindTopSales> {
         val startDatetime = startThreeDaysAgoDate()
         val endDatetime = endCurrentDate()

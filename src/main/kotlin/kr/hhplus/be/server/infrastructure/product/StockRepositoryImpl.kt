@@ -18,4 +18,8 @@ class StockRepositoryImpl(
         return stockJpaRepository.findByProductIdIn(productIds)
     }
 
+    override fun saveAll(stocks: List<Stock>) {
+        stockJpaRepository.saveAll(stocks)
+    }
+
 }

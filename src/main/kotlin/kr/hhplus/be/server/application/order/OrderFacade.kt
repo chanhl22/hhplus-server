@@ -2,11 +2,11 @@ package kr.hhplus.be.server.application.order
 
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.order.OrderCommand
-import kr.hhplus.be.server.domain.order.coupon.OrderCoupon
 import kr.hhplus.be.server.domain.order.OrderPoint
 import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.order.OrderedProducts
-import kr.hhplus.be.server.domain.payment.PaymentCommands.PaymentCommand
+import kr.hhplus.be.server.domain.order.coupon.OrderCoupon
+import kr.hhplus.be.server.domain.payment.PaymentCommand
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.product.ProductService
@@ -36,8 +36,8 @@ class OrderFacade(
         val order = orderService.order(OrderCommand.of(orderPoint, orderedProducts, orderCoupon))
 
         couponService.isUsed(order.couponId, user.id)
-
-        val payment = paymentService.process(PaymentCommand.of(user, order))
+        productService.deduct(criteria.toDeduct())
+        val payment = paymentService.process(PaymentCommand.of(point, order))
         if (payment.isSuccess()) {
             pointService.use(point.id, order.totalPrice)
         }

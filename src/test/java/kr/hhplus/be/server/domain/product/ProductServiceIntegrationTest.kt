@@ -78,6 +78,30 @@ class ProductServiceIntegrationTest {
             )
     }
 
+    @DisplayName("상품 재고를 차감한다.")
+    @Test
+    fun deduct() {
+        //given
+        val products = ProductDomainFixture.createProducts(productId1 = 0L, productId2 = 0L)
+        val savedProducts = productJpaRepository.saveAll(products)
+
+        val stocks = StockDomainFixture.createStocks(stockId1 = 0L, stockId2 = 0L, quantity1 = 25, quantity2 = 10)
+        stockJpaRepository.saveAll(stocks)
+
+        //when
+        val command = ProductCommand.Deduct(savedProducts.map { product ->
+            ProductCommand.OrderProduct(productId = product.id, 2)
+        })
+        productService.deduct(command)
+
+        //then
+        val stock1 = stockJpaRepository.findById(stocks[0].id)
+        assertThat(stock1.get().quantity).isEqualTo(23)
+
+        val stock2 = stockJpaRepository.findById(stocks[1].id)
+        assertThat(stock2.get().quantity).isEqualTo(8)
+    }
+
     @DisplayName("최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회한다.")
     @Test
     fun findTopSellingProducts() {
