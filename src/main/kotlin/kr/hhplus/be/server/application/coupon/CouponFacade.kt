@@ -2,20 +2,18 @@ package kr.hhplus.be.server.application.coupon
 
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.user.UserService
-import org.springframework.stereotype.Component
-import kr.hhplus.be.server.application.coupon.CouponCriteria.CouponCriterion
-import kr.hhplus.be.server.application.coupon.CouponResults.CouponResult
+import org.springframework.stereotype.Service
 
-@Component
+@Service
 class CouponFacade(
     private val couponService: CouponService,
     private val userService: UserService
 ) {
 
-    fun issueCouponFirstCome(criterion: CouponCriterion): CouponResult {
-        val user = userService.find(criterion.userId)
+    fun issueCouponFirstCome(criteria: CouponCriteria.Issue): CouponResult.Issue {
+        val user = userService.find(criteria.userId)
 
-        val coupon = couponService.issueCoupon(criterion.toCommand(user))
+        val coupon = couponService.issueCoupon(criteria.couponId, user.id)
         return CouponResult.of(coupon)
     }
 

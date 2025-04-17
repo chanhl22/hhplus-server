@@ -1,11 +1,12 @@
 package kr.hhplus.be.server.application.order
 
-import kr.hhplus.be.server.application.order.OrderCriteria.OrderCriterion
-import kr.hhplus.be.server.application.order.OrderResults.OrderResult
 import kr.hhplus.be.server.domain.coupon.CouponService
-import kr.hhplus.be.server.domain.order.OrderCommands.OrderCommand
+import kr.hhplus.be.server.domain.order.OrderCommand
+import kr.hhplus.be.server.domain.order.OrderPoint
 import kr.hhplus.be.server.domain.order.OrderService
-import kr.hhplus.be.server.domain.payment.PaymentCommands.PaymentCommand
+import kr.hhplus.be.server.domain.order.OrderedProducts
+import kr.hhplus.be.server.domain.order.coupon.OrderCoupon
+import kr.hhplus.be.server.domain.payment.PaymentCommand
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.product.ProductService
@@ -21,21 +22,27 @@ class OrderFacade(
     private val pointService: PointService,
     private val couponService: CouponService
 ) {
-    fun order(criterion: OrderCriterion): OrderResult {
-        val user = userService.findUserWithPointForOrder(criterion.userId)
+    fun order(criteria: OrderCriteria.Order): OrderResult.Order {
+        val user = userService.find(criteria.userId)
+        val point = pointService.find(user.pointId)
 
-        val products = productService.findAll(criterion.toProductCommand())
+        val productInfo = productService.findAll(criteria.getProductIds())
 
-        val coupon = couponService.find(criterion.couponId, user.id)
+        val coupon = couponService.find(criteria.couponId, user.id)
 
-        val order = orderService.order(OrderCommand.of(user, products, coupon))
+        val orderPoint = OrderPoint.create(user, point)
+        val orderedProducts = OrderedProducts.create(productInfo.products, productInfo.stocks, criteria.createOrderProductQuantityCountMap())
+        val orderCoupon = OrderCoupon.from(coupon)
+        val order = orderService.order(OrderCommand.of(orderPoint, orderedProducts, orderCoupon))
 
-        val payment = paymentService.process(PaymentCommand.of(user, order))
+        couponService.isUsed(order.couponId, user.id)
+        productService.deduct(criteria.toDeduct())
+        val payment = paymentService.process(PaymentCommand.of(point, order))
         if (payment.isSuccess()) {
-            pointService.pay(user.point.id, order.totalPrice)
+            pointService.use(point.id, order.totalPrice)
         }
 
-        return OrderResult.of(user, order, payment)
+        return OrderResult.of(point, order, payment)
     }
 
 }

@@ -1,26 +1,36 @@
 package kr.hhplus.be.server.domain.coupon
 
-import kr.hhplus.be.server.domain.user.User
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
+@Entity
+@Table(name = "user_coupon")
 class UserCoupon(
-    val id: Long? = null,
-    val user: User,
-    var coupon: Coupon? = null
+    val userId: Long,
+
+    var couponId: Long? = null,
+
+    val isUsed: Boolean = false,
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0L
 ) {
     companion object {
         fun create(
-            user: User,
-            coupon: Coupon
+            userId: Long,
+            couponId: Long
         ): UserCoupon {
-            val userCoupon = UserCoupon(user = user)
-            userCoupon.changeCoupon(coupon)
+            val userCoupon = UserCoupon(userId = userId, couponId = couponId)
             return userCoupon
         }
     }
 
-    fun changeCoupon(coupon: Coupon) {
-        this.coupon = coupon
-        coupon.userCoupons.add(this)
+    fun used(): UserCoupon {
+        return UserCoupon(userId, couponId, true, id)
     }
 
 }

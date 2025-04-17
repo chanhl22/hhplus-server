@@ -7,8 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.product.ProductResponses.ProductResponse
-import kr.hhplus.be.server.interfaces.product.ProductResponses.TopSellingProductResponse
+import kr.hhplus.be.server.interfaces.product.ProductResponse
 
 @Tag(name = "Product API", description = "상품 API")
 interface ProductApi {
@@ -64,7 +63,7 @@ interface ProductApi {
             )
         ]
     )
-    fun find(id: Long): ProductResponse
+    fun find(id: Long): ProductResponse.Find
 
     @Operation(summary = "상위 상품 조회", description = "최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회합니다.")
     @ApiResponses(
@@ -127,6 +126,6 @@ interface ProductApi {
             )
         ]
     )
-    fun findTopSellingProducts(): List<TopSellingProductResponse>
+    fun findTopSellingProducts(): List<ProductResponse.FindTopSales>
 
 }

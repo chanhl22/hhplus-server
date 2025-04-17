@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.payment
 
-import kr.hhplus.be.server.fixture.order.OrderDomainsFixture
+import kr.hhplus.be.server.fixture.order.OrderDomainFixture
 import kr.hhplus.be.server.fixture.payment.PaymentDomainFixture
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -28,10 +28,10 @@ class PaymentTest {
     @Test
     fun decide() {
         //given
-        val order1 = OrderDomainsFixture.create(totalPrice = 10000)
+        val order1 = OrderDomainFixture.create(totalPrice = 10000)
         val userPointBalance1 = 10000
 
-        val order2 = OrderDomainsFixture.create(totalPrice = 10001)
+        val order2 = OrderDomainFixture.create(totalPrice = 10001)
         val userPointBalance2 = 10000
 
         //when

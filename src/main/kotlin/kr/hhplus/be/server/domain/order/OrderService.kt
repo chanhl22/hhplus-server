@@ -1,19 +1,21 @@
 package kr.hhplus.be.server.domain.order
 
 import org.springframework.stereotype.Service
-import kr.hhplus.be.server.domain.order.OrderCommands.OrderCommand
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class OrderService(
     private val orderRepository: OrderRepository,
     private val orderProductRepository: OrderProductRepository,
-    private val orderFactory: OrderFactory
 ) {
-    fun order(command: OrderCommand): Order {
-        val order = orderFactory.create(command.user, command.products, command.coupon)
-        orderRepository.save(order)
+    @Transactional
+    fun order(command: OrderCommand.Order): Order {
+        val order = Order.create(command.orderPoint, command.orderedProducts, command.orderCoupon)
+
+        val savedOrder = orderRepository.save(order)
         orderProductRepository.saveAll(order.orderProducts)
-        return order
+        return savedOrder
     }
 
 }

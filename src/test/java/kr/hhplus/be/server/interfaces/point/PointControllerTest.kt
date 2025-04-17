@@ -2,14 +2,13 @@ package kr.hhplus.be.server.interfaces.point
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kr.hhplus.be.server.application.point.PointFacade
-import kr.hhplus.be.server.fixture.point.ChargePointResultFixture
 import kr.hhplus.be.server.fixture.point.PointResultFixture
 import kr.hhplus.be.server.interfaces.user.PointController
-import kr.hhplus.be.server.interfaces.user.PointRequests
+import kr.hhplus.be.server.interfaces.user.PointRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito
+import org.mockito.kotlin.any
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
@@ -35,15 +34,15 @@ class PointControllerTest {
     @Test
     fun find() {
         //given
-        val requestId = 1L
+        val userId = 1L
 
-        val fakeResult = PointResultFixture.create()
-        BDDMockito.given(pointFacade.find(ArgumentMatchers.anyLong()))
-            .willReturn(fakeResult)
+        val result = PointResultFixture.createFind()
+        BDDMockito.given(pointFacade.find(any()))
+            .willReturn(result)
 
         //when //then
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/point/${requestId}")
+            MockMvcRequestBuilders.get("/point?userId=${userId}")
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -53,16 +52,16 @@ class PointControllerTest {
     @Test
     fun charge() {
         //given
-        val requestId = 1L
-        val request = PointRequests.ChargePointRequest(10000)
+        val userId = 1L
+        val request = PointRequest.Charge(10000)
 
-        val fakeResult = ChargePointResultFixture.create()
-        BDDMockito.given(pointFacade.charge(request.toCriterion(requestId)))
-            .willReturn(fakeResult)
+        val result = PointResultFixture.createCharge()
+        BDDMockito.given(pointFacade.charge(any()))
+            .willReturn(result)
 
         //when //then
         mockMvc.perform(
-            MockMvcRequestBuilders.patch("/point/${requestId}/charge")
+            MockMvcRequestBuilders.patch("/point/charge?userId=${userId}")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )

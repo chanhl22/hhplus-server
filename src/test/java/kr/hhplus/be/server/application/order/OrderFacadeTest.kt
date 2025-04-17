@@ -7,20 +7,19 @@ import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.domain.user.UserService
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
-import kr.hhplus.be.server.fixture.order.OrderDomainsFixture
+import kr.hhplus.be.server.fixture.order.OrderCriteriaFixture
+import kr.hhplus.be.server.fixture.order.OrderDomainFixture
 import kr.hhplus.be.server.fixture.payment.PaymentDomainFixture
-import kr.hhplus.be.server.fixture.product.ProductDomainFixture
-import kr.hhplus.be.server.fixture.user.UserFixture
+import kr.hhplus.be.server.fixture.point.PointDomainFixture
+import kr.hhplus.be.server.fixture.product.ProductInfoFixture
+import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.BDDMockito
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -53,51 +52,55 @@ class OrderFacadeTest {
     @Test
     fun order() {
         //given
-        val user = UserFixture.create()
-        BDDMockito.given(userService.findUserWithPointForOrder(ArgumentMatchers.anyLong()))
+        val user = UserDomainFixture.create()
+        BDDMockito.given(userService.find(any()))
             .willReturn(user)
 
-        val products = ProductDomainFixture.createProducts()
+        val point = PointDomainFixture.create()
+        BDDMockito.given(pointService.find(any()))
+            .willReturn(point)
+
+        val products = ProductInfoFixture.createProducts()
         BDDMockito.given(productService.findAll(any()))
             .willReturn(products)
 
         val coupon = CouponDomainFixture.create()
-        BDDMockito.given(couponService.find(coupon.id, user.id))
+        BDDMockito.given(couponService.find(any(), any()))
             .willReturn(coupon)
 
-        val order = OrderDomainsFixture.create()
+        val order = OrderDomainFixture.create()
         BDDMockito.given(orderService.order(any()))
             .willReturn(order)
 
-        BDDMockito.given(pointService.pay(user.point.id, order.totalPrice))
-            .willReturn(user.point)
+        BDDMockito.willDoNothing()
+            .given(couponService)
+            .isUsed(any(), any())
 
         val payment = PaymentDomainFixture.create()
         BDDMockito.given(paymentService.process(any()))
             .willReturn(payment)
 
+        BDDMockito.willDoNothing()
+            .given(pointService)
+            .use(any(), any())
+
         //when
-        val of = OrderCriteria.OrderCriterion.of(
-            1L,
-            listOf(
-                OrderCriteria.OrderProductCriterion(1L, 2),
-                OrderCriteria.OrderProductCriterion(2L, 1),
-            ),
-            coupon.id
-        )
-        orderFacade.order(of)
+        val criteria = OrderCriteriaFixture.create()
+        orderFacade.order(criteria)
 
         //then
         Mockito.verify(userService, times(1))
-            .findUserWithPointForOrder(anyLong())
+            .find(any())
         Mockito.verify(productService, times(1))
             .findAll(any())
         Mockito.verify(couponService, times(1))
-            .find(anyLong(), anyLong())
+            .find(any(), any())
+        Mockito.verify(couponService, times(1))
+            .isUsed(any(), any())
         Mockito.verify(orderService, times(1))
             .order(any())
         Mockito.verify(pointService, times(1))
-            .pay(anyLong(), anyInt())
+            .use(any(), any())
         Mockito.verify(paymentService, times(1))
             .process(any())
     }

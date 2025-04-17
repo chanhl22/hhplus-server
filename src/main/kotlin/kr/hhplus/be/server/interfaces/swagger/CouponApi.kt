@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.coupon.CouponRequests.FirstComeCouponRequest
-import kr.hhplus.be.server.interfaces.coupon.CouponResponses.FirstComeCouponResponse
+import kr.hhplus.be.server.interfaces.coupon.CouponRequest
+import kr.hhplus.be.server.interfaces.coupon.CouponResponse
 import kr.hhplus.be.server.interfaces.coupon.response.CouponsResponse
 
 @Tag(name = "Coupon API", description = "쿠폰 API")
@@ -75,7 +75,7 @@ interface CouponApi {
                 Content(
                     mediaType = "application/json",
                     schema = Schema(
-                        implementation = FirstComeCouponRequest::class,
+                        implementation = CouponRequest.FirstComeIssue::class,
                         example = """{
                             "userId": 1,
                             "couponId": 1
@@ -83,8 +83,8 @@ interface CouponApi {
                     )
                 )
             ]
-        ) request: FirstComeCouponRequest
-    ): FirstComeCouponResponse
+        ) request: CouponRequest.FirstComeIssue
+    ): CouponResponse.FirstComeIssue
 
     @Operation(summary = "쿠폰 목록 조회", description = "발급된 쿠폰 목록을 조회합니다.")
     @Parameter(name = "id", description = "사용자 ID", example = "1")

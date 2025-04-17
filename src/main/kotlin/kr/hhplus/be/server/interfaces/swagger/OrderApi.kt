@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.order.OrderRequests.OrderRequest
-import kr.hhplus.be.server.interfaces.order.OrderResponses.OrderResponse
+import kr.hhplus.be.server.interfaces.order.OrderRequest
+import kr.hhplus.be.server.interfaces.order.OrderResponse
 
 @Tag(name = "Order API", description = "주문 API")
 interface OrderApi {
@@ -63,6 +63,7 @@ interface OrderApi {
         ]
     )
     fun order(
+        userId: Long,
         @RequestBody(
             description = "주문 생성 정보",
             required = true,
@@ -70,7 +71,7 @@ interface OrderApi {
                 Content(
                     mediaType = "application/json",
                     schema = Schema(
-                        implementation = OrderRequest::class,
+                        implementation = OrderRequest.Order::class,
                         example = """{
                                         "userId": 1,
                                         "items": [
@@ -88,7 +89,7 @@ interface OrderApi {
                 )
             ]
         )
-        request: OrderRequest
-    ): OrderResponse
+        request: OrderRequest.Order
+    ): OrderResponse.Order
 
 }

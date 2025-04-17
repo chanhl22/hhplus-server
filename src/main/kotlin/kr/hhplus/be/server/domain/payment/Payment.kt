@@ -1,5 +1,11 @@
 package kr.hhplus.be.server.domain.payment
 
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.OneToOne
+import jakarta.persistence.Table
 import kr.hhplus.be.server.domain.order.Order
 
 enum class PaymentStatus(
@@ -10,11 +16,20 @@ enum class PaymentStatus(
     ;
 }
 
+@Entity
+@Table(name = "payment")
 class Payment(
-    val id: Long? = null,
+
+    @OneToOne
     val order: Order,
+
     val amount: Int,
-    val paymentStatus: PaymentStatus
+
+    val paymentStatus: PaymentStatus,
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0L,
 ) {
     companion object {
         fun decide(order: Order, userPointBalance: Int): Payment {
