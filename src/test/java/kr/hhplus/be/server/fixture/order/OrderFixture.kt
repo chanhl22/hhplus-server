@@ -65,6 +65,18 @@ object OrderDomainFixture {
     }
 }
 
+object OrderProductDomainFixture {
+    fun create(
+        order: Order = OrderDomainFixture.create(),
+        productId: Long = 1L,
+    ): OrderProduct {
+        return OrderProduct(
+            order = order,
+            productId = productId,
+        )
+    }
+}
+
 object OrderCommandFixture {
     fun create(
         orderPoint: OrderPoint = OrderPointFixture.create(),
