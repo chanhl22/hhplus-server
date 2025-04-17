@@ -35,7 +35,7 @@ class RealOrderCoupon(
     companion object {
         fun create(coupon: Coupon): RealOrderCoupon {
             return RealOrderCoupon(
-                id = coupon.id!!,
+                id = coupon.id,
                 name = coupon.name,
                 discountType = coupon.discountType,
                 discountValue = coupon.discountValue,
