@@ -46,7 +46,7 @@ class ProductService(
         val productsStatistics =
             productStatisticsRepository.findAllByCreatedAtBetween(startDatetime, endDatetime)
 
-        val products = productRepository.findAllByIdIn(productsStatistics.map { it.id })
+        val products = productRepository.findAllByIdIn(productsStatistics.map { it.productId })
         val productMap: Map<Long, Product> = products.associateBy { it.id }
 
         return extractTop5Product(productsStatistics, productMap)
