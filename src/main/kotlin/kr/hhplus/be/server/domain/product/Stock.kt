@@ -23,15 +23,15 @@ class Stock(
     }
 
     fun deduct(orderQuantity: Int): Stock {
-        if (isSoldOut()) {
+        if (isSoldOut(orderQuantity)) {
             throw IllegalStateException("재고가 모두 소진되었습니다.")
         }
         quantity -= orderQuantity
         return this
     }
 
-    private fun isSoldOut(): Boolean {
-        return this.quantity <= 0
+    private fun isSoldOut(orderQuantity: Int): Boolean {
+        return this.quantity < orderQuantity
     }
 
 }
