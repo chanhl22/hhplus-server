@@ -1,8 +1,5 @@
 package kr.hhplus.be.server.domain.coupon
 
-import org.springframework.stereotype.Repository
-
-@Repository
 interface UserCouponRepository {
 
     fun findByCouponIdAndUserIdAndIsUsed(couponId: Long, userId: Long, isUsed: Boolean): List<UserCoupon>

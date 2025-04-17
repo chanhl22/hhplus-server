@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.coupon
 
-import kr.hhplus.be.server.domain.coupon.CouponCommands.IssueCouponCommand
 import org.springframework.stereotype.Service
 
 @Service
@@ -8,12 +7,6 @@ class CouponService(
     private val couponRepository: CouponRepository,
     private val userCouponRepository: UserCouponRepository
 ) {
-//    fun find(couponId: Long?, userId: Long): Coupon? {
-//        return userCouponRepository.findByCouponIdAndUserId(couponId, userId)
-//            .firstOrNull()
-//            ?.coupon
-//    }
-
     fun find(couponId: Long?, userId: Long): Coupon? {
         if (couponId != null && userCouponRepository.existsByCouponIdAndUserIdAndIsUsed(couponId, userId, false)) {
             return couponRepository.find(couponId)
@@ -22,11 +15,11 @@ class CouponService(
         return null
     }
 
-    fun issueCoupon(command: IssueCouponCommand): Coupon {
-        val coupon = couponRepository.find(command.couponId)
+    fun issueCoupon(couponId: Long, userId: Long): Coupon {
+        val coupon = couponRepository.find(couponId)
             .publish()
             .deduct()
-        val userCoupon = coupon.issueTo(command.user)
+        val userCoupon = coupon.issueTo(userId)
 
         val issuedCoupon = couponRepository.save(coupon)
         userCouponRepository.save(userCoupon)

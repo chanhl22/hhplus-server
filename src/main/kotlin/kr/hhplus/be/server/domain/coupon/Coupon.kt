@@ -1,6 +1,11 @@
 package kr.hhplus.be.server.domain.coupon
 
-import kr.hhplus.be.server.domain.user.User
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
 import java.time.LocalDateTime
 
 enum class DiscountType(
@@ -10,13 +15,22 @@ enum class DiscountType(
     AMOUNT("금액 할인")
 }
 
+@Entity
 class Coupon(
-    val id: Long? = null,
     val name: String,
+
+    @Enumerated(EnumType.STRING)
     val discountType: DiscountType,
+
     val discountValue: Int,
+
     var remainingQuantity: Int,
-    val expiredAt: LocalDateTime
+
+    val expiredAt: LocalDateTime,
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0L,
 ) {
     fun publish(): Coupon {
         if (isSoldOut()) {
@@ -38,8 +52,8 @@ class Coupon(
         return this
     }
 
-    fun issueTo(user: User): UserCoupon {
-        return UserCoupon.create(user, this)
+    fun issueTo(userId: Long): UserCoupon {
+        return UserCoupon.create(userId, this.id)
     }
 
     fun validateRemainingQuantity() {

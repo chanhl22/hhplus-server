@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.fixture.coupon
 
-import kr.hhplus.be.server.application.coupon.CouponResults.CouponResult
+import kr.hhplus.be.server.application.coupon.CouponResult.Issue
 import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.coupon.DiscountType
 import java.time.LocalDateTime
@@ -13,7 +13,7 @@ object CouponResultFixture {
         discountValue: Int = 1000,
         remainingQuantity: Int = 20,
         expiresAt: LocalDateTime = LocalDateTime.now().plusMonths(1)
-    ): CouponResult {
+    ): Issue {
         val coupon = Coupon(
             id = couponId,
             name = name,
@@ -23,7 +23,7 @@ object CouponResultFixture {
             expiredAt = expiresAt
         )
 
-        return CouponResult(
+        return Issue(
             coupon = coupon
         )
     }

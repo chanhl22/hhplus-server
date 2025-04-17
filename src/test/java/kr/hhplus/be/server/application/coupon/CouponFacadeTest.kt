@@ -38,7 +38,7 @@ class CouponFacadeTest {
             .willReturn(user)
 
         val coupon = CouponDomainFixture.create()
-        BDDMockito.given(couponService.issueCoupon(any()))
+        BDDMockito.given(couponService.issueCoupon(any(), any()))
             .willReturn(coupon)
 
         //when
@@ -49,7 +49,7 @@ class CouponFacadeTest {
         Mockito.verify(userService, times(1))
             .find(anyLong())
         Mockito.verify(couponService, times(1))
-            .issueCoupon(any())
+            .issueCoupon(any(), any())
     }
 
 }

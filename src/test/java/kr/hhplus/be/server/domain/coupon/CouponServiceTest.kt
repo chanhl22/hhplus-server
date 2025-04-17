@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
-import kr.hhplus.be.server.fixture.coupon.IssueCouponCommandFixture
 import kr.hhplus.be.server.fixture.coupon.UserCouponDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -81,8 +80,7 @@ class CouponServiceTest {
             .willReturn(userCoupon)
 
         //when
-        val command = IssueCouponCommandFixture.create()
-        couponService.issueCoupon(command)
+        couponService.issueCoupon(1L, 1L)
 
         //then
         Mockito.verify(couponRepository, times(1))

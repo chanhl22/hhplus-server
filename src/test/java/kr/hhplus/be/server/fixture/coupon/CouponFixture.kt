@@ -27,7 +27,7 @@ object CouponDomainFixture {
 
 object UserCouponDomainFixture {
     fun create(
-        userCouponId: Long? = 1,
+        userCouponId: Long = 1,
         userId: Long = 1L,
         couponId: Long? = null,
         isUsed: Boolean = false
