@@ -116,7 +116,7 @@ class CouponTest {
         latch.await()
 
         //then 동시성 테스트가 실패함을 검증
-        assertThat(successCount.get()).isGreaterThan(1)
+        assertThat(successCount.get()).isGreaterThanOrEqualTo(10)
         assertThat(coupon.remainingQuantity).isNotPositive()
     }
 
