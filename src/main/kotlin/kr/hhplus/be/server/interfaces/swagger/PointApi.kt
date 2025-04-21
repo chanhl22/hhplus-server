@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.user.PointRequests
-import kr.hhplus.be.server.interfaces.user.PointResponses
+import kr.hhplus.be.server.interfaces.user.PointRequest
+import kr.hhplus.be.server.interfaces.user.PointResponse
 
 @Tag(name = "Point API", description = "포인트 API")
 interface PointApi {
@@ -62,7 +62,7 @@ interface PointApi {
             )
         ]
     )
-    fun find(id: Long): PointResponses.PointResponse
+    fun find(userId: Long): PointResponse.Find
 
     @Operation(summary = "금액 충전", description = "충전할 금액을 받아 잔액을 충전합니다.")
     @Parameter(name = "id", description = "사용자 ID", example = "1")
@@ -114,7 +114,7 @@ interface PointApi {
         ]
     )
     fun charge(
-        id: Long,
+        userId: Long,
         @RequestBody(
             description = "충전할 포인트 정보",
             required = true,
@@ -122,7 +122,7 @@ interface PointApi {
                 Content(
                     mediaType = "application/json",
                     schema = Schema(
-                        implementation = PointRequests.ChargePointRequest::class,
+                        implementation = PointRequest.Charge::class,
                         example = """{
                             "amount": 10000
                         }"""
@@ -130,7 +130,7 @@ interface PointApi {
                 )
             ]
         )
-        request: PointRequests.ChargePointRequest
-    ): PointResponses.ChargePointResponse
+        request: PointRequest.Charge
+    ): PointResponse.Charge
 
 }

@@ -1,40 +1,55 @@
 package kr.hhplus.be.server.domain.product
 
-import kr.hhplus.be.server.domain.product.ProductCommands.ProductsCommand
-import kr.hhplus.be.server.domain.product.ProductDomains.ProductSalesInfo
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Service
+@Transactional(readOnly = true)
 class ProductService(
     private val productRepository: ProductRepository,
+    private val stockRepository: StockRepository,
     private val productStatisticsRepository: ProductStatisticsRepository
 ) {
-    fun find(productId: Long): Product {
-        return productRepository.find(productId)
+    fun find(productId: Long): ProductInfo.Find {
+        val product = productRepository.find(productId)
+        val stock = stockRepository.findByProductId(product.id)
+
+        return ProductInfo.of(product, stock)
     }
 
-    fun findAll(command: ProductsCommand): List<Product> {
-        val products = productRepository.findAllWithStockByIdIn(command.getProductIds())
+    fun findAll(productIds: List<Long>): ProductInfo.FindAll {
+        val products = productRepository.findAllByIdIn(productIds)
+        val stocks = stockRepository.findByProductIdIn(products.map { it.id })
 
-        val productMap: Map<Long, Product> = products.associateBy { it.id }
-        return command.products.map { commandProduct ->
-            val product = productMap[commandProduct.productId]
-                ?: throw IllegalArgumentException("존재하지 않는 상품입니다. id: ${commandProduct.productId}")
-            product.validateStockEnough(commandProduct.quantity)
-            product
+        return ProductInfo.of(products, stocks)
+    }
+
+    fun deduct(command: ProductCommand.Deduct) {
+        val stocks = stockRepository.findByProductIdIn(command.getProductIds())
+
+        val orderProductQuantityMap = command.products.associate { it.productId to it.quantity }
+        stocks.map { stock ->
+            val orderQuantity = orderProductQuantityMap[stock.productId]
+                ?: throw IllegalArgumentException("존재하지 않는 상품입니다. productId=${stock.productId}")
+            stock.deduct(orderQuantity)
         }
+
+        stockRepository.saveAll(stocks)
     }
 
-    fun findTopSellingProducts(): List<ProductSalesInfo> {
+    fun findTopSellingProducts(): List<ProductInfo.FindTopSales> {
         val startDatetime = startThreeDaysAgoDate()
         val endDatetime = endCurrentDate()
         val productsStatistics =
             productStatisticsRepository.findAllByCreatedAtBetween(startDatetime, endDatetime)
 
-        return extractTop5Product(productsStatistics)
+        val products = productRepository.findAllByIdIn(productsStatistics.map { it.productId })
+        val productMap: Map<Long, Product> = products.associateBy { it.id }
+
+        return extractTop5Product(productsStatistics, productMap)
     }
 
     private fun startThreeDaysAgoDate(): LocalDateTime {
@@ -45,16 +60,21 @@ class ProductService(
         return LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59))
     }
 
-    private fun extractTop5Product(productsStatistics: List<ProductStatistics>): List<ProductSalesInfo> {
+    private fun extractTop5Product(
+        productsStatistics: List<ProductStatistics>,
+        productMap: Map<Long, Product>
+    ): List<ProductInfo.FindTopSales> {
         return productsStatistics
-            .groupBy { it.product }
-            .map { (product, stats) ->
-                product to stats.sumOf { it.totalSales }
+            .groupBy { it.productId }
+            .map { (productId, stats) ->
+                productId to stats.sumOf { it.totalSales }
             }
             .sortedByDescending { (_, totalSales) -> totalSales }
             .take(5)
-            .mapIndexed { index, (product, totalSales) ->
-                ProductSalesInfo.of(
+            .mapIndexed { index, (productId, totalSales) ->
+                val product = productMap[productId]
+                    ?: throw IllegalArgumentException("존재하지 않는 상품입니다. productId=${productId}")
+                ProductInfo.of(
                     product = product,
                     totalSales = totalSales,
                     rank = index + 1

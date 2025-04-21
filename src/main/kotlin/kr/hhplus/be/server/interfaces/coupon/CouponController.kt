@@ -2,8 +2,6 @@ package kr.hhplus.be.server.interfaces.coupon
 
 import jakarta.validation.Valid
 import kr.hhplus.be.server.application.coupon.CouponFacade
-import kr.hhplus.be.server.interfaces.coupon.CouponResponses.FirstComeCouponResponse
-import kr.hhplus.be.server.interfaces.coupon.CouponRequests.FirstComeCouponRequest
 import kr.hhplus.be.server.interfaces.coupon.response.CouponsResponse
 import kr.hhplus.be.server.interfaces.swagger.CouponApi
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,10 +18,10 @@ class CouponController(
 
     @PostMapping("/coupon/issue")
     override fun issueCouponFirstCome(
-        @RequestBody @Valid request: FirstComeCouponRequest
-    ): FirstComeCouponResponse {
+        @RequestBody @Valid request: CouponRequest.FirstComeIssue
+    ): CouponResponse.FirstComeIssue {
         val result = couponFacade.issueCouponFirstCome(request.toCriterion())
-        return FirstComeCouponResponse.of(result)
+        return CouponResponse.of(result)
     }
 
     @GetMapping("/coupons/{id}")

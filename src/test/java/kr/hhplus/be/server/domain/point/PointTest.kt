@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.point
 
+import kr.hhplus.be.server.fixture.point.PointDomainFixture
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -12,13 +13,13 @@ class PointTest {
     fun increasePoint() {
         //given
         val amount = 10000
-        val point = Point(1, 100000)
+        val point = PointDomainFixture.create(1L, 100000)
 
         //when
-        point.charge(amount)
+        val result = point.charge(amount)
 
         //then
-        assertThat(point.balance).isEqualTo(110000)
+        assertThat(result.balance).isEqualTo(110000)
     }
 
     @DisplayName("포인트를 충전할 때 1,000,000,000을 초과하는 경우 예외가 발생한다.")
@@ -26,7 +27,7 @@ class PointTest {
     fun increasePoint2() {
         //given
         val amount = 1
-        val point = Point(1, 1000000000)
+        val point = PointDomainFixture.create(1L, 1000000000)
 
         //when //then
         assertThatThrownBy { point.charge(amount) }
@@ -39,13 +40,13 @@ class PointTest {
     fun deductPoint() {
         //given
         val amount = 1000
-        val point = Point(1, 10000)
+        val point = PointDomainFixture.create(1L, 10000)
 
         //when
-        point.deduct(amount)
+        val result = point.deduct(amount)
 
         //then
-        assertThat(point.balance).isEqualTo(9000L)
+        assertThat(result.balance).isEqualTo(9000)
     }
 
     @DisplayName("가진 포인트보다 높은 수량으로 차감 시도하는 경우 예외가 발생한다.")
@@ -53,12 +54,27 @@ class PointTest {
     fun deductPoint2() {
         //given
         val amount = 10001
-        val point = Point(1, 10000)
+        val point = PointDomainFixture.create(1L, 10000)
 
         //when //then
         assertThatThrownBy { point.deduct(amount) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("차감할 포인트가 없습니다.")
+    }
+
+    @DisplayName("포인트가 0보다 작다면 예외가 발생한다.")
+    @Test
+    fun validateBalance() {
+        //given
+        val point = PointDomainFixture.create(
+            pointId = 1L,
+            balance = -1
+        )
+
+        //when //then
+        assertThatThrownBy { point.validateBalance() }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("포인트는 0보다 작을 수 없습니다.")
     }
 
 }

@@ -7,6 +7,9 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 class CouponTest {
 
@@ -37,7 +40,7 @@ class CouponTest {
     @Test
     fun isExpired() {
         //given
-        val coupon = CouponDomainFixture.create(expiresAt = LocalDateTime.now().minusDays(1))
+        val coupon = CouponDomainFixture.create(expiredAt = LocalDateTime.now().minusDays(1))
 
         //when //then
         assertThatThrownBy { coupon.publish() }
@@ -68,6 +71,53 @@ class CouponTest {
         assertThatThrownBy { coupon.publish() }
             .isInstanceOf(IllegalStateException::class.java)
             .hasMessage("쿠폰이 모두 소진되었습니다.")
+    }
+
+    @DisplayName("쿠폰을 발행하면 UserCoupon에 기록한다.")
+    @Test
+    fun issueTo() {
+        //given
+        val coupon = CouponDomainFixture.create()
+
+        //when
+        val userCoupon = coupon.issueTo(coupon.id)
+
+        //then
+        assertThat(userCoupon.couponId).isEqualTo(coupon.id)
+    }
+
+    @DisplayName("쿠폰이 동시에 발급된다.")
+    @Test
+    fun deduct2() {
+        //given
+        val coupon = CouponDomainFixture.create(remainingQuantity = 10)
+
+        val threadCount = 100
+        val executorService = Executors.newFixedThreadPool(32)
+        val latch = CountDownLatch(threadCount)
+
+        //when
+        val successCount = AtomicInteger(0)
+        val failCount = AtomicInteger(0)
+
+        for (idx in 1..threadCount) {
+            executorService.execute {
+                try {
+                    coupon.deduct()
+                    successCount.incrementAndGet()
+                } catch (e: Exception) {
+                    failCount.incrementAndGet()
+                } finally {
+                    latch.countDown()
+                }
+            }
+        }
+
+        latch.await()
+
+        //then 동시성 테스트가 실패함을 검증
+        assertThat(successCount.get()).isGreaterThanOrEqualTo(10)
+        assertThat(coupon.remainingQuantity).isNotPositive()
     }
 
 }

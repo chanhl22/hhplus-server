@@ -4,7 +4,7 @@ import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.user.UserService
 import kr.hhplus.be.server.fixture.coupon.CouponCriterionFixture
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
-import kr.hhplus.be.server.fixture.user.UserFixture
+import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -33,12 +33,12 @@ class CouponFacadeTest {
     @Test
     fun issueCouponFirstCome() {
         //given
-        val user = UserFixture.create()
+        val user = UserDomainFixture.create()
         BDDMockito.given(userService.find(anyLong()))
             .willReturn(user)
 
         val coupon = CouponDomainFixture.create()
-        BDDMockito.given(couponService.issueCoupon(any()))
+        BDDMockito.given(couponService.issueCoupon(any(), any()))
             .willReturn(coupon)
 
         //when
@@ -49,7 +49,7 @@ class CouponFacadeTest {
         Mockito.verify(userService, times(1))
             .find(anyLong())
         Mockito.verify(couponService, times(1))
-            .issueCoupon(any())
+            .issueCoupon(any(), any())
     }
 
 }

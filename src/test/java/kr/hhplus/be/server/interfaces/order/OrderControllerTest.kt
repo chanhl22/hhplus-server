@@ -1,13 +1,12 @@
 package kr.hhplus.be.server.interfaces.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.application.order.OrderCriteria.OrderCriterion
-import kr.hhplus.be.server.application.order.OrderCriteria.OrderProductCriterion
 import kr.hhplus.be.server.application.order.OrderFacade
 import kr.hhplus.be.server.fixture.order.OrderResultFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
+import org.mockito.kotlin.any
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
@@ -32,22 +31,22 @@ class OrderControllerTest {
     @Test
     fun order() {
         //given
-        val request = OrderCriterion(
-            1L,
+        val userId = 1L
+        val request = OrderRequest.Order(
             listOf(
-                OrderProductCriterion(1, 2),
-                OrderProductCriterion(2, 1)
+                OrderRequest.OrderProduct(1L, 2),
+                OrderRequest.OrderProduct(2L, 1)
             ),
             1L
         )
 
-        val fakeResult = OrderResultFixture.create()
-        BDDMockito.given(orderFacade.order(request))
-            .willReturn(fakeResult)
+        val result = OrderResultFixture.create()
+        BDDMockito.given(orderFacade.order(any()))
+            .willReturn(result)
 
         //when //then
         mockMvc.perform(
-            MockMvcRequestBuilders.post("/order")
+            MockMvcRequestBuilders.post("/order?userId=${userId}")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )

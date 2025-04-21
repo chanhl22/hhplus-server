@@ -1,19 +1,25 @@
 package kr.hhplus.be.server.domain.user
 
-import kr.hhplus.be.server.domain.coupon.UserCoupon
-import kr.hhplus.be.server.domain.point.Point
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
+@Entity
+@Table(name = "user")
 class User(
-    val id: Long,
     val name: String,
-    val point: Point,
-    val userCoupons: MutableList<UserCoupon> = mutableListOf()
+    val pointId: Long,
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0L
 ) {
-    fun validatePointUsable() {
-        if (isEmptyBalance()) {
-            throw IllegalArgumentException("충전된 금액이 없습니다.")
+    init {
+        if (name.isBlank()) {
+            throw IllegalArgumentException("이름은 비어 있을 수 없습니다.")
         }
     }
 
-    private fun isEmptyBalance() = point.balance <= 0
 }
