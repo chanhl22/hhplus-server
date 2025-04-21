@@ -13,5 +13,4 @@ class ProductStatisticsRepositoryImpl(
         return productStatisticsJpaRepository.findAllByCreatedAtBetween(start, end)
     }
 
-
 }
