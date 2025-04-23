@@ -92,9 +92,9 @@ class ProductServiceIntegrationTest {
         val product2 = ProductDomainFixture.create(0L)
         val savedProduct2 = productJpaRepository.save(product2)
 
-        val stock1 = StockDomainFixture.create(0L)
+        val stock1 = StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id)
         val savedStock1 = stockJpaRepository.save(stock1)
-        val stock2 = StockDomainFixture.create(0L)
+        val stock2 = StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id)
         val savedStock2 = stockJpaRepository.save(stock2)
 
         //when

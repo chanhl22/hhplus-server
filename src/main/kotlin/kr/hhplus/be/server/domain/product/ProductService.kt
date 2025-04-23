@@ -27,6 +27,7 @@ class ProductService(
         return ProductInfo.of(products, stocks)
     }
 
+    @Transactional
     fun deduct(command: ProductCommand.Deduct) {
         val stocks = stockRepository.findByProductIdIn(command.getProductIds())
 
