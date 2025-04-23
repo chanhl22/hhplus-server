@@ -54,14 +54,14 @@ class ProductServiceIntegrationTest {
     @Test
     fun findAll() {
         //given
-        val products = ProductDomainFixture.createProducts(productId1 = 0L, productId2 = 0L)
+        val product1 = ProductDomainFixture.create(productId = 0L)
+        val product2 = ProductDomainFixture.create2(productId = 0L)
+        val products = listOf(product1, product2)
         val savedProducts = productJpaRepository.saveAll(products)
 
-        val stocks = StockDomainFixture.createStocks(
-            stockId1 = 0L,
-            stockId2 = 0L,
-            productId1 = savedProducts[0].id,
-            productId2 = savedProducts[1].id
+        val stocks = listOf(
+            StockDomainFixture.create(stockId = 0L, productId = savedProducts[0].id, quantity = 25),
+            StockDomainFixture.create(stockId = 0L, productId = savedProducts[1].id, quantity = 10)
         )
         stockJpaRepository.saveAll(stocks)
 

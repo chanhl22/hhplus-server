@@ -70,7 +70,7 @@ class CouponServiceTest {
     fun issueCoupon() {
         //given
         val coupon = CouponDomainFixture.create()
-        BDDMockito.given(couponRepository.find(any()))
+        BDDMockito.given(couponRepository.findWithPessimisticLock(any()))
             .willReturn(coupon)
 
         BDDMockito.given(couponRepository.save(any()))
@@ -85,7 +85,7 @@ class CouponServiceTest {
 
         //then
         Mockito.verify(couponRepository, times(1))
-            .find(any())
+            .findWithPessimisticLock(any())
         Mockito.verify(couponRepository, times(1))
             .save(any())
         Mockito.verify(userCouponRepository, times(1))

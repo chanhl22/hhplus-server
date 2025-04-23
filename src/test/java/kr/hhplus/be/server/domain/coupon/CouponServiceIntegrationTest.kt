@@ -71,9 +71,8 @@ class CouponServiceIntegrationTest {
             .extracting("name", "discountType", "discountValue", "remainingQuantity", "expiredAt")
             .containsExactly("1000원 할인 쿠폰", DiscountType.AMOUNT, 1000, 19, coupon.expiredAt)
 
-        val userCouponResult = userCouponJpaRepository.findById(savedCoupon.id)
-        assertThat(userCouponResult).isNotEmpty
-        assertThat(userCouponResult.get())
+        val userCouponResult = userCouponJpaRepository.findByCouponId(savedCoupon.id)
+        assertThat(userCouponResult)
             .extracting("userId", "couponId", "isUsed")
             .containsExactly(savedUser.id, savedCoupon.id, false)
     }
@@ -88,7 +87,7 @@ class CouponServiceIntegrationTest {
         val coupon = CouponDomainFixture.create(couponId = 0L)
         val savedCoupon = couponJpaRepository.save(coupon)
 
-        couponService.issueCoupon(savedUser.id, savedCoupon.id)
+        couponService.issueCoupon(savedCoupon.id, savedUser.id, )
 
         //when
         couponService.isUsed(savedCoupon.id, user.id)
