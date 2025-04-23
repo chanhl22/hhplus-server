@@ -21,10 +21,12 @@ class PointServiceConcurrencyTest {
     @Autowired
     private lateinit var pointJpaRepository: PointJpaRepository
 
+    private lateinit var savedPoint: Point
+
     @BeforeEach
     fun setUp() {
         val point = PointDomainFixture.create(pointId = 0L, 100_000)
-        pointJpaRepository.save(point)
+        savedPoint = pointJpaRepository.save(point)
     }
 
     @AfterEach
@@ -36,6 +38,8 @@ class PointServiceConcurrencyTest {
     @Test
     fun charge() {
         //given
+        val pointId = savedPoint.id
+
         val threadCount = 100
         val executorService = Executors.newFixedThreadPool(32)
         val latch = CountDownLatch(threadCount)
@@ -44,7 +48,7 @@ class PointServiceConcurrencyTest {
         for (idx in 1..threadCount) {
             executorService.execute {
                 try {
-                    pointService.charge(1L, 1000)
+                    pointService.charge(pointId, 1000)
                 } finally {
                     latch.countDown()
                 }
@@ -54,7 +58,7 @@ class PointServiceConcurrencyTest {
         latch.await()
 
         //then
-        val findStock = pointJpaRepository.findById(1L)
+        val findStock = pointJpaRepository.findById(pointId)
         assertThat(findStock.get().balance).isEqualTo(200_000)
     }
 
@@ -62,6 +66,8 @@ class PointServiceConcurrencyTest {
     @Test
     fun deduct() {
         //given
+        val pointId = savedPoint.id
+
         val threadCount = 100
         val executorService = Executors.newFixedThreadPool(32)
         val latch = CountDownLatch(threadCount)
@@ -70,7 +76,7 @@ class PointServiceConcurrencyTest {
         for (idx in 1..threadCount) {
             executorService.execute {
                 try {
-                    pointService.use(1L, 1000)
+                    pointService.use(pointId, 1000)
                 } finally {
                     latch.countDown()
                 }
@@ -80,7 +86,7 @@ class PointServiceConcurrencyTest {
         latch.await()
 
         //then
-        val findStock = pointJpaRepository.findById(1L)
+        val findStock = pointJpaRepository.findById(pointId)
         assertThat(findStock.get().balance).isEqualTo(0)
     }
 
