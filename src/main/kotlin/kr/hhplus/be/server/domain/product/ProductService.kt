@@ -29,16 +29,16 @@ class ProductService(
 
     @Transactional
     fun deduct(command: ProductCommand.Deduct) {
-        val stocks = stockRepository.findByProductIdIn(command.getProductIds())
+        val stocks = stockRepository.findByProductIdInWithOptimisticLock(command.getProductIds())
 
         val orderProductQuantityMap = command.products.associate { it.productId to it.quantity }
-        stocks.map { stock ->
+        val deductStocks = stocks.map { stock ->
             val orderQuantity = orderProductQuantityMap[stock.productId]
                 ?: throw IllegalArgumentException("존재하지 않는 상품입니다. productId=${stock.productId}")
             stock.deduct(orderQuantity)
         }
 
-        stockRepository.saveAll(stocks)
+        stockRepository.saveAll(deductStocks)
     }
 
     fun findTopSellingProducts(): List<ProductInfo.FindTopSales> {

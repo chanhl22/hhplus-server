@@ -11,8 +11,10 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
 class ProductServiceConcurrencyTest {
@@ -26,17 +28,21 @@ class ProductServiceConcurrencyTest {
     @Autowired
     private lateinit var stockJpaRepository: StockJpaRepository
 
+    private lateinit var savedProduct: Product
+
+    private lateinit var savedStock: Stock
+
     @BeforeEach
     fun setUp() {
         val product = ProductDomainFixture.create(productId = 0L)
-        productJpaRepository.saveAndFlush(product)
+        savedProduct = productJpaRepository.saveAndFlush(product)
 
         val stock = StockDomainFixture.create(
             stockId = 0L,
-            productId = 1L,
+            productId = savedProduct.id,
             quantity = 100
         )
-        stockJpaRepository.saveAndFlush(stock)
+        savedStock = stockJpaRepository.saveAndFlush(stock)
     }
 
     @AfterEach
@@ -49,9 +55,11 @@ class ProductServiceConcurrencyTest {
     @Test
     fun deduct() {
         //given
+        val productId = savedProduct.id
+
         val command = ProductCommand.Deduct(
             listOf(
-                ProductCommand.OrderProduct(productId = 1L, 1)
+                ProductCommand.OrderProduct(productId = productId, quantity = 1)
             )
         )
 
@@ -59,11 +67,15 @@ class ProductServiceConcurrencyTest {
         val executorService = Executors.newFixedThreadPool(32)
         val latch = CountDownLatch(threadCount)
 
+        val exceptionCount = AtomicInteger(0)
+
         //when
         for (idx in 1..threadCount) {
             executorService.execute {
                 try {
                     productService.deduct(command)
+                } catch (e: ObjectOptimisticLockingFailureException) {
+                    exceptionCount.incrementAndGet()
                 } finally {
                     latch.countDown()
                 }
@@ -73,8 +85,7 @@ class ProductServiceConcurrencyTest {
         latch.await()
 
         //then
-        val findStock = stockJpaRepository.findById(1L)
-        assertThat(findStock.get().quantity).isEqualTo(0)
+        assertThat(exceptionCount.get()).isGreaterThan(0)
     }
 
 }
