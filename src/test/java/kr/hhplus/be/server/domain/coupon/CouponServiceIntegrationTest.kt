@@ -93,9 +93,8 @@ class CouponServiceIntegrationTest {
         couponService.isUsed(savedCoupon.id, user.id)
 
         //then
-        val userCouponResult = userCouponJpaRepository.findById(savedCoupon.id)
-        assertThat(userCouponResult).isNotEmpty
-        assertThat(userCouponResult.get())
+        val userCouponResult = userCouponJpaRepository.findByCouponId(savedCoupon.id)
+        assertThat(userCouponResult)
             .extracting("userId", "couponId", "isUsed")
             .containsExactly(savedUser.id, savedCoupon.id, true)
     }
