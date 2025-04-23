@@ -21,10 +21,12 @@ class CouponServiceConcurrencyTest {
     @Autowired
     private lateinit var couponJpaRepository: CouponJpaRepository
 
+    private lateinit var savedCoupon: Coupon
+
     @BeforeEach
     fun setUp() {
         val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 100)
-        couponJpaRepository.save(coupon)
+        savedCoupon = couponJpaRepository.save(coupon)
     }
 
     @AfterEach
@@ -36,6 +38,8 @@ class CouponServiceConcurrencyTest {
     @Test
     fun issueCoupon() {
         //given
+        val couponId = savedCoupon.id
+
         val threadCount = 100
         val executorService = Executors.newFixedThreadPool(32)
         val latch = CountDownLatch(threadCount)
@@ -44,7 +48,7 @@ class CouponServiceConcurrencyTest {
         for (idx in 1..threadCount) {
             executorService.execute {
                 try {
-                    couponService.issueCoupon(1L, 1L)
+                    couponService.issueCoupon(couponId, 1L)
                 } finally {
                     latch.countDown()
                 }
@@ -54,7 +58,7 @@ class CouponServiceConcurrencyTest {
         latch.await()
 
         //then
-        val findStock = couponJpaRepository.findById(1L)
+        val findStock = couponJpaRepository.findById(couponId)
         assertThat(findStock.get().remainingQuantity).isEqualTo(0)
     }
 
