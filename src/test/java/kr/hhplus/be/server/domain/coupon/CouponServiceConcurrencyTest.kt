@@ -1,16 +1,18 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
+import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import kr.hhplus.be.server.infrastructure.coupon.CouponJpaRepository
+import kr.hhplus.be.server.infrastructure.coupon.UserCouponJpaRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
 class CouponServiceConcurrencyTest {
@@ -21,24 +23,21 @@ class CouponServiceConcurrencyTest {
     @Autowired
     private lateinit var couponJpaRepository: CouponJpaRepository
 
-    private lateinit var savedCoupon: Coupon
-
-    @BeforeEach
-    fun setUp() {
-        val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 100)
-        savedCoupon = couponJpaRepository.save(coupon)
-    }
+    @Autowired
+    private lateinit var userCouponJpaRepository: UserCouponJpaRepository
 
     @AfterEach
     fun tearDown() {
         couponJpaRepository.deleteAllInBatch()
+        userCouponJpaRepository.deleteAllInBatch()
     }
 
-    @DisplayName("쿠폰이 동시에 차감될 수 없다.")
+    @DisplayName("쿠폰 발행을 동시에 요청해도 누락되지 않고 차감된다.")
     @Test
-    fun issueCoupon() {
+    fun lostIssueCoupon() {
         //given
-        val couponId = savedCoupon.id
+        val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 100)
+        val savedCoupon = couponJpaRepository.save(coupon)
 
         val threadCount = 100
         val executorService = Executors.newFixedThreadPool(32)
@@ -48,7 +47,7 @@ class CouponServiceConcurrencyTest {
         for (idx in 1..threadCount) {
             executorService.execute {
                 try {
-                    couponService.issueCoupon(couponId, 1L)
+                    couponService.issueCoupon(savedCoupon.id, 1L)
                 } finally {
                     latch.countDown()
                 }
@@ -58,8 +57,43 @@ class CouponServiceConcurrencyTest {
         latch.await()
 
         //then
-        val findStock = couponJpaRepository.findById(couponId)
-        assertThat(findStock.get().remainingQuantity).isEqualTo(0)
+        val findCoupon = couponJpaRepository.findById(savedCoupon.id)
+        assertThat(findCoupon.get().remainingQuantity).isEqualTo(0)
+    }
+
+    @DisplayName("동시에 두 명이 동일한 쿠폰을 발급받으면 재고가 음수가 되지 않아야 한다.")
+    @Test
+    fun couponRemainingQuantityAlwaysPositive() {
+        //given
+        val user = UserDomainFixture.create(userId = 0L)
+
+        val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 1)
+        val savedCoupon = couponJpaRepository.save(coupon)
+
+        val executorService = Executors.newFixedThreadPool(32)
+        val latch = CountDownLatch(2)
+
+        val exceptionCount = AtomicInteger(0)
+
+        //when
+        for (idx in 1..2) {
+            executorService.execute {
+                try {
+                    couponService.issueCoupon(savedCoupon.id, user.id)
+                } catch (e: IllegalStateException) {
+                    exceptionCount.incrementAndGet()
+                } finally {
+                    latch.countDown()
+                }
+            }
+        }
+
+        latch.await()
+
+        //then
+        val findCoupon = couponJpaRepository.findById(savedCoupon.id)
+        assertThat(findCoupon.get().remainingQuantity).isEqualTo(0)
+        assertThat(exceptionCount.get()).isEqualTo(1)
     }
 
 }
