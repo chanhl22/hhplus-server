@@ -25,8 +25,9 @@ interface OrderApi {
                         schema = Schema(
                             example = """{
                             "orderId": 1L,
-                            "finalAmount": 10000,
-                            "status": "SUCCESS"
+                            "totalAmount": 10000,
+                            "paymentId": 1L,
+                            "remainBalance": 10000
                         }"""
                         )
                     )
@@ -73,8 +74,7 @@ interface OrderApi {
                     schema = Schema(
                         implementation = OrderRequest.Order::class,
                         example = """{
-                                        "userId": 1,
-                                        "items": [
+                                        "products": [
                                             {
                                               "productId": 1,
                                               "quantity": 2
@@ -83,7 +83,8 @@ interface OrderApi {
                                               "productId": 2,
                                               "quantity": 1
                                             }
-                                        ]
+                                        ],
+                                        "couponId": 1L,
                                      }"""
                     )
                 )
