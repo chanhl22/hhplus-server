@@ -1,5 +1,8 @@
 package kr.hhplus.be.server.domain.product
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -27,6 +30,11 @@ class ProductService(
         return ProductInfo.of(products, stocks)
     }
 
+    @Retryable(
+        value = [ObjectOptimisticLockingFailureException::class],
+        maxAttempts = 2,
+        backoff = Backoff(delay = 10)
+    )
     @Transactional
     fun deduct(command: ProductCommand.Deduct) {
         val stocks = stockRepository.findByProductIdInWithOptimisticLock(command.getProductIds())
