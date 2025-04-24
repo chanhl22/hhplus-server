@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.user.PointRequest
-import kr.hhplus.be.server.interfaces.user.PointResponse
+import kr.hhplus.be.server.interfaces.point.PointRequest
+import kr.hhplus.be.server.interfaces.point.PointResponse
 
 @Tag(name = "Point API", description = "포인트 API")
 interface PointApi {

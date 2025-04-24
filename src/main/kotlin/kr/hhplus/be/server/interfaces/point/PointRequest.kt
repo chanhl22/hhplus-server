@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.user
+package kr.hhplus.be.server.interfaces.point
 
 import jakarta.validation.constraints.Positive
 import kr.hhplus.be.server.application.point.PointCriteria

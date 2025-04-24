@@ -3,8 +3,6 @@ package kr.hhplus.be.server.interfaces.point
 import com.fasterxml.jackson.databind.ObjectMapper
 import kr.hhplus.be.server.application.point.PointFacade
 import kr.hhplus.be.server.fixture.point.PointResultFixture
-import kr.hhplus.be.server.interfaces.user.PointController
-import kr.hhplus.be.server.interfaces.user.PointRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito

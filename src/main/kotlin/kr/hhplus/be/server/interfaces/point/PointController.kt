@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.user
+package kr.hhplus.be.server.interfaces.point
 
 import jakarta.validation.Valid
 import kr.hhplus.be.server.application.point.PointFacade
