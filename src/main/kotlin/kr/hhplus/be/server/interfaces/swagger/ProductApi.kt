@@ -27,7 +27,7 @@ interface ProductApi {
                                             "productId": 1,
                                             "name": "무선 블루투스 이어폰",
                                             "price": 129000,
-                                            "stock": 25,
+                                            "quantity": 25,
                                             "description": "고음질 무선 블루투스 이어폰. 최대 20시간 사용 가능."
                                          }"""
                         )
@@ -81,16 +81,14 @@ interface ProductApi {
                                               "productId": 10,
                                               "name": "무선 블루투스 이어폰",
                                               "price": 129000,
-                                              "soldQuantity": 350,
-                                              "stock": 25
+                                              "soldQuantity": 350
                                             },
                                             {
                                               "rank": 2,
                                               "productId": 5,
                                               "name": "게이밍 키보드",
                                               "price": 89000,
-                                              "soldQuantity": 280,
-                                              "stock": 50
+                                              "soldQuantity": 280
                                             }
                                          ]"""
                         )
