@@ -16,9 +16,21 @@ class ProductCommand {
         val quantity: Int
     )
 
+    data class ProductStatistics(
+        val productId: Long,
+        val totalSales: Int
+    )
+
     companion object {
         fun of(orderProducts: List<OrderProduct>): Deduct {
             return Deduct(products = orderProducts)
+        }
+
+        fun of(productId: Long, totalSales: Int): ProductStatistics {
+            return ProductStatistics(
+                productId = productId,
+                totalSales = totalSales
+            )
         }
     }
 

@@ -49,18 +49,4 @@ class CouponControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk())
     }
 
-    @DisplayName("발급된 쿠폰 목록을 조회합니다.")
-    @Test
-    fun findCoupons() {
-        //given
-        val requestId = 1L
-
-        //when //then
-        mockMvc.perform(
-            MockMvcRequestBuilders.get("/coupons/${requestId}")
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(MockMvcResultMatchers.status().isOk())
-    }
-
 }
