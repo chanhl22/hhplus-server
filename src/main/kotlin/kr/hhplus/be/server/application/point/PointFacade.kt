@@ -3,8 +3,10 @@ package kr.hhplus.be.server.application.point
 import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.user.UserService
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Transactional(readOnly = true)
 class PointFacade(
     private val pointService: PointService,
     private val userService: UserService
@@ -16,6 +18,7 @@ class PointFacade(
         return PointResult.of(user, point)
     }
 
+    @Transactional
     fun charge(criteria: PointCriteria.Charge): PointResult.Charge {
         val user = userService.find(criteria.userId)
         val point = pointService.find(user.pointId)
