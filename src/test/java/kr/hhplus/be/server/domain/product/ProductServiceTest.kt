@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
 import kr.hhplus.be.server.fixture.product.ProductDomainFixture
+import kr.hhplus.be.server.fixture.product.ProductStatisticsFixture
 import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -70,9 +71,10 @@ class ProductServiceTest {
     @Test
     fun saveProductStatistics() {
         //given
-        BDDMockito.willDoNothing()
-            .given(productStatisticsRepository)
-            .saveAll(any())
+        val productsStatistics = listOf(ProductStatisticsFixture.create(productStatisticsId = 0L))
+        ProductDomainFixture.createProducts()
+        BDDMockito.given(productStatisticsRepository.saveAll(any()))
+            .willReturn(productsStatistics)
 
         val command = listOf(ProductCommand.of(productId = 1L, totalSales = 10000))
 

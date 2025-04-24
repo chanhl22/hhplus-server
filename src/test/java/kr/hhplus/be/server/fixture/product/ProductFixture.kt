@@ -71,6 +71,22 @@ object ProductDomainFixture {
 
 }
 
+object ProductStatisticsFixture {
+    fun create(
+        productStatisticsId: Long = 1L,
+        productId: Long = 1L,
+        totalSales: Int = 100,
+        createdAt: LocalDateTime = LocalDateTime.now()
+    ): ProductStatistics {
+        return ProductStatistics(
+            id = productStatisticsId,
+            productId = productId,
+            totalSales = totalSales,
+            createdAt = createdAt
+        )
+    }
+}
+
 object ProductInfoFixture {
     fun create(
         productId: Long = 1L,

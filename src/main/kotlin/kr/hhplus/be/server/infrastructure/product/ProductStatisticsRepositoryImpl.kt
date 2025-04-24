@@ -13,8 +13,8 @@ class ProductStatisticsRepositoryImpl(
         return productStatisticsJpaRepository.findAllByCreatedAtBetween(start, end)
     }
 
-    override fun saveAll(statistics: List<ProductStatistics>) {
-        productStatisticsJpaRepository.saveAll(statistics)
+    override fun saveAll(statistics: List<ProductStatistics>): List<ProductStatistics> {
+        return productStatisticsJpaRepository.saveAll(statistics)
     }
 
 }
