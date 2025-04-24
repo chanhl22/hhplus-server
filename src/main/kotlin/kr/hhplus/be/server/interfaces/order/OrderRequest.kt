@@ -2,7 +2,6 @@ package kr.hhplus.be.server.interfaces.order
 
 import kr.hhplus.be.server.application.order.OrderCriteria
 
-@Suppress("unused")
 class OrderRequest {
     data class Order(
         val products: List<OrderProduct>,

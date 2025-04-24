@@ -2,7 +2,6 @@ package kr.hhplus.be.server.interfaces.order
 
 import kr.hhplus.be.server.application.order.OrderResult
 
-@Suppress("unused")
 class OrderResponse {
     data class Order(
         val orderId: Long,
