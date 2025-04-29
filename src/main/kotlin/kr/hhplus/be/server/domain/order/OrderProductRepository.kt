@@ -7,4 +7,6 @@ interface OrderProductRepository {
 
     fun saveAll(orderProducts: List<OrderProduct>)
 
+    fun findByOrderIn(orders: List<Order>): List<OrderProduct>
+
 }

@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
 import kr.hhplus.be.server.fixture.product.ProductDomainFixture
+import kr.hhplus.be.server.fixture.product.ProductStatisticsFixture
 import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -64,6 +65,25 @@ class ProductServiceTest {
         //then
         Mockito.verify(productRepository, times(1))
             .findAllByIdIn(any())
+    }
+
+    @DisplayName("주문 통계를 저장한다.")
+    @Test
+    fun saveProductStatistics() {
+        //given
+        val productsStatistics = listOf(ProductStatisticsFixture.create(productStatisticsId = 0L))
+        ProductDomainFixture.createProducts()
+        BDDMockito.given(productStatisticsRepository.saveAll(any()))
+            .willReturn(productsStatistics)
+
+        val command = listOf(ProductCommand.of(productId = 1L, totalSales = 10000))
+
+        //when
+        productService.saveProductStatistics(command)
+
+        //then
+        Mockito.verify(productStatisticsRepository, times(1))
+            .saveAll(any())
     }
 
     @DisplayName("최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회한다.")

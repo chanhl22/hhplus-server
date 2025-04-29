@@ -77,6 +77,7 @@ class OrderFacadeTest {
             .isUsed(any(), any())
 
         val payment = PaymentDomainFixture.create()
+
         BDDMockito.given(paymentService.process(any()))
             .willReturn(payment)
 

@@ -12,8 +12,10 @@ import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.domain.user.UserService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class OrderFacade(
     private val productService: ProductService,
     private val orderService: OrderService,
@@ -22,6 +24,8 @@ class OrderFacade(
     private val pointService: PointService,
     private val couponService: CouponService
 ) {
+
+    @Transactional
     fun order(criteria: OrderCriteria.Order): OrderResult.Order {
         val user = userService.find(criteria.userId)
         val point = pointService.find(user.pointId)

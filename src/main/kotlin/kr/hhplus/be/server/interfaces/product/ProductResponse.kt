@@ -2,7 +2,6 @@ package kr.hhplus.be.server.interfaces.product
 
 import kr.hhplus.be.server.domain.product.ProductInfo
 
-@Suppress("unused")
 class ProductResponse {
     data class Find(
         val productId: Long,

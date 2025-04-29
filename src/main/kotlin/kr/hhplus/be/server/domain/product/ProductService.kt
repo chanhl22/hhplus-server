@@ -49,6 +49,13 @@ class ProductService(
         stockRepository.saveAll(deductStocks)
     }
 
+    fun saveProductStatistics(commands: List<ProductCommand.ProductStatistics>) {
+        productStatisticsRepository.saveAll(
+            commands.map { command ->
+                ProductStatistics.create(command.productId, command.totalSales)
+            })
+    }
+
     fun findTopSellingProducts(): List<ProductInfo.FindTopSales> {
         val startDatetime = startThreeDaysAgoDate()
         val endDatetime = endCurrentDate()

@@ -4,6 +4,7 @@ import kr.hhplus.be.server.application.order.OrderCriteria
 import kr.hhplus.be.server.application.order.OrderResult
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderCommand
+import kr.hhplus.be.server.domain.order.OrderInfo
 import kr.hhplus.be.server.domain.order.OrderPoint
 import kr.hhplus.be.server.domain.order.OrderProduct
 import kr.hhplus.be.server.domain.order.OrderedProduct
@@ -73,6 +74,18 @@ object OrderProductDomainFixture {
         return OrderProduct(
             order = order,
             productId = productId,
+        )
+    }
+}
+
+object OrderInfoFixture {
+    fun create(
+        productId: Long = 1L,
+        totalSales: Int = 10000
+    ): OrderInfo.ProductStatistics {
+        return OrderInfo.ProductStatistics(
+            productId = productId,
+            totalSales = totalSales
         )
     }
 }

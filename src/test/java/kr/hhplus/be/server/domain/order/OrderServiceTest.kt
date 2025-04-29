@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.order
 
 import kr.hhplus.be.server.fixture.order.OrderCommandFixture
 import kr.hhplus.be.server.fixture.order.OrderDomainFixture
+import kr.hhplus.be.server.fixture.order.OrderProductDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -46,6 +47,28 @@ class OrderServiceTest {
             .save(any())
         Mockito.verify(orderProductRepository, times(1))
             .saveAll(any())
+    }
+
+    @DisplayName("통계를 위해 주문을 집계한다.")
+    @Test
+    fun aggregateOrderProduct() {
+        //given
+        val orders = listOf(OrderDomainFixture.create())
+        BDDMockito.given(orderRepository.findByRegisteredAtBetween(any(), any()))
+            .willReturn(orders)
+
+        val orderProducts = listOf(OrderProductDomainFixture.create())
+        BDDMockito.given(orderProductRepository.findByOrderIn(any()))
+            .willReturn(orderProducts)
+
+        //when
+        orderService.aggregateOrderProduct()
+
+        //then
+        Mockito.verify(orderRepository, times(1))
+            .findByRegisteredAtBetween(any(), any())
+        Mockito.verify(orderProductRepository, times(1))
+            .findByOrderIn(any())
     }
 
 }

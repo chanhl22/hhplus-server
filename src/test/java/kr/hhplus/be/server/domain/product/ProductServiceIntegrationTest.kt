@@ -114,6 +114,26 @@ class ProductServiceIntegrationTest {
         assertThat(findStock2.get().quantity).isEqualTo(9998)
     }
 
+    @DisplayName("주문 통계를 저장한다.")
+    @Test
+    fun saveProductStatistics() {
+        //given
+        val command = listOf(
+            ProductCommand.of(productId = 1L, totalSales = 10000)
+        )
+
+        //when
+        productService.saveProductStatistics(command)
+
+        //then
+        val productsStatistics = productStatisticsJpaRepository.findAll()
+        assertThat(productsStatistics).hasSize(1)
+            .extracting("productId", "totalSales")
+            .containsExactly(
+                Tuple.tuple(1L, 10000)
+            )
+    }
+
     @DisplayName("최근 3일간 가장 많이 팔린 상위 5개 상품 정보를 조회한다.")
     @Test
     fun findTopSellingProducts() {
