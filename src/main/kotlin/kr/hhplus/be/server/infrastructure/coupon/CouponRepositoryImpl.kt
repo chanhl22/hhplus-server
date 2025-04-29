@@ -14,6 +14,11 @@ class CouponRepositoryImpl(
             .orElseThrow(::IllegalArgumentException)
     }
 
+    override fun findWithPessimisticLock(couponId: Long): Coupon {
+        return couponJpaRepository.findWithPessimisticLock(couponId)
+            .orElseThrow(::IllegalArgumentException)
+    }
+
     override fun save(coupon: Coupon): Coupon {
         return couponJpaRepository.save(coupon)
     }

@@ -14,7 +14,7 @@ class PointService(
 
     @Transactional
     fun charge(pointId: Long, amount: Int): Point {
-        val point = find(pointId)
+        val point = pointRepository.findWithPessimisticLock(pointId)
             .charge(amount)
 
         return pointRepository.save(point)
@@ -22,7 +22,7 @@ class PointService(
 
     @Transactional
     fun use(pointId: Long, amount: Int) {
-        val point = find(pointId)
+        val point = pointRepository.findWithPessimisticLock(pointId)
             .deduct(amount)
 
         pointRepository.save(point)

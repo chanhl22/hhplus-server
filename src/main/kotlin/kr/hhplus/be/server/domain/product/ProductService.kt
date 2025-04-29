@@ -1,5 +1,8 @@
 package kr.hhplus.be.server.domain.product
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -27,17 +30,23 @@ class ProductService(
         return ProductInfo.of(products, stocks)
     }
 
+    @Retryable(
+        value = [ObjectOptimisticLockingFailureException::class],
+        maxAttempts = 2,
+        backoff = Backoff(delay = 10)
+    )
+    @Transactional
     fun deduct(command: ProductCommand.Deduct) {
-        val stocks = stockRepository.findByProductIdIn(command.getProductIds())
+        val stocks = stockRepository.findByProductIdInWithOptimisticLock(command.getProductIds())
 
         val orderProductQuantityMap = command.products.associate { it.productId to it.quantity }
-        stocks.map { stock ->
+        val deductStocks = stocks.map { stock ->
             val orderQuantity = orderProductQuantityMap[stock.productId]
                 ?: throw IllegalArgumentException("존재하지 않는 상품입니다. productId=${stock.productId}")
             stock.deduct(orderQuantity)
         }
 
-        stockRepository.saveAll(stocks)
+        stockRepository.saveAll(deductStocks)
     }
 
     fun findTopSellingProducts(): List<ProductInfo.FindTopSales> {

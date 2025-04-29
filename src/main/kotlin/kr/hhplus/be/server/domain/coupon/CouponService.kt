@@ -19,7 +19,7 @@ class CouponService(
 
     @Transactional
     fun issueCoupon(couponId: Long, userId: Long): Coupon {
-        val coupon = couponRepository.find(couponId)
+        val coupon = couponRepository.findWithPessimisticLock(couponId)
             .publish()
             .deduct()
         val userCoupon = coupon.issueTo(userId)

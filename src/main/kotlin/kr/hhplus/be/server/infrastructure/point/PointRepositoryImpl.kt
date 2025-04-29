@@ -14,6 +14,11 @@ class PointRepositoryImpl(
             .orElseThrow(::IllegalArgumentException)
     }
 
+    override fun findWithPessimisticLock(pointId: Long): Point {
+        return pointJpaRepository.findWithPessimisticLock(pointId)
+            .orElseThrow(::IllegalArgumentException)
+    }
+
     override fun save(point: Point): Point {
         return pointJpaRepository.save(point)
     }

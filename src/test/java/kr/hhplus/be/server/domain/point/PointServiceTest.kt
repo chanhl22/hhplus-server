@@ -42,7 +42,7 @@ class PointServiceTest {
     fun charge() {
         //given
         val point = PointDomainFixture.create()
-        BDDMockito.given(pointRepository.find(any()))
+        BDDMockito.given(pointRepository.findWithPessimisticLock(any()))
             .willReturn(point)
 
         val updatedPoint = PointDomainFixture.create(balance = 110000)
@@ -54,7 +54,7 @@ class PointServiceTest {
 
         //then
         Mockito.verify(pointRepository, times(1))
-            .find(any())
+            .findWithPessimisticLock(any())
         Mockito.verify(pointRepository, times(1))
             .save(any())
     }
@@ -64,7 +64,7 @@ class PointServiceTest {
     fun use() {
         //given
         val point = PointDomainFixture.create()
-        BDDMockito.given(pointRepository.find(any()))
+        BDDMockito.given(pointRepository.findWithPessimisticLock(any()))
             .willReturn(point)
 
         val updatedPoint = PointDomainFixture.create(balance = 90000)
@@ -76,7 +76,7 @@ class PointServiceTest {
 
         //then
         Mockito.verify(pointRepository, times(1))
-            .find(any())
+            .findWithPessimisticLock(any())
         Mockito.verify(pointRepository, times(1))
             .save(any())
     }

@@ -21,6 +21,20 @@ object ProductDomainFixture {
         )
     }
 
+    fun create2(
+        productId: Long = 2L,
+        name: String = "무선 키보드",
+        price: Int = 375000,
+        description: String = "적축 키보드."
+    ): Product {
+        return Product(
+            id = productId,
+            name = name,
+            price = price,
+            description = description
+        )
+    }
+
     fun createProducts(
         productId1: Long = 1L,
         productId2: Long = 2L

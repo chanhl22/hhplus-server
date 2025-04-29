@@ -18,6 +18,10 @@ class StockRepositoryImpl(
         return stockJpaRepository.findByProductIdIn(productIds)
     }
 
+    override fun findByProductIdInWithOptimisticLock(productIds: List<Long>): List<Stock> {
+        return stockJpaRepository.findByProductIdInWithOptimisticLock(productIds)
+    }
+
     override fun saveAll(stocks: List<Stock>) {
         stockJpaRepository.saveAll(stocks)
     }

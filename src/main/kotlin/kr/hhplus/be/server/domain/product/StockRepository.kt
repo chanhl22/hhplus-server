@@ -6,6 +6,8 @@ interface StockRepository {
 
     fun findByProductIdIn(productIds: List<Long>): List<Stock>
 
+    fun findByProductIdInWithOptimisticLock(productIds: List<Long>): List<Stock>
+
     fun saveAll(stocks: List<Stock>)
 
 }

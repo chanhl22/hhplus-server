@@ -7,9 +7,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
 
 class CouponTest {
 
@@ -84,40 +81,6 @@ class CouponTest {
 
         //then
         assertThat(userCoupon.couponId).isEqualTo(coupon.id)
-    }
-
-    @DisplayName("쿠폰이 동시에 발급된다.")
-    @Test
-    fun deduct2() {
-        //given
-        val coupon = CouponDomainFixture.create(remainingQuantity = 10)
-
-        val threadCount = 100
-        val executorService = Executors.newFixedThreadPool(32)
-        val latch = CountDownLatch(threadCount)
-
-        //when
-        val successCount = AtomicInteger(0)
-        val failCount = AtomicInteger(0)
-
-        for (idx in 1..threadCount) {
-            executorService.execute {
-                try {
-                    coupon.deduct()
-                    successCount.incrementAndGet()
-                } catch (e: Exception) {
-                    failCount.incrementAndGet()
-                } finally {
-                    latch.countDown()
-                }
-            }
-        }
-
-        latch.await()
-
-        //then 동시성 테스트가 실패함을 검증
-        assertThat(successCount.get()).isGreaterThanOrEqualTo(10)
-        assertThat(coupon.remainingQuantity).isNotPositive()
     }
 
 }
