@@ -26,6 +26,14 @@ class OrderCriteria {
                 )
             })
         }
+
+        @Suppress("unused")
+        fun toLockKeys(): List<String> {
+            return products.map { it.productId }
+                .distinct()
+                .sorted()
+                .map { productId -> productId.toString() }
+        }
     }
 
     data class OrderProduct(

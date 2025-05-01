@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import jakarta.persistence.Version
 
 @Entity
 @Table(name = "stock")
@@ -14,9 +13,6 @@ class Stock(
     val productId: Long,
 
     val quantity: Int,
-
-    @Version
-    val version: Long? = null,
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +29,7 @@ class Stock(
             throw IllegalStateException("재고가 모두 소진되었습니다.")
         }
         val deductQuantity = quantity - orderQuantity
-        return Stock(productId, deductQuantity, version, id)
+        return Stock(productId, deductQuantity, id)
     }
 
     private fun isSoldOut(orderQuantity: Int): Boolean {

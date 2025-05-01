@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.application.order
 
+import kr.hhplus.be.server.common.annotation.DistributedLock
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.order.OrderCommand
 import kr.hhplus.be.server.domain.order.OrderPoint
@@ -25,6 +26,7 @@ class OrderFacade(
     private val couponService: CouponService
 ) {
 
+    @DistributedLock(key = "#criteria.toLockKeys()")
     @Transactional
     fun order(criteria: OrderCriteria.Order): OrderResult.Order {
         val user = userService.find(criteria.userId)
