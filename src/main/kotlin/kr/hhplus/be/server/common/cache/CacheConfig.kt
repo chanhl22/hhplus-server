@@ -3,6 +3,7 @@ package kr.hhplus.be.server.common.cache
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -20,6 +21,12 @@ import java.time.Duration
 @Configuration
 @EnableCaching
 class CacheConfig {
+
+    @Value("\${spring.data.redis.host}")
+    private val host: String = ""
+
+    @Value("\${spring.data.redis.port}")
+    private val port = 0
 
     @Bean
     fun objectMapper(): ObjectMapper {
@@ -43,7 +50,7 @@ class CacheConfig {
 
     @Bean
     fun redisConnectionFactory(): RedisConnectionFactory {
-        return LettuceConnectionFactory()
+        return LettuceConnectionFactory(host, port)
     }
 
     @Bean
