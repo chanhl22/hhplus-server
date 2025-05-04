@@ -12,7 +12,6 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
-import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
@@ -20,16 +19,13 @@ import java.time.Duration
 
 @Configuration
 @EnableCaching
-class CacheConfig {
-
-    @Value("\${spring.data.redis.host}")
-    private val host: String = ""
-
-    @Value("\${spring.data.redis.port}")
-    private val port = 0
+class CacheConfig(
+    @Value("\${spring.data.redis.host}") private val host: String,
+    @Value("\${spring.data.redis.port}") private val port: Int
+) {
 
     @Bean
-    fun objectMapper(): ObjectMapper {
+    fun redisObjectMapper(): ObjectMapper {
         val objectMapper = ObjectMapper()
         objectMapper.registerModule(KotlinModule.Builder().build())
         objectMapper.activateDefaultTyping(
@@ -59,18 +55,10 @@ class CacheConfig {
             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()))
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
-                    GenericJackson2JsonRedisSerializer(objectMapper())
+                    GenericJackson2JsonRedisSerializer(redisObjectMapper())
                 )
             )
-            .entryTtl(Duration.ofSeconds(10))
-    }
-
-    @Bean
-    fun redisTemplate(): RedisTemplate<*, *> {
-        val redisTemplate: RedisTemplate<*, *> = RedisTemplate<Any, Any>()
-        redisTemplate.connectionFactory = redisConnectionFactory()
-        redisTemplate.setDefaultSerializer(StringRedisSerializer())
-        return redisTemplate
+            .entryTtl(Duration.ofDays(1))
     }
 
 }
