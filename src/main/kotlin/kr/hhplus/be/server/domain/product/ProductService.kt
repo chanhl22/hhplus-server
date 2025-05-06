@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -90,6 +91,10 @@ class ProductService(
                     rank = index + 1
                 )
             }
+    }
+
+    @CacheEvict(cacheNames = ["findTopSellingProducts"], allEntries = true)
+    fun clearProductStatisticsCache() {
     }
 
 }
