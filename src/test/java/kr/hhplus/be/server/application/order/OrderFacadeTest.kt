@@ -86,7 +86,7 @@ class OrderFacadeTest {
             .use(any(), any())
 
         //when
-        val criteria = OrderCriteriaFixture.create()
+        val criteria = OrderCriteriaFixture.create(userId = 1L)
         orderFacade.order(criteria)
 
         //then
