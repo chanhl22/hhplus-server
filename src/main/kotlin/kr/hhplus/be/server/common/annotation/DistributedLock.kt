@@ -10,7 +10,7 @@ annotation class DistributedLock(
 
     val timeUnit: TimeUnit = TimeUnit.SECONDS,
 
-    val waitTime: Long = 10L,
+    val waitTime: Long = 5L,
 
     val leaseTime: Long = 3L
 
