@@ -176,4 +176,19 @@ class ProductServiceIntegrationTest {
             )
     }
 
+    @DisplayName("캐시가 비워졌는지 확인한다.")
+    @Test
+    fun clearProductStatisticsCache() {
+        //given
+        val cache = cacheManager.getCache("findTopSellingProducts")
+        cache?.put("findTopSellingProducts", "test")
+
+        // when
+        productService.clearProductStatisticsCache()
+
+        // then
+        val result = cache?.get("findTopSellingProducts", String::class.java)
+        assertThat(result).isNull()
+    }
+
 }
