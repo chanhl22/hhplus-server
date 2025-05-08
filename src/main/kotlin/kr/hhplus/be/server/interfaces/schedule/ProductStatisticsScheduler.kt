@@ -16,11 +16,8 @@ class ProductStatisticsScheduler(
     @Scheduled(cron = "0 0 4 * * *")
     fun runDailyAt4AMForStatistics() {
         productFacade.scheduledProductStatistics()
-    }
-
-    @Scheduled(cron = "0 5 4 * * *")
-    fun scheduledCacheClear() {
         productService.clearProductStatisticsCache()
+        productService.findTopSellingProducts()
     }
 
 }
