@@ -27,6 +27,16 @@ object OrderCriteriaFixture {
             couponId = couponId
         )
     }
+
+    fun create(
+        productId: Long = 1L,
+        quantity: Int = 5,
+    ): OrderCriteria.OrderProduct {
+        return OrderCriteria.OrderProduct(
+            productId = productId,
+            quantity = quantity,
+        )
+    }
 }
 
 object OrderResultFixture {
