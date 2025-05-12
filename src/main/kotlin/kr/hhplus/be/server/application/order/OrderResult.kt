@@ -14,9 +14,9 @@ class OrderResult {
     companion object {
         fun of(point: Point, order: kr.hhplus.be.server.domain.order.Order, payment: Payment): Order {
             return Order(
-                orderId = order.id!!,
+                orderId = order.id,
                 totalAmount = order.totalPrice,
-                paymentId = payment.id!!,
+                paymentId = payment.id,
                 remainBalance = point.balance
             )
         }
