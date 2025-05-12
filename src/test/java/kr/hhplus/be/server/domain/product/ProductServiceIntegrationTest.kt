@@ -7,10 +7,12 @@ import kr.hhplus.be.server.infrastructure.product.ProductStatisticsJpaRepository
 import kr.hhplus.be.server.infrastructure.product.StockJpaRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.groups.Tuple
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cache.CacheManager
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
@@ -28,6 +30,14 @@ class ProductServiceIntegrationTest {
 
     @Autowired
     private lateinit var stockJpaRepository: StockJpaRepository
+
+    @Autowired
+    private lateinit var cacheManager: CacheManager
+
+    @AfterEach
+    fun tearDown() {
+        cacheManager.getCache("findTopSellingProducts")?.clear()
+    }
 
     @DisplayName("상품 정보를 조회한다.")
     @Test
@@ -164,6 +174,21 @@ class ProductServiceIntegrationTest {
                 Tuple.tuple("무선 키보드", 375000, 900, 1),
                 Tuple.tuple("무선 블루투스 이어폰", 129000, 500, 2)
             )
+    }
+
+    @DisplayName("캐시가 비워졌는지 확인한다.")
+    @Test
+    fun clearProductStatisticsCache() {
+        //given
+        val cache = cacheManager.getCache("findTopSellingProducts")
+        cache?.put("findTopSellingProducts", "test")
+
+        // when
+        productService.clearProductStatisticsCache()
+
+        // then
+        val result = cache?.get("findTopSellingProducts", String::class.java)
+        assertThat(result).isNull()
     }
 
 }

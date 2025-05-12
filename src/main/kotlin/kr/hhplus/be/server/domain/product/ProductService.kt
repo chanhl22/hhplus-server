@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -48,6 +50,7 @@ class ProductService(
             })
     }
 
+    @Cacheable(cacheNames = ["findTopSellingProducts"])
     fun findTopSellingProducts(): List<ProductInfo.FindTopSales> {
         val startDatetime = startThreeDaysAgoDate()
         val endDatetime = endCurrentDate()
@@ -88,6 +91,10 @@ class ProductService(
                     rank = index + 1
                 )
             }
+    }
+
+    @CacheEvict(cacheNames = ["findTopSellingProducts"], allEntries = true)
+    fun clearProductStatisticsCache() {
     }
 
 }

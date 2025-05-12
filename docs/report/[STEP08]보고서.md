@@ -43,12 +43,12 @@
 
 ### ✅ 1. 인덱스 부재로 인한 테이블 전체 스캔
 created_at 또는 product_id에 적절한 인덱스가 없는 경우, WHERE 절에서의 날짜 필터링조차 효율적으로 동작하지 않아 전체 테이블 스캔(Full Table Scan)이 발생합니다.  
-![img_1.png](image/img_1.png)
+![img_1.png](image/step08/img_1.png)
 
 ### ✅ 2. 데이터 증가에 따른 응답 지연
 product_statistics 테이블은 매일 집계된 데이터를 저장하기 때문에 시간이 지날수록 누적 행 수가 증가합니다.  
 현재는 몇 만 건 수준이라도, 월 단위로 수십만 건까지 쌓일 수 있으며, 이 경우 집계 → 정렬 → LIMIT 추출까지 모든 연산에 비용이 증가하게 됩니다.  
-![img.png](image/img.png)
+![img.png](image/step08/img.png)
 
 ### ✅ 3. 코드 일관성 측면에서 문맥의 단절
 Java/Kotlin은 절차적이거나 객체지향적인 흐름 속에서 클래스, 메서드, 타입, 로직 흐름 등으로 구성됩니다.  
@@ -89,32 +89,32 @@ SQL에서 모든 계산 로직을 처리하면
 
 #### ✔ 쿼리 속도 개선
 각각의 쿼리 자체의 속도는 단순 조회로 최적화하여 속도가 현저히 개선되었습니다.   
-![img_2.png](image/img_2.png)
+![img_2.png](image/step08/img_2.png)
 
 #### ✔ 전체 성능 비교
 하지만, 쿼리 한 번으로 처리하는 방식에 비해 전체적인 성능은 저하되었습니다.  
 쿼리에서 모든 계산을 하지 않고, 데이터를 메모리에 올려 애플리케이션 내에서 계산을 진행하게 되면, 전체 성능에 미치는 영향은 단순히 쿼리 속도 개선을 넘어서는 문제입니다.
 * As-Is  
-![img_3.png](image/img_3.png)  
+![img_3.png](image/step08/img_3.png)  
 * To-Be  
-![img_4.png](image/img_4.png)  
+![img_4.png](image/step08/img_4.png)  
 
 ### ✅ 방안 2: **DB 인덱스를 활용한 쿼리 최적화**
 인덱스를 추가하여 조회 속도 개선을 달성했습니다.  
 As-Is 상태에서는 풀 스캔이 발생하여 성능 저하가 있었지만, To-Be 상태에서는 인덱스를 통해 미미하지만 좀 더 빠르게 데이터를 조회할 수 있게 되었습니다.  
 * As-Is  
-  ![img_5.png](image/img_5.png)
-  ![img_6.png](image/img_6.png)
+  ![img_5.png](image/step08/img_5.png)
+  ![img_6.png](image/step08/img_6.png)
 * To-Be  
-  ![img_7.png](image/img_7.png)
-  ![img_8.png](image/img_8.png)
+  ![img_7.png](image/step08/img_7.png)
+  ![img_8.png](image/step08/img_8.png)
   
 인덱스를 추가한 후, 쿼리 속도는 비교적 빨라졌고, 풀 스캔을 피한 방식으로 처리되었음을 EXPLAIN 및 Digma 결과로 확인할 수 있었습니다. 이를 통해 DB 성능이 개선되었음을 명확하게 알 수 있습니다.  
 
 DB 성능이 개선됨에 따라 전체 API 성능도 개선되었음을 알 수 있습니다.
 * As-Is  
-  ![img_4.png](image/img_4.png)
+  ![img_4.png](image/step08/img_4.png)
 * To-Be  
-  ![img_9.png](image/img_9.png)
+  ![img_9.png](image/step08/img_9.png)
 
 결론적으로, 인덱스를 통한 쿼리 최적화는 단일 SQL 성능만 개선한 것이 아니라, 전체 API의 응답 속도 향상으로 이어지며 시스템 전반의 사용자 경험 개선에도 긍정적인 영향을 미쳤습니다.
