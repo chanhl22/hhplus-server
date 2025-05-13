@@ -11,4 +11,8 @@ class ProductRankingService(
         productRankingRedisRepository.increaseScores(command.orderProductQuantityCountMap)
     }
 
+    fun findProductRanking(limit: Long): List<ProductRanking> {
+        return productRankingRedisRepository.findDailyTop(limit)
+    }
+
 }
