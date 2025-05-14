@@ -57,13 +57,15 @@ class OrderFacade(
             pointService.use(point.id, order.totalPrice)
         }
 
-        TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
-            override fun afterCommit() {
-                productRankingService.upsertRanking(
-                    ProductRankingCommand.of(orderedProducts.createProductIdToNameAndQuantityMap())
-                )
-            }
-        })
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+                override fun afterCommit() {
+                    productRankingService.upsertRanking(
+                        ProductRankingCommand.of(orderedProducts.createProductIdToNameAndQuantityMap())
+                    )
+                }
+            })
+        }
 
         return OrderResult.of(point, order, payment)
     }

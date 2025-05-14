@@ -13,10 +13,12 @@ import kr.hhplus.be.server.infrastructure.product.StockJpaRepository
 import kr.hhplus.be.server.infrastructure.user.UserJpaRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.StringRedisTemplate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
@@ -41,6 +43,14 @@ class OrderFacadeConcurrencyTest {
     @Autowired
     private lateinit var couponJpaRepository: CouponJpaRepository
 
+    @Autowired
+    private lateinit var redisTemplate: StringRedisTemplate
+
+    @BeforeEach
+    fun setUp() {
+        redisFlushAll()
+    }
+
     @AfterEach
     fun tearDown() {
         userJpaRepository.deleteAllInBatch()
@@ -48,6 +58,7 @@ class OrderFacadeConcurrencyTest {
         productJpaRepository.deleteAllInBatch()
         stockJpaRepository.deleteAllInBatch()
         couponJpaRepository.deleteAllInBatch()
+        redisFlushAll()
     }
 
     @DisplayName("주문을 동시에 요청해도 상품 재고는 누락되지 않고 차감된다.")
@@ -103,6 +114,10 @@ class OrderFacadeConcurrencyTest {
         val findStock2 = stockJpaRepository.findById(savedStock2.id)
         assertThat(findStock1.get().quantity).isEqualTo(0)
         assertThat(findStock2.get().quantity).isEqualTo(0)
+    }
+
+    private fun redisFlushAll() {
+        redisTemplate.connectionFactory?.connection?.serverCommands()?.flushAll()
     }
 
 }
