@@ -20,10 +20,24 @@ object ProductRankingCommandFixture {
 object ProductRankingDomainFixture {
     fun createDaily(
         productId: Long = 1L,
+        productName: String = "상품",
         rank: Int = 1
     ): ProductRanking {
         return ProductRanking(
             productId = productId,
+            productName = productName,
+            rank = rank
+        )
+    }
+
+    fun createWeekly(
+        productId: Long = 1L,
+        productName: String = "상품",
+        rank: Int = 1
+    ): ProductRanking {
+        return ProductRanking(
+            productId = productId,
+            productName = productName,
             rank = rank
         )
     }

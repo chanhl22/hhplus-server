@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.infrastructure.rank
 
-import kr.hhplus.be.server.domain.rank.ProductRanking
 import kr.hhplus.be.server.domain.rank.ProductRankingRepository
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Repository
@@ -47,16 +46,48 @@ class ProductRankingRepositoryImpl(
         redisTemplate.expire(weeklyNameKey, Duration.ofDays(8))
     }
 
-    override fun findDailyTop(limit: Long): List<ProductRanking> {
-        val today = getDailyPattern(LocalDate.now())
-        val dailyKey = String.format(RANKING_DAILY_KEY, today)
+    override fun findDailyTopRank(now: LocalDate, limit: Long): List<Pair<String, Int>> {
+        val dailyKey = String.format(RANKING_DAILY_KEY, getDailyPattern(now))
 
         val result = redisTemplate.opsForZSet()
             .reverseRangeWithScores(dailyKey, 0, limit - 1) ?: return emptyList()
 
         return result.mapIndexed { index, tuple ->
-            ProductRanking.of(tuple.value.toString(), index)
+            Pair(tuple.value.toString(), index)
         }
+    }
+
+    override fun findWeeklyTopRank(now: LocalDate, limit: Long): List<Pair<String, Int>> {
+        val weeklyKey = String.format(RANKING_WEEKLY_KEY, getWeeklyPattern(now))
+
+        val result = redisTemplate.opsForZSet()
+            .reverseRangeWithScores(weeklyKey, 0, limit - 1) ?: return emptyList()
+
+        return result.mapIndexed { index, tuple ->
+            Pair(tuple.value.toString(), index)
+        }
+    }
+
+    override fun findDailyProductNames(now: LocalDate, productIds: List<String>): Map<String, String> {
+        val dailyNameKey = String.format(PRODUCT_NAME_DAILY_KEY, getDailyPattern(now))
+
+        val productNames = redisTemplate.opsForHash<String, String>()
+            .multiGet(dailyNameKey, productIds)
+
+        return productIds
+            .zip(productNames)
+            .associate { (id, value) -> id to value.toString() }
+    }
+
+    override fun findWeeklyProductNames(now: LocalDate, productIds: List<String>): Map<String, String> {
+        val weeklyNameKey = String.format(PRODUCT_NAME_WEEKLY_KEY, getWeeklyPattern(now))
+
+        val productNames = redisTemplate.opsForHash<String, String>()
+            .multiGet(weeklyNameKey, productIds)
+
+        return productIds
+            .zip(productNames)
+            .associate { (id, value) -> id to value.toString() }
     }
 
     private fun getDailyPattern(today: LocalDate): String {

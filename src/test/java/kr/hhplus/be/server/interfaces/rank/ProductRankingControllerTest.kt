@@ -23,20 +23,39 @@ class ProductRankingControllerTest {
     @MockitoBean
     private lateinit var productRankingService: ProductRankingService
 
-    @DisplayName("사용자의 잔액을 조회합니다.")
+    @DisplayName("상품의 일간 랭킹을 조회한다.")
     @Test
-    fun find() {
+    fun findDaily() {
         //given
         val limit = 2L
 
         val daily1 = ProductRankingDomainFixture.createDaily(productId = 1L, rank = 1)
         val daily2 = ProductRankingDomainFixture.createDaily(productId = 2L, rank = 2)
-        BDDMockito.given(productRankingService.findProductRanking(any()))
+        BDDMockito.given(productRankingService.findProductDailyRanking(any()))
             .willReturn(listOf(daily1, daily2))
 
         //when //then
         mockMvc.perform(
             MockMvcRequestBuilders.get("/product/rank/daily?limit=${limit}")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(MockMvcResultMatchers.status().isOk())
+    }
+
+    @DisplayName("상품의 주간 랭킹을 조회한다.")
+    @Test
+    fun findWeekly() {
+        //given
+        val limit = 2L
+
+        val daily1 = ProductRankingDomainFixture.createWeekly(productId = 1L, rank = 1)
+        val daily2 = ProductRankingDomainFixture.createWeekly(productId = 2L, rank = 2)
+        BDDMockito.given(productRankingService.findProductWeeklyRanking(any()))
+            .willReturn(listOf(daily1, daily2))
+
+        //when //then
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/product/rank/weekly?limit=${limit}")
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())

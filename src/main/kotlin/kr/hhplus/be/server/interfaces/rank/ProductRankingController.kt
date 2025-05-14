@@ -11,11 +11,19 @@ class ProductRankingController(
 ) {
 
     @GetMapping("/product/rank/daily")
-    fun find(
+    fun findDaily(
         @RequestParam limit: Long
     ): List<ProductRankingResponse.Daily> {
-        val domain = productRankingService.findProductRanking(limit)
-        return domain.map { ProductRankingResponse.from(it) }
+        val domain = productRankingService.findProductDailyRanking(limit)
+        return domain.map { ProductRankingResponse.fromDaily(it) }
+    }
+
+    @GetMapping("/product/rank/weekly")
+    fun findWeekly(
+        @RequestParam limit: Long
+    ): List<ProductRankingResponse.Weekly> {
+        val domain = productRankingService.findProductWeeklyRanking(limit)
+        return domain.map { ProductRankingResponse.fromWeekly(it) }
     }
 
 }

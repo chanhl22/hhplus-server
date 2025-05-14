@@ -99,25 +99,61 @@ class ProductRankingServiceIntegrationTest {
 
     @DisplayName("일간 상품 랭킹을 조회한다.")
     @Test
-    fun findProductRanking() {
+    fun findProductDailyRanking() {
         //given
         val limit = 2L
-        val key = "product:ranking:daily:%s"
-        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-        val dailyKey = String.format(key, today)
+        val now = LocalDate.now()
+        val dailyPattern = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        val dailyKey = "product:ranking:daily:${dailyPattern}"
+        val nameKey = "product:name:daily:${dailyPattern}"
 
         redisTemplate.opsForZSet().add(dailyKey, "1", 1.0)
         redisTemplate.opsForZSet().add(dailyKey, "2", 2.0)
+        redisTemplate.opsForHash<String, String>()
+            .put(nameKey, "1", "상품1")
+        redisTemplate.opsForHash<String, String>()
+            .put(nameKey, "2", "상품2")
 
         //when
-        val result = productRankingService.findProductRanking(limit)
+        val result = productRankingService.findProductDailyRanking(limit)
 
         //then
         assertThat(result).hasSize(2)
-            .extracting("productId", "rank")
+            .extracting("productId", "productName", "rank")
             .containsExactly(
-                tuple(2L, 1),
-                tuple(1L, 2)
+                tuple(2L, "상품2", 1),
+                tuple(1L, "상품1", 2)
+            )
+    }
+
+    @DisplayName("주간 상품 랭킹을 조회한다.")
+    @Test
+    fun findProductWeeklyRanking() {
+        //given
+        val limit = 2L
+        val now = LocalDate.now()
+        val week = now.get(WeekFields.ISO.weekOfWeekBasedYear())
+        val year = now.year
+        val weeklyPattern = "$year-W$week"
+        val weeklyKey = "product:ranking:weekly:${weeklyPattern}"
+        val nameKey = "product:name:weekly:${weeklyPattern}"
+
+        redisTemplate.opsForZSet().add(weeklyKey, "1", 1.0)
+        redisTemplate.opsForZSet().add(weeklyKey, "2", 2.0)
+        redisTemplate.opsForHash<String, String>()
+            .put(nameKey, "1", "상품1")
+        redisTemplate.opsForHash<String, String>()
+            .put(nameKey, "2", "상품2")
+
+        //when
+        val result = productRankingService.findProductWeeklyRanking(limit)
+
+        //then
+        assertThat(result).hasSize(2)
+            .extracting("productId", "productName", "rank")
+            .containsExactly(
+                tuple(2L, "상품2", 1),
+                tuple(1L, "상품1", 2)
             )
     }
 

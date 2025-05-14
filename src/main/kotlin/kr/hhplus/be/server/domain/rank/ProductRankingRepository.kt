@@ -8,6 +8,12 @@ interface ProductRankingRepository {
 
     fun increaseWeeklyRanking(now: LocalDate, productId: Long, name: String, quantity: Int)
 
-    fun findDailyTop(limit: Long): List<ProductRanking>
+    fun findDailyTopRank(now: LocalDate, limit: Long): List<Pair<String, Int>>
+
+    fun findWeeklyTopRank(now: LocalDate, limit: Long): List<Pair<String, Int>>
+
+    fun findDailyProductNames(now: LocalDate, productIds: List<String>): Map<String, String>
+
+    fun findWeeklyProductNames(now: LocalDate, productIds: List<String>): Map<String, String>
 
 }
