@@ -1,18 +1,24 @@
 package kr.hhplus.be.server.domain.rank
 
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class ProductRankingService(
-    private val productRankingRedisRepository: ProductRankingRedisRepository
+    private val productRankingRepository: ProductRankingRepository
 ) {
 
-    fun increaseProductScore(command: ProductRankingCommand.Increase) {
-        productRankingRedisRepository.increaseScores(command.orderProductQuantityCountMap)
+    fun upsertRanking(command: ProductRankingCommand.Increase) {
+        val now = LocalDate.now()
+        command.productIdToNameAndQuantityMap.forEach { (productId, nameAndQuantity) ->
+            val (name, quantity) = nameAndQuantity
+            productRankingRepository.increaseDailyRanking(now, productId, name, quantity)
+            productRankingRepository.increaseWeeklyRanking(now, productId, name, quantity)
+        }
     }
 
     fun findProductRanking(limit: Long): List<ProductRanking> {
-        return productRankingRedisRepository.findDailyTop(limit)
+        return productRankingRepository.findDailyTop(limit)
     }
 
 }

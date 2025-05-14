@@ -42,7 +42,11 @@ class OrderFacade(
         val coupon = couponService.find(criteria.couponId, user.id)
 
         val orderPoint = OrderPoint.create(user, point)
-        val orderedProducts = OrderedProducts.create(productInfo.products, productInfo.stocks, criteria.createOrderProductQuantityCountMap())
+        val orderedProducts = OrderedProducts.create(
+            productInfo.products,
+            productInfo.stocks,
+            criteria.createOrderProductQuantityCountMap()
+        )
         val orderCoupon = OrderCoupon.from(coupon)
         val order = orderService.order(OrderCommand.of(orderPoint, orderedProducts, orderCoupon))
 
@@ -55,7 +59,9 @@ class OrderFacade(
 
         TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
             override fun afterCommit() {
-                productRankingService.increaseProductScore(ProductRankingCommand.of(criteria.createOrderProductQuantityCountMap()))
+                productRankingService.upsertRanking(
+                    ProductRankingCommand.of(orderedProducts.createProductIdToNameAndQuantityMap())
+                )
             }
         })
 
