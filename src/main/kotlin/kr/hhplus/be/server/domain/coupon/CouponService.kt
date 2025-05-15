@@ -66,4 +66,14 @@ class CouponService(
         userCouponRepository.save(usedUserCoupon)
     }
 
+    fun polling(couponId: Long, userId: Long): String {
+        val userCoupon = userCouponRepository.findByCouponIdAndUserIdAndIsUsed(couponId, userId, false)
+            .firstOrNull()
+
+        if (userCoupon == null) {
+            return "FAIL"
+        }
+        return "SUCCESS"
+    }
+
 }

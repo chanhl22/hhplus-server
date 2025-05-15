@@ -156,6 +156,33 @@ class CouponServiceIntegrationTest {
             .containsExactly(savedUser.id, savedCoupon.id, true)
     }
 
+    @DisplayName("쿠폰 발급 상태를 조회한다.")
+    @Test
+    fun polling() {
+        //given
+        val user = UserDomainFixture.create(userId = 0L)
+        val savedUser = userJpaRepository.save(user)
+
+        val coupon = CouponDomainFixture.create(couponId = 0L)
+        val savedCoupon = couponJpaRepository.save(coupon)
+
+        val userCoupon = UserCouponDomainFixture.create(
+            userCouponId = 0L,
+            userId = savedUser.id,
+            couponId = savedCoupon.id
+        )
+        userCouponJpaRepository.save(userCoupon)
+
+        //when
+        couponService.polling(savedCoupon.id, savedUser.id)
+
+        //then
+        val userCouponResult = userCouponJpaRepository.findByCouponId(savedCoupon.id)
+        assertThat(userCouponResult)
+            .extracting("userId", "couponId", "isUsed")
+            .containsExactly(savedUser.id, savedCoupon.id, false)
+    }
+
     private fun redisFlushAll() {
         redisTemplate.connectionFactory?.connection?.serverCommands()?.flushAll()
     }

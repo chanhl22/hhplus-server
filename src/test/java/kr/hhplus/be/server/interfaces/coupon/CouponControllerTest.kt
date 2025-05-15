@@ -48,4 +48,22 @@ class CouponControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk())
     }
 
+    @DisplayName("쿠폰 발급 상태를 조회한다.")
+    @Test
+    fun polling() {
+        //given
+        val couponId = 1L
+        val userId = 1L
+
+        BDDMockito.given(couponService.polling(any(), any()))
+            .willReturn("")
+
+        //when //then
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/coupon/status?couponId=${couponId}&userId=${userId}")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(MockMvcResultMatchers.status().isOk())
+    }
+
 }

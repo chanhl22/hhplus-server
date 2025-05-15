@@ -174,4 +174,19 @@ class CouponServiceTest {
             .save(any())
     }
 
+    @DisplayName("쿠폰 발급 상태를 조회한다.")
+    @Test
+    fun polling() {
+        //given
+        BDDMockito.given(userCouponRepository.findByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
+            .willReturn(emptyList())
+
+        //when
+        couponService.polling(1L, 1L)
+
+        //then
+        Mockito.verify(userCouponRepository, times(1))
+            .findByCouponIdAndUserIdAndIsUsed(any(), any(), any())
+    }
+
 }
