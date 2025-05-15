@@ -6,7 +6,20 @@ import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.coupon.DiscountType
 import kr.hhplus.be.server.domain.coupon.UserCoupon
 import kr.hhplus.be.server.domain.order.coupon.RealOrderCoupon
+import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import java.time.LocalDateTime
+
+object CouponRequestFixture {
+    fun create(
+        userId: Long = 1L,
+        couponId: Long = 1L
+    ): CouponRequest.FirstCome {
+        return CouponRequest.FirstCome(
+            userId = userId,
+            couponId = couponId,
+        )
+    }
+}
 
 object CouponCriterionFixture {
     fun create(
@@ -34,7 +47,7 @@ object CouponResultFixture {
             name = name,
             discountType = discountType,
             discountValue = discountValue,
-            remainingQuantity = remainingQuantity,
+            quantity = remainingQuantity,
             expiredAt = expiresAt
         )
 
@@ -58,7 +71,7 @@ object CouponDomainFixture {
             name = name,
             discountType = discountType,
             discountValue = discountValue,
-            remainingQuantity = remainingQuantity,
+            quantity = remainingQuantity,
             expiredAt = expiredAt
         )
     }

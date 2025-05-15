@@ -52,10 +52,10 @@ class CouponTest {
         val coupon = CouponDomainFixture.create(remainingQuantity = 10)
 
         //when
-        coupon.deduct()
+        val result = coupon.deduct()
 
         // then
-        assertThat(coupon.remainingQuantity).isEqualTo(9)
+        assertThat(result.quantity).isEqualTo(9)
     }
 
     @DisplayName("쿠폰 수량을 감소시킬 때 수량이 부족하다면 예외가 발생한다.")

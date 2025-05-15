@@ -2,11 +2,9 @@ package kr.hhplus.be.server.interfaces.schedule
 
 import kr.hhplus.be.server.application.product.ProductFacade
 import kr.hhplus.be.server.domain.product.ProductService
-import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
-@EnableScheduling
 @Component
 class ProductStatisticsScheduler(
     private val productFacade: ProductFacade,

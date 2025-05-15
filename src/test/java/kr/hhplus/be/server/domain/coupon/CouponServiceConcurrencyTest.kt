@@ -1,18 +1,18 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
-import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import kr.hhplus.be.server.infrastructure.coupon.CouponJpaRepository
 import kr.hhplus.be.server.infrastructure.coupon.UserCouponJpaRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.StringRedisTemplate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
 class CouponServiceConcurrencyTest {
@@ -26,15 +26,55 @@ class CouponServiceConcurrencyTest {
     @Autowired
     private lateinit var userCouponJpaRepository: UserCouponJpaRepository
 
+    @Autowired
+    private lateinit var redisTemplate: StringRedisTemplate
+
+    @BeforeEach
+    fun setUp() {
+        redisFlushAll()
+    }
+
     @AfterEach
     fun tearDown() {
         couponJpaRepository.deleteAllInBatch()
         userCouponJpaRepository.deleteAllInBatch()
+        redisFlushAll()
     }
 
-    @DisplayName("쿠폰 발행을 동시에 요청해도 누락되지 않고 차감된다.")
+    @DisplayName("쿠폰 발급 요청을 동시에 해도 쿠폰 수량 만큼 차감된다.")
     @Test
-    fun lostIssueCoupon() {
+    fun reserveFirstCome() {
+        //given
+        val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 100)
+        val savedCoupon = couponJpaRepository.save(coupon)
+
+        val threadCount = 200
+        val executorService = Executors.newFixedThreadPool(32)
+        val latch = CountDownLatch(threadCount)
+
+        //when
+        for (idx in 1..threadCount) {
+            executorService.execute {
+                try {
+                    couponService.reserveFirstCome(savedCoupon.id, idx.toLong())
+                } finally {
+                    latch.countDown()
+                }
+            }
+        }
+
+        latch.await()
+
+        //then
+        val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
+        val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)!!
+
+        assertThat(couponRequestMembers.size).isEqualTo(100)
+    }
+
+    @DisplayName("동시에 동일한 쿠폰을 발급 받을 수 없다.")
+    @Test
+    fun checkAlreadyRequested() {
         //given
         val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 100)
         val savedCoupon = couponJpaRepository.save(coupon)
@@ -47,7 +87,7 @@ class CouponServiceConcurrencyTest {
         for (idx in 1..threadCount) {
             executorService.execute {
                 try {
-                    couponService.issueCoupon(savedCoupon.id, 1L)
+                    couponService.reserveFirstCome(savedCoupon.id, 1L)
                 } finally {
                     latch.countDown()
                 }
@@ -57,31 +97,28 @@ class CouponServiceConcurrencyTest {
         latch.await()
 
         //then
-        val findCoupon = couponJpaRepository.findById(savedCoupon.id)
-        assertThat(findCoupon.get().remainingQuantity).isEqualTo(0)
+        val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
+        val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)!!
+
+        assertThat(couponRequestMembers.size).isEqualTo(1)
     }
 
-    @DisplayName("동시에 두 명이 동일한 쿠폰을 발급받으면 재고가 음수가 되지 않아야 한다.")
+    @DisplayName("쿠폰 수량이 없다면 발급 받을 수 없다.")
     @Test
-    fun couponRemainingQuantityAlwaysPositive() {
+    fun checkOutOfStock() {
         //given
-        val user = UserDomainFixture.create(userId = 0L)
-
-        val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 1)
+        val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 0)
         val savedCoupon = couponJpaRepository.save(coupon)
 
+        val threadCount = 100
         val executorService = Executors.newFixedThreadPool(32)
-        val latch = CountDownLatch(2)
-
-        val exceptionCount = AtomicInteger(0)
+        val latch = CountDownLatch(threadCount)
 
         //when
-        for (idx in 1..2) {
+        for (idx in 1..threadCount) {
             executorService.execute {
                 try {
-                    couponService.issueCoupon(savedCoupon.id, user.id)
-                } catch (e: IllegalStateException) {
-                    exceptionCount.incrementAndGet()
+                    couponService.reserveFirstCome(savedCoupon.id, idx.toLong())
                 } finally {
                     latch.countDown()
                 }
@@ -91,9 +128,14 @@ class CouponServiceConcurrencyTest {
         latch.await()
 
         //then
-        val findCoupon = couponJpaRepository.findById(savedCoupon.id)
-        assertThat(findCoupon.get().remainingQuantity).isEqualTo(0)
-        assertThat(exceptionCount.get()).isEqualTo(1)
+        val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
+        val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)!!
+
+        assertThat(couponRequestMembers.size).isEqualTo(0)
+    }
+
+    private fun redisFlushAll() {
+        redisTemplate.connectionFactory?.connection?.serverCommands()?.flushAll()
     }
 
 }

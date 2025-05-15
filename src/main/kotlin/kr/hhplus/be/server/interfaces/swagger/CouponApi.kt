@@ -71,7 +71,7 @@ interface CouponApi {
                 Content(
                     mediaType = "application/json",
                     schema = Schema(
-                        implementation = CouponRequest.FirstComeIssue::class,
+                        implementation = CouponRequest.FirstCome::class,
                         example = """{
                             "userId": 1,
                             "couponId": 1
@@ -79,7 +79,7 @@ interface CouponApi {
                     )
                 )
             ]
-        ) request: CouponRequest.FirstComeIssue
+        ) request: CouponRequest.FirstCome
     ): CouponResponse.FirstComeIssue
 
 }
