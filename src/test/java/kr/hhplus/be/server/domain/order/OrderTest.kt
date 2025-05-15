@@ -16,8 +16,8 @@ class OrderTest {
         val orderPoint = OrderPointFixture.create()
         val orderedProducts = OrderedProductsFixture.create(
             listOf(
-                OrderedProduct(1L, 10000, 10),
-                OrderedProduct(2L, 20000, 20)
+                OrderedProduct(1L, "상품1", 10000, 10),
+                OrderedProduct(2L, "상품2", 20000, 20)
             ),
             mapOf(
                 1L to 2,

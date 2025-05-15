@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.product.ProductService
+import kr.hhplus.be.server.domain.rank.ProductRankingService
 import kr.hhplus.be.server.domain.user.UserService
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import kr.hhplus.be.server.fixture.order.OrderCriteriaFixture
@@ -44,6 +45,9 @@ class OrderFacadeTest {
 
     @Mock
     private lateinit var couponService: CouponService
+
+    @Mock
+    private lateinit var productRankingService: ProductRankingService
 
     @InjectMocks
     private lateinit var orderFacade: OrderFacade

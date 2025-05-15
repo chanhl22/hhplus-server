@@ -11,9 +11,13 @@ import kr.hhplus.be.server.domain.payment.PaymentCommand
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.point.PointService
 import kr.hhplus.be.server.domain.product.ProductService
+import kr.hhplus.be.server.domain.rank.ProductRankingCommand
+import kr.hhplus.be.server.domain.rank.ProductRankingService
 import kr.hhplus.be.server.domain.user.UserService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Service
 @Transactional(readOnly = true)
@@ -23,7 +27,8 @@ class OrderFacade(
     private val userService: UserService,
     private val paymentService: PaymentService,
     private val pointService: PointService,
-    private val couponService: CouponService
+    private val couponService: CouponService,
+    private val productRankingService: ProductRankingService
 ) {
 
     @DistributedLock(key = "#criteria.toLockKeys()")
@@ -37,7 +42,11 @@ class OrderFacade(
         val coupon = couponService.find(criteria.couponId, user.id)
 
         val orderPoint = OrderPoint.create(user, point)
-        val orderedProducts = OrderedProducts.create(productInfo.products, productInfo.stocks, criteria.createOrderProductQuantityCountMap())
+        val orderedProducts = OrderedProducts.create(
+            productInfo.products,
+            productInfo.stocks,
+            criteria.createOrderProductQuantityCountMap()
+        )
         val orderCoupon = OrderCoupon.from(coupon)
         val order = orderService.order(OrderCommand.of(orderPoint, orderedProducts, orderCoupon))
 
@@ -46,6 +55,16 @@ class OrderFacade(
         val payment = paymentService.process(PaymentCommand.of(point, order))
         if (payment.isSuccess()) {
             pointService.use(point.id, order.totalPrice)
+        }
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+                override fun afterCommit() {
+                    productRankingService.upsertRanking(
+                        ProductRankingCommand.of(orderedProducts.createProductIdToNameAndQuantityMap())
+                    )
+                }
+            })
         }
 
         return OrderResult.of(point, order, payment)
