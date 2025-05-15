@@ -18,15 +18,35 @@ class CouponService(
     }
 
     @Transactional
-    fun issueCoupon(couponId: Long, userId: Long): Coupon {
-        val coupon = couponRepository.findWithPessimisticLock(couponId)
-            .publish()
-            .deduct()
-        val userCoupon = coupon.issueTo(userId)
+    fun reserveFirstCome(couponId: Long, userId: Long) {
+        if (isEmptyQuantityKey(couponId)) {
+            val coupon = couponRepository.find(couponId)
+            couponRepository.registerQuantityKey(couponId, coupon.quantity)
+        }
 
-        val issuedCoupon = couponRepository.save(coupon)
-        userCouponRepository.save(userCoupon)
-        return issuedCoupon
+        val status = couponRepository.reserveFirstCome(couponId, userId)
+        when (status) {
+            CouponReserveStatus.SUCCESS -> return
+            CouponReserveStatus.ALREADY_REQUESTED -> throw IllegalStateException("이미 요청한 유저입니다.")
+            CouponReserveStatus.OUT_OF_STOCK -> throw IllegalStateException("쿠폰 수량이 부족합니다.")
+            CouponReserveStatus.NO_STOCK_INFO -> throw IllegalStateException("쿠폰의 정보가 존재하지 않습니다.")
+        }
+    }
+
+    private fun isEmptyQuantityKey(couponId: Long): Boolean {
+        return !couponRepository.existsQuantityKey(couponId)
+    }
+
+    @Transactional
+    fun issueCoupon() {
+        val activeCoupons = couponRepository.findActiveCoupon()
+        for (couponId in activeCoupons) {
+            val successUsers = couponRepository.updateSuccess(couponId)
+            val userCoupons = successUsers.map { userId ->
+                UserCoupon.create(userId = userId.toLong(), couponId = couponId.toLong())
+            }
+            userCouponRepository.saveAll(userCoupons)
+        }
     }
 
     @Transactional

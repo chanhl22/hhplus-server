@@ -20,4 +20,8 @@ class UserCouponRepositoryImpl(
         return userCouponJpaRepository.existsByCouponIdAndUserIdAndIsUsed(couponId, userId, isUsed)
     }
 
+    override fun saveAll(userCoupons: List<UserCoupon>) {
+        userCouponJpaRepository.saveAll(userCoupons)
+    }
+
 }

@@ -1,9 +1,8 @@
 package kr.hhplus.be.server.interfaces.coupon
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.application.coupon.CouponFacade
-import kr.hhplus.be.server.fixture.coupon.CouponCriterionFixture
-import kr.hhplus.be.server.fixture.coupon.CouponResultFixture
+import kr.hhplus.be.server.domain.coupon.CouponService
+import kr.hhplus.be.server.fixture.coupon.CouponRequestFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -27,21 +26,21 @@ class CouponControllerTest {
     private lateinit var objectMapper: ObjectMapper
 
     @MockitoBean
-    private lateinit var couponFacade: CouponFacade
+    private lateinit var couponService: CouponService
 
-    @DisplayName("선착순으로 쿠폰을 발급합니다.")
+    @DisplayName("선착순으로 쿠폰 발급을 요청한다.")
     @Test
-    fun issueCouponFirstCome() {
+    fun reserveFirstCome() {
         //given
-        val request = CouponCriterionFixture.create()
+        val request = CouponRequestFixture.create()
 
-        val result = CouponResultFixture.create()
-        BDDMockito.given(couponFacade.issueCouponFirstCome(any()))
-            .willReturn(result)
+        BDDMockito.willDoNothing()
+            .given(couponService)
+            .reserveFirstCome(any(), any())
 
         //when //then
         mockMvc.perform(
-            MockMvcRequestBuilders.post("/coupon/issue")
+            MockMvcRequestBuilders.post("/coupon/reserve")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )

@@ -67,29 +67,55 @@ class CouponServiceTest {
 
     @DisplayName("쿠폰을 발행한다.")
     @Test
-    fun issueCoupon() {
+    fun reserveFirstCome() {
         //given
         val coupon = CouponDomainFixture.create()
-        BDDMockito.given(couponRepository.findWithPessimisticLock(any()))
+        BDDMockito.given(couponRepository.find(any()))
             .willReturn(coupon)
 
-        BDDMockito.given(couponRepository.save(any()))
-            .willReturn(coupon)
+        BDDMockito.willDoNothing()
+            .given(couponRepository)
+            .registerQuantityKey(any(), any())
 
-        val userCoupon = UserCouponDomainFixture.create()
-        BDDMockito.given(userCouponRepository.save(any()))
-            .willReturn(userCoupon)
+        BDDMockito.given(couponRepository.reserveFirstCome(any(), any()))
+            .willReturn(CouponReserveStatus.SUCCESS)
 
         //when
-        couponService.issueCoupon(1L, 1L)
+        couponService.reserveFirstCome(1L, 1L)
 
         //then
         Mockito.verify(couponRepository, times(1))
-            .findWithPessimisticLock(any())
+            .find(any())
         Mockito.verify(couponRepository, times(1))
-            .save(any())
+            .registerQuantityKey(any(), any())
+        Mockito.verify(couponRepository, times(1))
+            .reserveFirstCome(any(), any())
+    }
+
+    @DisplayName("쿠폰을 발행한다.")
+    @Test
+    fun issueCoupon() {
+        //given
+        BDDMockito.given(couponRepository.findActiveCoupon())
+            .willReturn(setOf("1"))
+
+        BDDMockito.given(couponRepository.updateSuccess(any()))
+            .willReturn(emptyList())
+
+        BDDMockito.willDoNothing()
+            .given(userCouponRepository)
+            .saveAll(any())
+
+        //when
+        couponService.issueCoupon()
+
+        //then
+        Mockito.verify(couponRepository, times(1))
+            .findActiveCoupon()
+        Mockito.verify(couponRepository, times(1))
+            .updateSuccess(any())
         Mockito.verify(userCouponRepository, times(1))
-            .save(any())
+            .saveAll(any())
     }
 
     @DisplayName("쿠폰을 사용한다.")

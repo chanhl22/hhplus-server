@@ -8,4 +8,6 @@ interface UserCouponRepository {
 
     fun existsByCouponIdAndUserIdAndIsUsed(couponId: Long, userId: Long, isUsed: Boolean): Boolean
 
+    fun saveAll(userCoupons: List<UserCoupon>)
+
 }
