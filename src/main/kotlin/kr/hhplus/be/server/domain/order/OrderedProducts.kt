@@ -36,7 +36,7 @@ class OrderedProducts(
                 val stock = stockMap[product.id]
                     ?: throw IllegalArgumentException("재고 정보가 없습니다. productId=${product.id}")
 
-                OrderedProduct.create(product.id, product.price, stock.quantity)
+                OrderedProduct.create(product.id, product.name, product.price, stock.quantity)
             }
             return orderedProducts
         }
@@ -72,17 +72,23 @@ class OrderedProducts(
         return products.map { it.productId }
     }
 
+    fun createProductIdToNameAndQuantityMap(): Map<Long, Pair<String, Int>> {
+        return products.associate { it.productId to (it.name to it.quantity) }
+    }
+
 }
 
 class OrderedProduct(
     val productId: Long,
+    val name: String,
     val price: Int,
     val quantity: Int
 ) {
     companion object {
-        fun create(productId: Long, price: Int, quantity: Int): OrderedProduct {
+        fun create(productId: Long, name: String, price: Int, quantity: Int): OrderedProduct {
             return OrderedProduct(
                 productId = productId,
+                name = name,
                 price = price,
                 quantity = quantity
             )
