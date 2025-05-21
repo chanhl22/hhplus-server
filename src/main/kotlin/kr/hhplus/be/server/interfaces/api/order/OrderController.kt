@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.order
+package kr.hhplus.be.server.interfaces.api.order
 
 import kr.hhplus.be.server.application.order.OrderFacade
 import kr.hhplus.be.server.interfaces.swagger.OrderApi

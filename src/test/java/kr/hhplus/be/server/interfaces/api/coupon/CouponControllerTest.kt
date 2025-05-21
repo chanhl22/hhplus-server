@@ -1,8 +1,8 @@
-package kr.hhplus.be.server.interfaces.point
+package kr.hhplus.be.server.interfaces.api.coupon
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.application.point.PointFacade
-import kr.hhplus.be.server.fixture.point.PointResultFixture
+import kr.hhplus.be.server.domain.coupon.CouponService
+import kr.hhplus.be.server.fixture.coupon.CouponRequestFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-@WebMvcTest(PointController::class)
-class PointControllerTest {
+@WebMvcTest(CouponController::class)
+class CouponControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -26,42 +26,41 @@ class PointControllerTest {
     private lateinit var objectMapper: ObjectMapper
 
     @MockitoBean
-    private lateinit var pointFacade: PointFacade
+    private lateinit var couponService: CouponService
 
-    @DisplayName("사용자의 잔액을 조회합니다.")
+    @DisplayName("선착순으로 쿠폰 발급을 요청한다.")
     @Test
-    fun find() {
+    fun reserveFirstCome() {
         //given
-        val userId = 1L
+        val request = CouponRequestFixture.create()
 
-        val result = PointResultFixture.createFind()
-        BDDMockito.given(pointFacade.find(any()))
-            .willReturn(result)
+        BDDMockito.willDoNothing()
+            .given(couponService)
+            .reserveFirstCome(any(), any())
 
         //when //then
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/point?userId=${userId}")
+            MockMvcRequestBuilders.post("/coupon/reserve")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())
     }
 
-    @DisplayName("충전할 금액을 받아 잔액을 충전합니다.")
+    @DisplayName("쿠폰 발급 상태를 조회한다.")
     @Test
-    fun charge() {
+    fun polling() {
         //given
+        val couponId = 1L
         val userId = 1L
-        val request = PointRequest.Charge(10000)
 
-        val result = PointResultFixture.createCharge()
-        BDDMockito.given(pointFacade.charge(any()))
-            .willReturn(result)
+        BDDMockito.given(couponService.polling(any(), any()))
+            .willReturn("")
 
         //when //then
         mockMvc.perform(
-            MockMvcRequestBuilders.patch("/point/charge?userId=${userId}")
-                .content(objectMapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON)
+            MockMvcRequestBuilders.get("/coupon/status?couponId=${couponId}&userId=${userId}")
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())

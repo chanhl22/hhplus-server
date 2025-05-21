@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.coupon
+package kr.hhplus.be.server.interfaces.api.coupon
 
 import kr.hhplus.be.server.application.coupon.CouponResult.Issue
 import java.time.LocalDateTime

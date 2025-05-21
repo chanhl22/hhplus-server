@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.coupon
+package kr.hhplus.be.server.interfaces.api.coupon
 
 import jakarta.validation.Valid
 import kr.hhplus.be.server.domain.coupon.CouponService

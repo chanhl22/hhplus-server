@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.rank
+package kr.hhplus.be.server.interfaces.api.rank
 
 import kr.hhplus.be.server.domain.rank.ProductRankingService
 import org.springframework.web.bind.annotation.GetMapping

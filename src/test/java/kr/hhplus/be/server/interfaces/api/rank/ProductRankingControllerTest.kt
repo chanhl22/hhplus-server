@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.rank
+package kr.hhplus.be.server.interfaces.api.rank
 
 import kr.hhplus.be.server.domain.rank.ProductRankingService
 import kr.hhplus.be.server.fixture.rank.ProductRankingDomainFixture

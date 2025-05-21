@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.coupon
+package kr.hhplus.be.server.interfaces.api.coupon
 
 class CouponRequest {
     data class FirstCome(

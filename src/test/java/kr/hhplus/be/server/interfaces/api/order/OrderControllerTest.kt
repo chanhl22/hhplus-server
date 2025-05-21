@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.order
+package kr.hhplus.be.server.interfaces.api.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kr.hhplus.be.server.application.order.OrderFacade
