@@ -8,4 +8,16 @@ interface CouponRepository {
 
     fun save(coupon: Coupon): Coupon
 
+    fun reserveFirstCome(couponId: Long, userId: Long): CouponReserveStatus
+
+    fun alreadyIssue(couponId: Long, userId: Long): Boolean
+
+    fun existsQuantityKey(couponId: Long): Boolean
+
+    fun registerQuantityKey(couponId: Long, remainingQuantity: Int)
+
+    fun findActiveCoupon(): Set<String>
+
+    fun updateSuccess(couponId: String): List<String>
+
 }

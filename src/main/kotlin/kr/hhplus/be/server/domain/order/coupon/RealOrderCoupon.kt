@@ -39,7 +39,7 @@ class RealOrderCoupon(
                 name = coupon.name,
                 discountType = coupon.discountType,
                 discountValue = coupon.discountValue,
-                remainingQuantity = coupon.remainingQuantity,
+                remainingQuantity = coupon.quantity,
                 expiredAt = coupon.expiredAt
             )
         }
