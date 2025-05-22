@@ -4,6 +4,7 @@ import kr.hhplus.be.server.application.order.OrderCriteria
 import kr.hhplus.be.server.application.order.OrderResult
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderCommand
+import kr.hhplus.be.server.domain.order.OrderEvent
 import kr.hhplus.be.server.domain.order.OrderInfo
 import kr.hhplus.be.server.domain.order.OrderPoint
 import kr.hhplus.be.server.domain.order.OrderProduct
@@ -148,5 +149,42 @@ object OrderCouponFixture {
     fun create(
     ): OrderCoupon {
         return EmptyOrderCoupon
+    }
+}
+
+object OrderEventFixture {
+    fun create(
+        orderId: Long = 1L,
+        totalPrice: Int = 30000,
+        products: List<OrderEvent.OrderedProduct> = listOf(
+            OrderEvent.OrderedProduct(
+                productId = 101L,
+                name = "테스트 상품 1",
+                price = 10000,
+                quantity = 1
+            ),
+            OrderEvent.OrderedProduct(
+                productId = 102L,
+                name = "테스트 상품 2",
+                price = 20000,
+                quantity = 1
+            )
+        ),
+        userId: Long = 10L,
+        name: String = "홍길동",
+        couponId: Long? = 555L,
+        discountType: String? = "금액 할인",
+        discountValue: Int? = 5000
+    ): OrderEvent.Completed {
+        return OrderEvent.Completed(
+            orderId = orderId,
+            totalPrice = totalPrice,
+            products = products,
+            userId = userId,
+            name = name,
+            couponId = couponId,
+            discountType = discountType,
+            discountValue = discountValue
+        )
     }
 }

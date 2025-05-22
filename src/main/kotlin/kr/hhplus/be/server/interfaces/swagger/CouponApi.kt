@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.coupon.CouponRequest
-import kr.hhplus.be.server.interfaces.coupon.CouponResponse
+import kr.hhplus.be.server.interfaces.api.coupon.CouponRequest
+import kr.hhplus.be.server.interfaces.api.coupon.CouponResponse
 
 @Tag(name = "Coupon API", description = "쿠폰 API")
 interface CouponApi {

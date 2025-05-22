@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.order.OrderRequest
-import kr.hhplus.be.server.interfaces.order.OrderResponse
+import kr.hhplus.be.server.interfaces.api.order.OrderRequest
+import kr.hhplus.be.server.interfaces.api.order.OrderResponse
 
 @Tag(name = "Order API", description = "주문 API")
 interface OrderApi {

@@ -3,6 +3,8 @@ package kr.hhplus.be.server.application.order
 import kr.hhplus.be.server.common.annotation.DistributedLock
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.order.OrderCommand
+import kr.hhplus.be.server.domain.order.OrderEvent
+import kr.hhplus.be.server.domain.order.OrderEventPublisher
 import kr.hhplus.be.server.domain.order.OrderPoint
 import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.order.OrderedProducts
@@ -28,7 +30,8 @@ class OrderFacade(
     private val paymentService: PaymentService,
     private val pointService: PointService,
     private val couponService: CouponService,
-    private val productRankingService: ProductRankingService
+    private val productRankingService: ProductRankingService,
+    private val orderEventPublisher: OrderEventPublisher
 ) {
 
     @DistributedLock(key = "#criteria.toLockKeys()")
@@ -66,6 +69,8 @@ class OrderFacade(
                 }
             })
         }
+
+        orderEventPublisher.publish(OrderEvent.of(order, orderedProducts, user, coupon))
 
         return OrderResult.of(point, order, payment)
     }
