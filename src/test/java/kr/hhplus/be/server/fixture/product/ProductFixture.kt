@@ -1,10 +1,29 @@
 package kr.hhplus.be.server.fixture.product
 
 import kr.hhplus.be.server.domain.product.Product
+import kr.hhplus.be.server.domain.product.ProductCommand
 import kr.hhplus.be.server.domain.product.ProductInfo
 import kr.hhplus.be.server.domain.product.ProductStatistics
 import kr.hhplus.be.server.domain.product.Stock
 import java.time.LocalDateTime
+
+object ProductCommandFixture {
+    fun create(
+        orderId: Long = 1L,
+        userId: Long = 100L,
+        pointId: Long = 10L,
+        products: List<Pair<Long, Int>> = listOf(1L to 2, 2L to 1),
+        couponId: Long? = 1L
+    ): ProductCommand.Deduct {
+        return ProductCommand.Deduct(
+            orderId = orderId,
+            userId = userId,
+            pointId = pointId,
+            products = products,
+            couponId = couponId
+        )
+    }
+}
 
 object ProductDomainFixture {
     fun create(

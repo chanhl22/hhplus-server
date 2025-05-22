@@ -3,6 +3,7 @@ package kr.hhplus.be.server.fixture.coupon
 import kr.hhplus.be.server.application.coupon.CouponCriteria.Issue
 import kr.hhplus.be.server.application.coupon.CouponResult
 import kr.hhplus.be.server.domain.coupon.Coupon
+import kr.hhplus.be.server.domain.coupon.CouponCommand
 import kr.hhplus.be.server.domain.coupon.DiscountType
 import kr.hhplus.be.server.domain.coupon.UserCoupon
 import kr.hhplus.be.server.domain.order.coupon.RealOrderCoupon
@@ -53,6 +54,41 @@ object CouponResultFixture {
 
         return CouponResult.Issue(
             coupon = coupon
+        )
+    }
+}
+
+object CouponCommandFixture {
+    fun create(
+        orderId: Long = 1L,
+        userId: Long = 100L,
+        pointId: Long = 10L,
+        products: List<Pair<Long, Int>> = listOf(1L to 2, 2L to 1),
+        couponId: Long? = 1L,
+        totalPrice: Int = 30000,
+        productsDetail: List<CouponCommand.OrderedProduct> = listOf(
+            CouponCommand.OrderedProduct(
+                productId = 1L,
+                name = "상품 A",
+                price = 10000,
+                quantity = 2
+            ),
+            CouponCommand.OrderedProduct(
+                productId = 2L,
+                name = "상품 B",
+                price = 10000,
+                quantity = 1
+            )
+        )
+    ): CouponCommand.Use {
+        return CouponCommand.Use(
+            orderId = orderId,
+            userId = userId,
+            pointId = pointId,
+            products = products,
+            couponId = couponId,
+            totalPrice = totalPrice,
+            productsDetail = productsDetail
         )
     }
 }

@@ -19,6 +19,9 @@ class PaymentServiceTest {
     @Mock
     private lateinit var paymentRepository: PaymentRepository
 
+    @Mock
+    private lateinit var paymentEventPublisher: PaymentEventPublisher
+
     @InjectMocks
     private lateinit var paymentService: PaymentService
 
@@ -30,6 +33,10 @@ class PaymentServiceTest {
         BDDMockito.given(paymentRepository.save(any()))
             .willReturn(payment)
 
+        BDDMockito.willDoNothing()
+            .given(paymentEventPublisher)
+            .publish(any())
+
         //when
         val paymentCommand = PaymentCommandFixture.create()
         paymentService.process(paymentCommand)
@@ -37,6 +44,8 @@ class PaymentServiceTest {
         //then
         Mockito.verify(paymentRepository, times(1))
             .save(any())
+        Mockito.verify(paymentEventPublisher, times(1))
+            .publish(any())
     }
 
 }

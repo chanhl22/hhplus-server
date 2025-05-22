@@ -6,7 +6,6 @@ class PlatformCommand {
         val totalPrice: Int,
         val products: List<OrderedProduct>,
         val userId: Long,
-        val name: String,
         val couponId: Long?,
         val discountType: String?,
         val discountValue: Int?,

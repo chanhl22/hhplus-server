@@ -5,7 +5,6 @@ class PlatformOrder(
     val totalPrice: Int,
     val products: List<PlatformProductOrder>,
     val userId: Long,
-    val name: String,
     val couponId: Long?,
     val discountType: String?,
     val discountValue: Int?,
@@ -16,7 +15,6 @@ class PlatformOrder(
             totalPrice: Int,
             products: List<PlatformProductOrder>,
             userId: Long,
-            name: String,
             couponId: Long?,
             discountType: String?,
             discountValue: Int?
@@ -26,7 +24,6 @@ class PlatformOrder(
                 totalPrice = totalPrice,
                 products = products,
                 userId = userId,
-                name = name,
                 couponId = couponId,
                 discountType = discountType,
                 discountValue = discountValue

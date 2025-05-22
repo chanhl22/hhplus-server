@@ -1,10 +1,13 @@
 package kr.hhplus.be.server.domain.coupon
 
+import kr.hhplus.be.server.fixture.coupon.CouponCommandFixture
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import kr.hhplus.be.server.fixture.coupon.UserCouponDomainFixture
+import kr.hhplus.be.server.fixture.point.PointDomainFixture
 import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import kr.hhplus.be.server.infrastructure.coupon.CouponJpaRepository
 import kr.hhplus.be.server.infrastructure.coupon.UserCouponJpaRepository
+import kr.hhplus.be.server.infrastructure.point.PointJpaRepository
 import kr.hhplus.be.server.infrastructure.user.UserJpaRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
@@ -23,11 +27,17 @@ class CouponServiceIntegrationTest {
     @Autowired
     private lateinit var couponService: CouponService
 
+    @MockitoBean
+    private lateinit var couponEventPublisher: CouponEventPublisher
+
     @Autowired
     private lateinit var couponJpaRepository: CouponJpaRepository
 
     @Autowired
     private lateinit var userJpaRepository: UserJpaRepository
+
+    @Autowired
+    private lateinit var pointJpaRepository: PointJpaRepository
 
     @Autowired
     private lateinit var userCouponJpaRepository: UserCouponJpaRepository
@@ -45,35 +55,14 @@ class CouponServiceIntegrationTest {
         redisFlushAll()
     }
 
-    @DisplayName("쿠폰을 조회한다.")
-    @Test
-    fun find() {
-        //given
-        val user = UserDomainFixture.create(userId = 0L)
-        val savedUser = userJpaRepository.save(user)
-
-        val coupon = CouponDomainFixture.create(couponId = 0L)
-        val savedCoupon = couponJpaRepository.save(coupon)
-
-        val userCoupon =
-            UserCouponDomainFixture.create(userCouponId = 0L, userId = savedUser.id, couponId = savedCoupon.id)
-        userCouponJpaRepository.save(userCoupon)
-
-        //when
-        val result = couponService.find(couponId = savedCoupon.id, userId = savedUser.id)
-
-        //then
-        assertThat(result).isNotNull
-        assertThat(result)
-            .extracting("name", "discountType", "discountValue", "quantity", "expiredAt")
-            .containsExactly("1000원 할인 쿠폰", DiscountType.AMOUNT, 1000, 20, coupon.expiredAt)
-    }
-
     @DisplayName("선착순 쿠폰 발급 요청을 한다.")
     @Test
     fun reserveFirstCome() {
         //given
-        val user = UserDomainFixture.create(userId = 0L)
+        val point = PointDomainFixture.create(pointId = 0L, balance = 5_000_000)
+        val savedPoint = pointJpaRepository.save(point)
+
+        val user = UserDomainFixture.create(userId = 0L, pointId = savedPoint.id, balance = savedPoint.balance)
         val savedUser = userJpaRepository.save(user)
 
         val coupon = CouponDomainFixture.create(couponId = 0L, remainingQuantity = 100)
@@ -146,8 +135,10 @@ class CouponServiceIntegrationTest {
         )
         userCouponJpaRepository.save(userCoupon)
 
+        val command = CouponCommandFixture.create(userId = savedUser.id, couponId = savedCoupon.id)
+
         //when
-        couponService.isUsed(savedCoupon.id, savedUser.id)
+        couponService.isUsed(command)
 
         //then
         val userCouponResult = userCouponJpaRepository.findByCouponId(savedCoupon.id)

@@ -8,6 +8,7 @@ import kr.hhplus.be.server.domain.order.OrderEvent
 import kr.hhplus.be.server.domain.order.OrderInfo
 import kr.hhplus.be.server.domain.order.OrderPoint
 import kr.hhplus.be.server.domain.order.OrderProduct
+import kr.hhplus.be.server.domain.order.OrderStatus
 import kr.hhplus.be.server.domain.order.OrderedProduct
 import kr.hhplus.be.server.domain.order.OrderedProducts
 import kr.hhplus.be.server.domain.order.coupon.EmptyOrderCoupon
@@ -42,16 +43,10 @@ object OrderCriteriaFixture {
 
 object OrderResultFixture {
     fun create(
-        orderId: Long = 1L,
-        totalAmount: Int = 10000,
-        paymentId: Long = 1L,
-        remainBalance: Int = 10000,
+        orderId: Long = 1L
     ): OrderResult.Order {
         return OrderResult.Order(
-            orderId = orderId,
-            totalAmount = totalAmount,
-            paymentId = paymentId,
-            remainBalance = remainBalance,
+            orderId = orderId
         )
     }
 }
@@ -63,6 +58,7 @@ object OrderDomainFixture {
         totalPrice: Int = 100000,
         couponId: Long? = 1L,
         registeredAt: LocalDateTime = LocalDateTime.now(),
+        status: OrderStatus = OrderStatus.PENDING,
         orderProducts: List<OrderProduct> = emptyList()
     ): Order {
         val order = Order(
@@ -70,7 +66,8 @@ object OrderDomainFixture {
             userId = userId,
             totalPrice = totalPrice,
             couponId = couponId,
-            registeredAt = registeredAt
+            registeredAt = registeredAt,
+            status = status,
         )
         orderProducts.map { orderProduct -> order.orderProducts.add(orderProduct) }
         return order
@@ -81,10 +78,12 @@ object OrderProductDomainFixture {
     fun create(
         order: Order = OrderDomainFixture.create(),
         productId: Long = 1L,
+        quantity: Int = 10
     ): OrderProduct {
         return OrderProduct(
             order = order,
             productId = productId,
+            quantity = quantity
         )
     }
 }
@@ -103,14 +102,19 @@ object OrderInfoFixture {
 
 object OrderCommandFixture {
     fun create(
-        orderPoint: OrderPoint = OrderPointFixture.create(),
-        orderedProducts: OrderedProducts = OrderedProductsFixture.create(),
-        orderCoupon: OrderCoupon = OrderCouponFixture.create()
-    ): OrderCommand.Order {
-        return OrderCommand.Order(
-            orderPoint = orderPoint,
-            orderedProducts = orderedProducts,
-            orderCoupon = orderCoupon
+        userId: Long = 100L,
+        pointId: Long = 10L,
+        products: List<OrderCommand.OrderProduct> = listOf(
+            OrderCommand.OrderProduct(productId = 1L, quantity = 2),
+            OrderCommand.OrderProduct(productId = 2L, quantity = 1)
+        ),
+        couponId: Long? = 1L
+    ): OrderCommand.Create {
+        return OrderCommand.Create(
+            userId = userId,
+            pointId = pointId,
+            products = products,
+            couponId = couponId
         )
     }
 }
@@ -155,34 +159,36 @@ object OrderCouponFixture {
 object OrderEventFixture {
     fun create(
         orderId: Long = 1L,
-        totalPrice: Int = 30000,
-        products: List<OrderEvent.OrderedProduct> = listOf(
+        userId: Long = 100L,
+        pointId: Long = 10L,
+        products: List<Pair<Long, Int>> = listOf(1L to 2, 2L to 1),
+        couponId: Long? = 1L,
+        totalPrice: Int = 18000,
+        productsDetail: List<OrderEvent.OrderedProduct> = listOf(
             OrderEvent.OrderedProduct(
-                productId = 101L,
-                name = "테스트 상품 1",
-                price = 10000,
-                quantity = 1
+                productId = 1L,
+                name = "상품A",
+                price = 5000,
+                quantity = 2
             ),
             OrderEvent.OrderedProduct(
-                productId = 102L,
-                name = "테스트 상품 2",
-                price = 20000,
+                productId = 2L,
+                name = "상품B",
+                price = 8000,
                 quantity = 1
             )
         ),
-        userId: Long = 10L,
-        name: String = "홍길동",
-        couponId: Long? = 555L,
-        discountType: String? = "금액 할인",
-        discountValue: Int? = 5000
+        discountType: String? = "AMOUNT",
+        discountValue: Int? = 1000
     ): OrderEvent.Completed {
         return OrderEvent.Completed(
             orderId = orderId,
-            totalPrice = totalPrice,
-            products = products,
             userId = userId,
-            name = name,
+            pointId = pointId,
+            products = products,
             couponId = couponId,
+            totalPrice = totalPrice,
+            productsDetail = productsDetail,
             discountType = discountType,
             discountValue = discountValue
         )

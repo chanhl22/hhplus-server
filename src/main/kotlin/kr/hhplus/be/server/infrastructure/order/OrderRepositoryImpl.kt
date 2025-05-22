@@ -18,4 +18,9 @@ class OrderRepositoryImpl(
         return orderJpaRepository.findByRegisteredAtBetween(yesterdayStart, yesterdayEnd)
     }
 
+    override fun find(orderId: Long): Order {
+        return orderJpaRepository.findById(orderId)
+            .orElseThrow(::IllegalArgumentException)
+    }
+
 }

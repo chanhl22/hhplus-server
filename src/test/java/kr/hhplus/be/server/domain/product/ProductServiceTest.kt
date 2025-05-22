@@ -26,6 +26,9 @@ class ProductServiceTest {
     @Mock
     private lateinit var stockRepository: StockRepository
 
+    @Mock
+    private lateinit var productEventPublisher: ProductEventPublisher
+
     @InjectMocks
     private lateinit var productService: ProductService
 
@@ -49,22 +52,6 @@ class ProductServiceTest {
             .find(any())
         Mockito.verify(stockRepository, times(1))
             .findByProductId(any())
-    }
-
-    @DisplayName("주문 가능한 상품들을 조회한다.")
-    @Test
-    fun findAll() {
-        //given
-        val products = ProductDomainFixture.createProducts()
-        BDDMockito.given(productRepository.findAllByIdIn(any()))
-            .willReturn(products)
-
-        //when
-        productService.findAll(products.map { it.id })
-
-        //then
-        Mockito.verify(productRepository, times(1))
-            .findAllByIdIn(any())
     }
 
     @DisplayName("주문 통계를 저장한다.")

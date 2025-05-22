@@ -9,7 +9,7 @@ class PlatformOrderEventMapper {
             return PlatformCommand.Payload(
                 orderId = event.orderId,
                 totalPrice = event.totalPrice,
-                products = event.products.map {
+                products = event.productsDetail.map {
                     PlatformCommand.OrderedProduct(
                         productId = it.productId,
                         name = it.name,
@@ -18,7 +18,6 @@ class PlatformOrderEventMapper {
                     )
                 },
                 userId = event.userId,
-                name = event.name,
                 couponId = event.couponId,
                 discountType = event.discountType,
                 discountValue = event.discountValue

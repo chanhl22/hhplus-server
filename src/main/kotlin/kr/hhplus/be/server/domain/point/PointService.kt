@@ -6,7 +6,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 @Service
 class PointService(
-    private val pointRepository: PointRepository
+    private val pointRepository: PointRepository,
+    private val pointEventPublisher: PointEventPublisher
 ) {
     fun find(pointId: Long): Point {
         return pointRepository.find(pointId)
@@ -21,11 +22,13 @@ class PointService(
     }
 
     @Transactional
-    fun use(pointId: Long, amount: Int) {
-        val point = pointRepository.findWithPessimisticLock(pointId)
-            .deduct(amount)
+    fun use(command: PointCommand.Deduct) {
+        val point = pointRepository.findWithPessimisticLock(command.pointId)
+            .deduct(command.totalPrice)
 
         pointRepository.save(point)
+
+        pointEventPublisher.publish(command.toEvent())
     }
 
 }

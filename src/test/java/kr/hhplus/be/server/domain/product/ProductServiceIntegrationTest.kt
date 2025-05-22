@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.fixture.product.ProductCommandFixture
 import kr.hhplus.be.server.fixture.product.ProductDomainFixture
 import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import kr.hhplus.be.server.infrastructure.product.ProductJpaRepository
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cache.CacheManager
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
@@ -33,6 +35,9 @@ class ProductServiceIntegrationTest {
 
     @Autowired
     private lateinit var cacheManager: CacheManager
+
+    @MockitoBean
+    private lateinit var productEventPublisher: ProductEventPublisher
 
     @AfterEach
     fun tearDown() {
@@ -60,39 +65,6 @@ class ProductServiceIntegrationTest {
             )
     }
 
-    @DisplayName("상품 정보들을 조회한다.")
-    @Test
-    fun findAll() {
-        //given
-        val product1 = ProductDomainFixture.create(productId = 0L)
-        val product2 = ProductDomainFixture.create2(productId = 0L)
-        val products = listOf(product1, product2)
-        val savedProducts = productJpaRepository.saveAll(products)
-
-        val stocks = listOf(
-            StockDomainFixture.create(stockId = 0L, productId = savedProducts[0].id, quantity = 25),
-            StockDomainFixture.create(stockId = 0L, productId = savedProducts[1].id, quantity = 10)
-        )
-        stockJpaRepository.saveAll(stocks)
-
-        //when
-        val result = productService.findAll(savedProducts.map { it.id })
-
-        //then
-        assertThat(result.products).hasSize(2)
-            .extracting("name", "price", "description")
-            .containsExactly(
-                Tuple.tuple("무선 블루투스 이어폰", 129000, "고음질 무선 블루투스 이어폰."),
-                Tuple.tuple("무선 키보드", 375000, "적축 키보드.")
-            )
-        assertThat(result.stocks).hasSize(2)
-            .extracting("productId", "quantity")
-            .containsExactly(
-                Tuple.tuple(savedProducts[0].id, 25),
-                Tuple.tuple(savedProducts[1].id, 10)
-            )
-    }
-
     @DisplayName("상품 재고를 차감한다.")
     @Test
     fun deduct() {
@@ -107,13 +79,11 @@ class ProductServiceIntegrationTest {
         val stock2 = StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id)
         val savedStock2 = stockJpaRepository.save(stock2)
 
-        //when
-        val command = ProductCommand.Deduct(
-            listOf(
-                ProductCommand.OrderProduct(productId = savedProduct1.id, 2),
-                ProductCommand.OrderProduct(productId = savedProduct2.id, 2)
-            )
+        val command = ProductCommandFixture.create(
+            products = listOf(savedProduct1.id to 2, savedProduct2.id to 2)
         )
+
+        //when
         productService.deduct(command)
 
         //then

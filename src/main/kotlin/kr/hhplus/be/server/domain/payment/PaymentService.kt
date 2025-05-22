@@ -6,13 +6,18 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class PaymentService(
-    private val paymentRepository: PaymentRepository
+    private val paymentRepository: PaymentRepository,
+    private val paymentEventPublisher: PaymentEventPublisher
 ) {
+
     @Transactional
-    fun process(command: PaymentCommand.Pay): Payment {
-        val order = command.order
-        val payment = Payment.decide(order, command.balance)
-        return paymentRepository.save(payment)
+    fun process(command: PaymentCommand.Save): Long {
+        val payment = Payment.create(command.orderId, command.totalPrice)
+        val savedPayment = paymentRepository.save(payment)
+
+        paymentEventPublisher.publish(command.toEvent())
+
+        return savedPayment.id
     }
 
 }
