@@ -8,4 +8,6 @@ interface OrderRepository {
 
     fun findByRegisteredAtBetween(yesterdayStart: LocalDateTime, yesterdayEnd: LocalDateTime): List<Order>
 
+    fun find(orderId: Long): Order
+
 }

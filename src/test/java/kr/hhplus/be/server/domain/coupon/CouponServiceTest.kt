@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon
 
+import kr.hhplus.be.server.fixture.coupon.CouponCommandFixture
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import kr.hhplus.be.server.fixture.coupon.UserCouponDomainFixture
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -24,46 +25,12 @@ class CouponServiceTest {
     @Mock
     private lateinit var userCouponRepository: UserCouponRepository
 
+    @Mock
+    private lateinit var couponEventPublisher: CouponEventPublisher
+
     @InjectMocks
     private lateinit var couponService: CouponService
 
-    @DisplayName("쿠폰을 조회한다.")
-    @Test
-    fun find() {
-        //given
-        BDDMockito.given(userCouponRepository.existsByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
-            .willReturn(true)
-
-        val coupon = CouponDomainFixture.create()
-        BDDMockito.given(couponRepository.find(any()))
-            .willReturn(coupon)
-
-        //when
-        couponService.find(1L, 1L)
-
-        //then
-        Mockito.verify(userCouponRepository, times(1))
-            .existsByCouponIdAndUserIdAndIsUsed(any(), any(), any())
-        Mockito.verify(couponRepository, times(1))
-            .find(any())
-    }
-
-    @DisplayName("쿠폰이 존재하지 않으면 조회하지 않는다.")
-    @Test
-    fun emptyCoupon() {
-        //given
-        BDDMockito.given(userCouponRepository.existsByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
-            .willReturn(false)
-
-        //when
-        couponService.find(1L, 1L)
-
-        //then
-        Mockito.verify(userCouponRepository, times(1))
-            .existsByCouponIdAndUserIdAndIsUsed(any(), any(), any())
-        Mockito.verify(couponRepository, never())
-            .find(any())
-    }
 
     @DisplayName("쿠폰을 발행한다.")
     @Test
@@ -133,12 +100,19 @@ class CouponServiceTest {
         BDDMockito.given(userCouponRepository.save(any()))
             .willReturn(userCoupon)
 
+        BDDMockito.given(userCouponRepository.existsByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
+            .willReturn(true)
+
+        val command = CouponCommandFixture.create()
+
         //when
-        couponService.isUsed(1L, 1L)
+        couponService.isUsed(command)
 
         //then
         Mockito.verify(userCouponRepository, times(1))
             .findByCouponIdAndUserIdAndIsUsed(any(), any(), any())
+        Mockito.verify(userCouponRepository, times(1))
+            .existsByCouponIdAndUserIdAndIsUsed(any(), any(), any())
         Mockito.verify(userCouponRepository, times(1))
             .save(any())
     }
@@ -146,8 +120,11 @@ class CouponServiceTest {
     @DisplayName("쿠폰이 없으면 null을 반환한다.")
     @Test
     fun noCoupon() {
+        //given
+        val command = CouponCommandFixture.create()
+
         //when
-        couponService.isUsed(null, 1L)
+        couponService.isUsed(command)
 
         //then
         Mockito.verify(userCouponRepository, never())
@@ -163,13 +140,20 @@ class CouponServiceTest {
         BDDMockito.given(userCouponRepository.findByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
             .willReturn(emptyList())
 
+        BDDMockito.given(userCouponRepository.existsByCouponIdAndUserIdAndIsUsed(any(), any(), any()))
+            .willReturn(true)
+
+        val command = CouponCommandFixture.create()
+
         //when //then
-        assertThatThrownBy { couponService.isUsed(1L, 1L) }
+        assertThatThrownBy { couponService.isUsed(command) }
             .isInstanceOf(IllegalStateException::class.java)
             .hasMessage("해당 쿠폰을 사용할 수 없습니다. 쿠폰이 존재하지 않거나 이미 사용되었습니다.")
 
         Mockito.verify(userCouponRepository, times(1))
             .findByCouponIdAndUserIdAndIsUsed(any(), any(), any())
+        Mockito.verify(userCouponRepository, times(1))
+            .existsByCouponIdAndUserIdAndIsUsed(any(), any(), any())
         Mockito.verify(userCouponRepository, never())
             .save(any())
     }

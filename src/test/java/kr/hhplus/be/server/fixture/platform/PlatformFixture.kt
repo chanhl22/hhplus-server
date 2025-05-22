@@ -21,7 +21,6 @@ object PlatformCommandFixture {
             )
         ),
         userId: Long = 10L,
-        name: String = "홍길동",
         couponId: Long? = 555L,
         discountType: String? = "금액 할인",
         discountValue: Int? = 5000
@@ -31,7 +30,6 @@ object PlatformCommandFixture {
             totalPrice = totalPrice,
             products = products,
             userId = userId,
-            name = name,
             couponId = couponId,
             discountType = discountType,
             discountValue = discountValue

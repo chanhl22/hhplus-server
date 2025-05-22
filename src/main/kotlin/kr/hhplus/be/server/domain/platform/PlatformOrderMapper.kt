@@ -15,7 +15,6 @@ class PlatformOrderMapper {
                     )
                 },
                 userId = command.userId,
-                name = command.name,
                 couponId = command.couponId,
                 discountType = command.discountType,
                 discountValue = command.discountValue

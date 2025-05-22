@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.point
 
+import kr.hhplus.be.server.fixture.point.PointCommandFixture
 import kr.hhplus.be.server.fixture.point.PointDomainFixture
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -17,6 +18,9 @@ class PointServiceTest {
 
     @Mock
     private lateinit var pointRepository: PointRepository
+
+    @Mock
+    private lateinit var pointEventPublisher: PointEventPublisher
 
     @InjectMocks
     private lateinit var pointService: PointService
@@ -71,14 +75,22 @@ class PointServiceTest {
         BDDMockito.given(pointRepository.save(any()))
             .willReturn(updatedPoint)
 
+        BDDMockito.willDoNothing()
+            .given(pointEventPublisher)
+            .publish(any())
+
+        val command = PointCommandFixture.create()
+
         //when
-        pointService.use(1L, 10000)
+        pointService.use(command)
 
         //then
         Mockito.verify(pointRepository, times(1))
             .findWithPessimisticLock(any())
         Mockito.verify(pointRepository, times(1))
             .save(any())
+        Mockito.verify(pointEventPublisher, times(1))
+            .publish(any())
     }
 
 }

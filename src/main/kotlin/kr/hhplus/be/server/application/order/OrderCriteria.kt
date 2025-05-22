@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.application.order
 
-import kr.hhplus.be.server.domain.product.ProductCommand
+import kr.hhplus.be.server.domain.order.OrderCommand
 
 class OrderCriteria {
     data class Order(
@@ -8,31 +8,26 @@ class OrderCriteria {
         val products: List<OrderProduct>,
         val couponId: Long?
     ) {
-        fun getProductIds(): List<Long> {
-            return products.map { product ->
-                product.productId
-            }
-        }
-
-        fun createOrderProductQuantityCountMap(): Map<Long, Int> {
-            return products.associate { it.productId to it.quantity }
-        }
-
-        fun toDeduct(): ProductCommand.Deduct {
-            return ProductCommand.of(products.map { product ->
-                ProductCommand.OrderProduct(
-                    product.productId,
-                    product.quantity
-                )
-            })
-        }
-
         @Suppress("unused")
         fun toLockKeys(): List<String> {
             return products.map { it.productId }
                 .distinct()
                 .sorted()
                 .map { productId -> productId.toString() }
+        }
+
+        fun toCommand(pointId: Long): OrderCommand.Create {
+            return OrderCommand.Create(
+                userId = userId,
+                pointId = pointId,
+                products = products.map { product ->
+                    OrderCommand.OrderProduct(
+                        product.productId,
+                        product.quantity
+                    )
+                },
+                couponId = couponId
+            )
         }
     }
 

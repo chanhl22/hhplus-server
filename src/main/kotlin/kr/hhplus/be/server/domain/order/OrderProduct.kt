@@ -10,9 +10,13 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "order_product")
 class OrderProduct(
+
     @ManyToOne
     val order: Order,
+
     val productId: Long,
+
+    val quantity: Int,
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

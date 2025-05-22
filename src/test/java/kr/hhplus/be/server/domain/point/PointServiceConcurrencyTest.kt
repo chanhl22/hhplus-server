@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.point
 
+import kr.hhplus.be.server.fixture.point.PointCommandFixture
 import kr.hhplus.be.server.fixture.point.PointDomainFixture
 import kr.hhplus.be.server.infrastructure.point.PointJpaRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -20,6 +22,9 @@ class PointServiceConcurrencyTest {
 
     @Autowired
     private lateinit var pointJpaRepository: PointJpaRepository
+
+    @MockitoBean
+    private lateinit var pointEventPublisher: PointEventPublisher
 
     @AfterEach
     fun tearDown() {
@@ -66,11 +71,13 @@ class PointServiceConcurrencyTest {
         val executorService = Executors.newFixedThreadPool(32)
         val latch = CountDownLatch(threadCount)
 
+        val command = PointCommandFixture.create(pointId = savedPoint.id, totalPrice = 1000)
+
         //when
         for (idx in 1..threadCount) {
             executorService.execute {
                 try {
-                    pointService.use(savedPoint.id, 1000)
+                    pointService.use(command)
                 } finally {
                     latch.countDown()
                 }
@@ -101,6 +108,8 @@ class PointServiceConcurrencyTest {
         val successChargeCount = AtomicInteger(0)
         val successUseCount = AtomicInteger(0)
 
+        val command = PointCommandFixture.create(pointId = savedPoint.id, totalPrice = 1000)
+
         // when
         repeat(chargeCount) {
             executorService.execute {
@@ -116,7 +125,7 @@ class PointServiceConcurrencyTest {
         repeat(useCount) {
             executorService.execute {
                 try {
-                    pointService.use(savedPoint.id, 1000)
+                    pointService.use(command)
                     successUseCount.incrementAndGet()
                 } finally {
                     latch.countDown()

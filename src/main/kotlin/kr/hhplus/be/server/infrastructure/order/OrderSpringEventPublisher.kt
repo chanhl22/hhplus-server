@@ -14,4 +14,8 @@ class OrderSpringEventPublisher(
         applicationEventPublisher.publishEvent(event)
     }
 
+    override fun publish(event: OrderEvent.Create) {
+        applicationEventPublisher.publishEvent(event)
+    }
+
 }
