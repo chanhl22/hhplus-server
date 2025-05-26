@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.domain.order.OrderedProducts
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -13,7 +14,8 @@ import java.time.LocalTime
 class ProductService(
     private val productRepository: ProductRepository,
     private val stockRepository: StockRepository,
-    private val productStatisticsRepository: ProductStatisticsRepository
+    private val productStatisticsRepository: ProductStatisticsRepository,
+    private val productEventPublisher: ProductEventPublisher
 ) {
     fun find(productId: Long): ProductInfo.Find {
         val product = productRepository.find(productId)
@@ -22,25 +24,29 @@ class ProductService(
         return ProductInfo.of(product, stock)
     }
 
-    fun findAll(productIds: List<Long>): ProductInfo.FindAll {
-        val products = productRepository.findAllByIdIn(productIds)
-        val stocks = stockRepository.findByProductIdIn(products.map { it.id })
-
-        return ProductInfo.of(products, stocks)
-    }
-
     @Transactional
     fun deduct(command: ProductCommand.Deduct) {
-        val stocks = stockRepository.findByProductIdIn(command.getProductIds())
+        val products = productRepository.findAllByIdIn(command.getProductIds())
+        val stocks = stockRepository.findByProductIdIn(products.map { it.id })
 
-        val orderProductQuantityMap = command.products.associate { it.productId to it.quantity }
+        val orderedProducts = OrderedProducts.create(
+            products,
+            stocks,
+            command.createOrderProductQuantityCountMap()
+        )
+        orderedProducts.isEmptyOrder()
+        orderedProducts.isEnoughQuantity()
+        val totalPrice = orderedProducts.calculateTotalPrice()
+
+        val orderProductQuantityMap = command.createOrderProductQuantityCountMap()
         val deductStocks = stocks.map { stock ->
             val orderQuantity = orderProductQuantityMap[stock.productId]
                 ?: throw IllegalArgumentException("존재하지 않는 상품입니다. productId=${stock.productId}")
             stock.deduct(orderQuantity)
         }
-
         stockRepository.saveAll(deductStocks)
+
+        productEventPublisher.publish(command.toEvent(totalPrice, orderedProducts))
     }
 
     fun saveProductStatistics(commands: List<ProductCommand.ProductStatistics>) {

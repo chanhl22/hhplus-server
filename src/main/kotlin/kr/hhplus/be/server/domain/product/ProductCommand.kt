@@ -1,13 +1,40 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.domain.order.OrderedProducts
+
 class ProductCommand {
     data class Deduct(
-        val products: List<OrderProduct>,
+        val orderId: Long,
+        val userId: Long,
+        val pointId: Long,
+        val products: List<Pair<Long, Int>>,
+        val couponId: Long?
     ) {
         fun getProductIds(): List<Long> {
-            return products.map { product ->
-                product.productId
-            }
+            return products.map { it.first }
+        }
+
+        fun createOrderProductQuantityCountMap(): Map<Long, Int> {
+            return products.associate { it.first to it.second }
+        }
+
+        fun toEvent(totalPrice: Int, orderedProducts: OrderedProducts): ProductEvent.Completed {
+            return ProductEvent.Completed(
+                orderId = orderId,
+                userId = userId,
+                pointId = pointId,
+                products = products,
+                couponId = couponId,
+                totalPrice = totalPrice,
+                productsDetail = orderedProducts.products.map {
+                    ProductEvent.OrderedProduct(
+                        productId = it.productId,
+                        name = it.name,
+                        price = it.price,
+                        quantity = it.quantity
+                    )
+                }
+            )
         }
     }
 
@@ -22,10 +49,6 @@ class ProductCommand {
     )
 
     companion object {
-        fun of(orderProducts: List<OrderProduct>): Deduct {
-            return Deduct(products = orderProducts)
-        }
-
         fun of(productId: Long, totalSales: Int): ProductStatistics {
             return ProductStatistics(
                 productId = productId,

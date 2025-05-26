@@ -23,31 +23,11 @@ class OrderServiceTest {
     @Mock
     private lateinit var orderProductRepository: OrderProductRepository
 
+    @Mock
+    private lateinit var orderEventPublisher: OrderEventPublisher
+
     @InjectMocks
     private lateinit var orderService: OrderService
-
-    @DisplayName("주문을 생성한다.")
-    @Test
-    fun order() {
-        //given
-        val order = OrderDomainFixture.create()
-        BDDMockito.given(orderRepository.save(any()))
-            .willReturn(order)
-
-        BDDMockito.willDoNothing()
-            .given(orderProductRepository)
-            .saveAll(any())
-
-        //when
-        val orderCommand = OrderCommandFixture.create()
-        orderService.order(orderCommand)
-
-        //then
-        Mockito.verify(orderRepository, times(1))
-            .save(any())
-        Mockito.verify(orderProductRepository, times(1))
-            .saveAll(any())
-    }
 
     @DisplayName("통계를 위해 주문을 집계한다.")
     @Test
@@ -69,6 +49,36 @@ class OrderServiceTest {
             .findByRegisteredAtBetween(any(), any())
         Mockito.verify(orderProductRepository, times(1))
             .findByOrderIn(any())
+    }
+
+    @DisplayName("주문을 생성한다.")
+    @Test
+    fun ready() {
+        //given
+        val order = OrderDomainFixture.create()
+        BDDMockito.given(orderRepository.save(any()))
+            .willReturn(order)
+
+        BDDMockito.willDoNothing()
+            .given(orderProductRepository)
+            .saveAll(any())
+
+        val command = OrderCommandFixture.create()
+
+        BDDMockito.willDoNothing()
+            .given(orderEventPublisher)
+            .publish(any<OrderEvent.Create>())
+
+        //when
+        orderService.ready(command)
+
+        //then
+        Mockito.verify(orderRepository, times(1))
+            .save(any())
+        Mockito.verify(orderProductRepository, times(1))
+            .saveAll(any())
+        Mockito.verify(orderEventPublisher, times(1))
+            .publish(any<OrderEvent.Create>())
     }
 
 }

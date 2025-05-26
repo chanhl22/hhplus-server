@@ -4,9 +4,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import kr.hhplus.be.server.domain.order.Order
 
 enum class PaymentStatus(
     val description: String
@@ -20,8 +18,7 @@ enum class PaymentStatus(
 @Table(name = "payment")
 class Payment(
 
-    @OneToOne
-    val order: Order,
+    val orderId: Long,
 
     val amount: Int,
 
@@ -32,39 +29,16 @@ class Payment(
     val id: Long = 0L,
 ) {
     companion object {
-        fun decide(order: Order, userPointBalance: Int): Payment {
-            return if (userPointBalance < order.totalPrice) {
-                fail(order)
-            } else {
-                success(order)
-            }
-        }
-
-        private fun success(
-            order: Order,
-            paymentStatus: PaymentStatus = PaymentStatus.SUCCEEDED
+        fun create(
+            orderId: Long,
+            amount: Int
         ): Payment {
             return Payment(
-                order = order,
-                amount = order.totalPrice,
-                paymentStatus = paymentStatus
+                orderId = orderId,
+                amount = amount,
+                paymentStatus = PaymentStatus.SUCCEEDED
             )
         }
-
-        private fun fail(
-            order: Order,
-            paymentStatus: PaymentStatus = PaymentStatus.FAILED
-        ): Payment {
-            return Payment(
-                order = order,
-                amount = order.totalPrice,
-                paymentStatus = paymentStatus
-            )
-        }
-    }
-
-    fun isSuccess(): Boolean {
-        return this.paymentStatus == PaymentStatus.SUCCEEDED
     }
 
 }
