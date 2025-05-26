@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.application.order
 
 import kr.hhplus.be.server.domain.coupon.CouponService
+import kr.hhplus.be.server.domain.order.OrderEventPublisher
 import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.point.PointService
@@ -48,6 +49,9 @@ class OrderFacadeTest {
 
     @Mock
     private lateinit var productRankingService: ProductRankingService
+
+    @Mock
+    private lateinit var orderEventPublisher: OrderEventPublisher
 
     @InjectMocks
     private lateinit var orderFacade: OrderFacade

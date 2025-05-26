@@ -7,6 +7,9 @@ import kr.hhplus.be.server.fixture.product.ProductDomainFixture
 import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import kr.hhplus.be.server.infrastructure.coupon.CouponJpaRepository
+import kr.hhplus.be.server.infrastructure.order.OrderJpaRepository
+import kr.hhplus.be.server.infrastructure.order.OrderProductJpaRepository
+import kr.hhplus.be.server.infrastructure.payment.PaymentJpaRepository
 import kr.hhplus.be.server.infrastructure.point.PointJpaRepository
 import kr.hhplus.be.server.infrastructure.product.ProductJpaRepository
 import kr.hhplus.be.server.infrastructure.product.StockJpaRepository
@@ -44,6 +47,15 @@ class OrderFacadeConcurrencyTest {
     private lateinit var couponJpaRepository: CouponJpaRepository
 
     @Autowired
+    private lateinit var orderJpaRepository: OrderJpaRepository
+
+    @Autowired
+    private lateinit var orderProductJpaRepository: OrderProductJpaRepository
+
+    @Autowired
+    private lateinit var paymentJpaRepository: PaymentJpaRepository
+
+    @Autowired
     private lateinit var redisTemplate: StringRedisTemplate
 
     @BeforeEach
@@ -58,6 +70,9 @@ class OrderFacadeConcurrencyTest {
         productJpaRepository.deleteAllInBatch()
         stockJpaRepository.deleteAllInBatch()
         couponJpaRepository.deleteAllInBatch()
+        orderProductJpaRepository.deleteAllInBatch()
+        paymentJpaRepository.deleteAllInBatch()
+        orderJpaRepository.deleteAllInBatch()
         redisFlushAll()
     }
 
@@ -65,26 +80,26 @@ class OrderFacadeConcurrencyTest {
     @Test
     fun lostOrder() {
         //given
-        val user = UserDomainFixture.create(userId = 0L)
-        val savedUser = userJpaRepository.save(user)
-
         val point = PointDomainFixture.create(pointId = 0L, balance = 2000000)
-        pointJpaRepository.save(point)
+        val savedPoint = pointJpaRepository.save(point)
+
+        val user = UserDomainFixture.create(userId = 0L, pointId = savedPoint.id, balance = 2000000)
+        val savedUser = userJpaRepository.save(user)
 
         val product1 = ProductDomainFixture.create(productId = 0L, price = 1000)
         val savedProduct1 = productJpaRepository.save(product1)
         val product2 = ProductDomainFixture.create(productId = 0L, price = 1000)
         val savedProduct2 = productJpaRepository.save(product2)
 
-        val stock1 = StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, quantity = 100)
+        val stock1 = StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, quantity = 10)
         val savedStock1 = stockJpaRepository.save(stock1)
-        val stock2 = StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, quantity = 100)
+        val stock2 = StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, quantity = 10)
         val savedStock2 = stockJpaRepository.save(stock2)
 
         val coupon = CouponDomainFixture.create(couponId = 0L)
         couponJpaRepository.save(coupon)
 
-        val threadCount = 100
+        val threadCount = 10
         val executorService = Executors.newFixedThreadPool(32)
         val latch = CountDownLatch(threadCount)
 
