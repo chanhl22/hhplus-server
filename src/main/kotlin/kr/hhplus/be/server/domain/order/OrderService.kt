@@ -39,6 +39,7 @@ class OrderService(
         return savedOrder.id
     }
 
+    @Transactional
     fun complete(command: OrderCommand.Completed) {
         val order = orderRepository.find(command.orderId)
         val successOrder =

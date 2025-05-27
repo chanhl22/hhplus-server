@@ -15,6 +15,7 @@ import kr.hhplus.be.server.infrastructure.point.PointJpaRepository
 import kr.hhplus.be.server.infrastructure.product.ProductJpaRepository
 import kr.hhplus.be.server.infrastructure.product.StockJpaRepository
 import kr.hhplus.be.server.infrastructure.user.UserJpaRepository
+import kr.hhplus.be.server.interfaces.event.platform.PlatformOrderEventListener
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.groups.Tuple
@@ -22,10 +23,17 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+import org.testcontainers.shaded.org.awaitility.Awaitility.await
+import java.time.Duration
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 class OrderServiceIntegrationTest {
@@ -59,6 +67,9 @@ class OrderServiceIntegrationTest {
 
     @Autowired
     private lateinit var redisTemplate: StringRedisTemplate
+
+    @MockitoSpyBean
+    lateinit var platformOrderEventListener: PlatformOrderEventListener
 
     @BeforeEach
     fun setUp() {
@@ -115,8 +126,10 @@ class OrderServiceIntegrationTest {
         val savedProduct1 = productJpaRepository.save(ProductDomainFixture.create(productId = 0L))
         val savedProduct2 = productJpaRepository.save(ProductDomainFixture.create2(productId = 0L))
 
-        val savedStock1 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
-        val savedStock2 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
+        val savedStock1 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
+        val savedStock2 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
 
         val command = OrderCommandFixture.create(
             userId = savedUser.id,
@@ -150,8 +163,10 @@ class OrderServiceIntegrationTest {
         val savedProduct1 = productJpaRepository.save(ProductDomainFixture.create(productId = 0L))
         val savedProduct2 = productJpaRepository.save(ProductDomainFixture.create2(productId = 0L))
 
-        val savedStock1 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
-        val savedStock2 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
+        val savedStock1 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
+        val savedStock2 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
 
         val command = OrderCommandFixture.create(
             userId = savedUser.id,
@@ -174,6 +189,29 @@ class OrderServiceIntegrationTest {
         assertThat(findStock1.quantity).isEqualTo(100)
         val findStock2 = stockJpaRepository.findById(savedStock2.id).get()
         assertThat(findStock2.quantity).isEqualTo(100)
+    }
+
+    @DisplayName("주문 생성이 완료되면 주문 완료 이벤트를 발행한다.")
+    @Test
+    fun complete() {
+        //given
+        val order = OrderDomainFixture.create(orderId = 0L)
+        val savedOrder = orderJpaRepository.save(order)
+
+        val command = OrderCommandFixture.createCompleted(
+            orderId = savedOrder.id
+        )
+
+        //when
+        orderService.complete(command)
+
+        //then
+        await()
+            .pollInterval(Duration.ofMillis(500))
+            .atMost(30, TimeUnit.SECONDS)
+            .untilAsserted {
+                verify(platformOrderEventListener, atLeastOnce()).handle(any())
+            }
     }
 
     private fun redisFlushAll() {
