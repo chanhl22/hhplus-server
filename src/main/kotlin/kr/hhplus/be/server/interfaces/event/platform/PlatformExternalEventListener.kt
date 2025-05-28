@@ -6,13 +6,13 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 
 @Component
-class PlatformOrderEventListener(
+class PlatformExternalEventListener(
     private val platformSendService: PlatformSendService
 ) {
 
     @KafkaListener(topics = ["order_completed"], groupId = "group-1")
     fun handle(event: OrderEvent.Completed) {
-        val command = PlatformOrderEventMapper.toCommand(event)
+        val command = PlatformExternalEventMapper.toCommand(event)
         platformSendService.send(command)
     }
 
