@@ -11,7 +11,7 @@ class CouponScheduler(
 
     @Scheduled(fixedDelay = 3000)
     fun runDailyAt4AMForStatistics() {
-        couponService.issueCoupon()
+//        couponService.issueCoupon()
     }
 
 }
