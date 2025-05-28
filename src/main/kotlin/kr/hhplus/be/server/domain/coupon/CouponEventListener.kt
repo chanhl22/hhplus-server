@@ -6,7 +6,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
 
 @Component
-class CouponSelfEventListener(
+class CouponEventListener(
     private val couponService: CouponService
 ) {
 

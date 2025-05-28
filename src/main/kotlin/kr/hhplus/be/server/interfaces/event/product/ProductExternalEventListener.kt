@@ -6,14 +6,14 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class ProductEventListener(
+class ProductExternalEventListener(
     private val productService: ProductService
 ) {
 
     @EventListener
     fun handle(event: OrderEvent.Create) {
         println("🔥 이벤트 수신됨: $event")
-        val command = ProductEventMapper.toCommand(event)
+        val command = ProductExternalEventMapper.toCommand(event)
         productService.deduct(command)
     }
 

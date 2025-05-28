@@ -3,7 +3,7 @@ package kr.hhplus.be.server.interfaces.event.payment
 import kr.hhplus.be.server.domain.payment.PaymentCommand
 import kr.hhplus.be.server.domain.point.PointEvent
 
-class PaymentEventMapper {
+class PaymentExternalEventMapper {
     companion object {
         fun toCommand(event: PointEvent.Completed): PaymentCommand.Save {
             return PaymentCommand.Save(
