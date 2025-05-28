@@ -15,6 +15,7 @@ class CouponEventListener(
         println("🔥 이벤트 수신됨: ${events.size}")
         val payloads = events.map { it.value() }
         couponService.issueCoupon(payloads)
+        ack.acknowledge()
     }
 
 }

@@ -17,7 +17,7 @@ class CouponSpringEventPublisher(
     }
 
     override fun publish(event: CouponEvent.Created) {
-        kafkaTemplate.send("coupon_created", event)
+        kafkaTemplate.send("coupon_created", event.couponId.toString(), event)
     }
 
 }
