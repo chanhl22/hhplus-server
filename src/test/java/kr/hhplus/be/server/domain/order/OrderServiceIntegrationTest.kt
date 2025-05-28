@@ -15,7 +15,7 @@ import kr.hhplus.be.server.infrastructure.point.PointJpaRepository
 import kr.hhplus.be.server.infrastructure.product.ProductJpaRepository
 import kr.hhplus.be.server.infrastructure.product.StockJpaRepository
 import kr.hhplus.be.server.infrastructure.user.UserJpaRepository
-import kr.hhplus.be.server.interfaces.event.platform.PlatformOrderEventListener
+import kr.hhplus.be.server.interfaces.event.platform.PlatformExternalEventListener
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.groups.Tuple
@@ -69,7 +69,7 @@ class OrderServiceIntegrationTest {
     private lateinit var redisTemplate: StringRedisTemplate
 
     @MockitoSpyBean
-    lateinit var platformOrderEventListener: PlatformOrderEventListener
+    lateinit var platformExternalEventListener: PlatformExternalEventListener
 
     @BeforeEach
     fun setUp() {
@@ -210,7 +210,7 @@ class OrderServiceIntegrationTest {
             .pollInterval(Duration.ofMillis(500))
             .atMost(30, TimeUnit.SECONDS)
             .untilAsserted {
-                verify(platformOrderEventListener, atLeastOnce()).handle(any())
+                verify(platformExternalEventListener, atLeastOnce()).handle(any())
             }
     }
 
