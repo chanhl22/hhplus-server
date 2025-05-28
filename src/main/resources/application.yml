@@ -45,3 +45,8 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+      enable-auto-commit: false
+      max-poll-records: 100
+    listener:
+      type: batch
+      ack-mode: manual
