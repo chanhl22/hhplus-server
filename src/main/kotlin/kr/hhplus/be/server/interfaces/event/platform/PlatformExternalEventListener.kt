@@ -10,7 +10,7 @@ class PlatformExternalEventListener(
     private val platformSendService: PlatformSendService
 ) {
 
-    @KafkaListener(topics = ["order_completed"], groupId = "group-1")
+    @KafkaListener(topics = ["order_completed"], groupId = "platform-service")
     fun handle(event: OrderEvent.Completed) {
         val command = PlatformExternalEventMapper.toCommand(event)
         platformSendService.send(command)
