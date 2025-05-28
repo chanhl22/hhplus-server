@@ -82,8 +82,6 @@ class CouponRepositoryImplTest {
 
         val couponKey = String.format("coupon:%s:requested:users", couponId)
         val quantityKey = String.format("coupon:%s:quantity", couponId)
-        val statusKey = String.format("coupon:%s:user:status", couponId)
-        val activeKey = "coupon:active"
 
         redisTemplate.opsForValue().set(quantityKey, "100")
 
@@ -92,13 +90,9 @@ class CouponRepositoryImplTest {
 
         //then
         val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)
-        val statusValue = redisTemplate.opsForHash<String, String>().get(statusKey, userId.toString())
-        val activeCoupons = redisTemplate.opsForSet().members(activeKey)
         val quantity = redisTemplate.opsForValue().get(quantityKey)
 
         assertThat(couponRequestMembers).contains("1")
-        assertThat(statusValue).isEqualTo("pending")
-        assertThat(activeCoupons).contains("1")
         assertThat(quantity).isEqualTo("100")
     }
 

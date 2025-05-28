@@ -72,21 +72,15 @@ class CouponServiceIntegrationTest {
 
         val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
         val quantityKey = String.format("coupon:%s:quantity", savedCoupon.id)
-        val statusKey = String.format("coupon:%s:user:status", savedCoupon.id)
-        val activeKey = "coupon:active"
 
         //when
         couponService.reserveFirstCome(savedCoupon.id, savedUser.id)
 
         //then
         val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)
-        val statusValue = redisTemplate.opsForHash<String, String>().get(statusKey, savedUser.id.toString())
-        val activeCoupons = redisTemplate.opsForSet().members(activeKey)
         val quantity = redisTemplate.opsForValue().get(quantityKey)
 
         assertThat(couponRequestMembers).contains(savedUser.id.toString())
-        assertThat(statusValue).isEqualTo("pending")
-        assertThat(activeCoupons).contains(savedCoupon.id.toString())
         assertThat(quantity).isEqualTo("100")
     }
 

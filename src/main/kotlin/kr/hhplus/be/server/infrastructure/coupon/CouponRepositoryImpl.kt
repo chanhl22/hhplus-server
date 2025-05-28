@@ -16,8 +16,6 @@ class CouponRepositoryImpl(
     companion object {
         private const val COUPON_REQUEST_KEY = "coupon:%s:requested:users"
         private const val COUPON_QUANTITY_KEY = "coupon:%s:quantity"
-        private const val COUPON_USER_STATUS_KEY = "coupon:%s:user:status"
-        private const val COUPON_ACTIVE_KEY = "coupon:active"
     }
 
     override fun find(couponId: Long): Coupon {
@@ -37,13 +35,11 @@ class CouponRepositoryImpl(
     override fun reserveFirstCome(couponId: Long, userId: Long): CouponReserveStatus {
         val couponKey = createKey(COUPON_REQUEST_KEY, couponId)
         val quantityKey = createKey(COUPON_QUANTITY_KEY, couponId)
-        val statusKey = createKey(COUPON_USER_STATUS_KEY, couponId)
-        val activeKey = COUPON_ACTIVE_KEY
 
         val luaScript = getLuaScript()
         val result = redisTemplate.execute(
             DefaultRedisScript(luaScript, Long::class.java),
-            listOf(couponKey, quantityKey, statusKey, activeKey),
+            listOf(couponKey, quantityKey),
             userId.toString(),
             couponId.toString()
         )
@@ -75,10 +71,6 @@ class CouponRepositoryImpl(
         
             -- 요청 등록 및 상태 저장
             redis.call("SADD", KEYS[1], userId)
-            redis.call("HSET", KEYS[3], userId, "pending")
-            
-            -- 활성 쿠폰 리스트에 쿠폰 ID 등록
-            redis.call("SADD", KEYS[4], couponId)
             
             return 1
         """.trimIndent()
