@@ -36,18 +36,6 @@ class CouponService(
     }
 
     @Transactional
-    fun issueCoupon() {
-        val activeCoupons = couponRepository.findActiveCoupon()
-        for (couponId in activeCoupons) {
-            val successUsers = couponRepository.updateSuccess(couponId)
-            val userCoupons = successUsers.map { userId ->
-                UserCoupon.create(userId = userId.toLong(), couponId = couponId.toLong())
-            }
-            userCouponRepository.saveAll(userCoupons)
-        }
-    }
-
-    @Transactional
     fun issueCoupon(events: List<CouponEvent.Created>) {
         val userCoupons = events.map { event ->
             UserCoupon.create(userId = event.userId, couponId = event.couponId)

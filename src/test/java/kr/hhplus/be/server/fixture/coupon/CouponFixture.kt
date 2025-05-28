@@ -4,6 +4,7 @@ import kr.hhplus.be.server.application.coupon.CouponCriteria.Issue
 import kr.hhplus.be.server.application.coupon.CouponResult
 import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.coupon.CouponCommand
+import kr.hhplus.be.server.domain.coupon.CouponEvent
 import kr.hhplus.be.server.domain.coupon.DiscountType
 import kr.hhplus.be.server.domain.coupon.UserCoupon
 import kr.hhplus.be.server.domain.order.coupon.RealOrderCoupon
@@ -145,6 +146,18 @@ object RealOrderCouponFixture {
             discountValue = discountValue,
             remainingQuantity = remainingQuantity,
             expiredAt = expiredAt
+        )
+    }
+}
+
+object CouponEventFixture {
+    fun create(
+        couponId: Long = 1L,
+        userId: Long = 1L
+    ): CouponEvent.Created {
+        return CouponEvent.Created(
+            couponId = couponId,
+            userId = userId
         )
     }
 }

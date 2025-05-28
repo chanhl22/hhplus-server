@@ -99,27 +99,6 @@ class CouponRepositoryImpl(
         redisTemplate.opsForValue().set(quantityKey, remainingQuantity.toString())
     }
 
-    override fun findActiveCoupon(): Set<String> {
-        return redisTemplate.opsForSet().members(COUPON_ACTIVE_KEY) ?: emptySet()
-    }
-
-    override fun updateSuccess(couponId: String): List<String> {
-        val statusKey = createKey(COUPON_USER_STATUS_KEY, couponId)
-        val hashOps = redisTemplate.opsForHash<String, String>()
-
-        val users = hashOps.entries(statusKey)
-            .filterValues { it == "pending" }
-            .map { it.key }
-
-        if (users.isNotEmpty()) {
-            users.forEach { userId ->
-                hashOps.put(statusKey, userId, "success")
-            }
-        }
-
-        return users
-    }
-
     private fun createKey(key: String, couponId: Any): String {
         return String.format(key, couponId)
     }

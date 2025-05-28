@@ -16,8 +16,4 @@ interface CouponRepository {
 
     fun registerQuantityKey(couponId: Long, remainingQuantity: Int)
 
-    fun findActiveCoupon(): Set<String>
-
-    fun updateSuccess(couponId: String): List<String>
-
 }
