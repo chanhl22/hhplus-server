@@ -10,10 +10,7 @@ class CouponEventListener(
     private val couponService: CouponService
 ) {
 
-    @KafkaListener(
-        topics = ["coupon_created"],
-        groupId = "group-1"
-    )
+    @KafkaListener(topics = ["coupon_created"], groupId = "coupon-service")
     fun handle(events: List<ConsumerRecord<String, CouponEvent.Created>>, ack: Acknowledgment) {
         println("🔥 이벤트 수신됨: ${events.size}")
         val payloads = events.map { it.value() }
