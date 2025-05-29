@@ -117,6 +117,44 @@ object OrderCommandFixture {
             couponId = couponId
         )
     }
+
+    fun createCompleted(
+        orderId: Long = 1L,
+        userId: Long = 100L,
+        pointId: Long = 10L,
+        products: List<Pair<Long, Int>> = listOf(1L to 2, 2L to 1),
+        couponId: Long? = 1L,
+        totalPrice: Int = 30000,
+        discountType: String? = "AMOUNT",
+        discountValue: Int? = 1000,
+        productsDetail: List<OrderCommand.OrderedProduct> = listOf(
+            OrderCommand.OrderedProduct(
+                productId = 1L,
+                name = "상품 A",
+                price = 10000,
+                quantity = 2
+            ),
+            OrderCommand.OrderedProduct(
+                productId = 2L,
+                name = "상품 B",
+                price = 10000,
+                quantity = 1
+            )
+        )
+    ): OrderCommand.Completed {
+        return OrderCommand.Completed(
+            orderId = orderId,
+            userId = userId,
+            pointId = pointId,
+            products = products,
+            couponId = couponId,
+            totalPrice = totalPrice,
+            productsDetail = productsDetail,
+            discountType = discountType,
+            discountValue = discountValue
+        )
+    }
+
 }
 
 object OrderPointFixture {

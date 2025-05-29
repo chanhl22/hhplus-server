@@ -115,8 +115,10 @@ class OrderServiceIntegrationTest {
         val savedProduct1 = productJpaRepository.save(ProductDomainFixture.create(productId = 0L))
         val savedProduct2 = productJpaRepository.save(ProductDomainFixture.create2(productId = 0L))
 
-        val savedStock1 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
-        val savedStock2 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
+        val savedStock1 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
+        val savedStock2 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
 
         val command = OrderCommandFixture.create(
             userId = savedUser.id,
@@ -150,8 +152,10 @@ class OrderServiceIntegrationTest {
         val savedProduct1 = productJpaRepository.save(ProductDomainFixture.create(productId = 0L))
         val savedProduct2 = productJpaRepository.save(ProductDomainFixture.create2(productId = 0L))
 
-        val savedStock1 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
-        val savedStock2 = stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
+        val savedStock1 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct1.id, 100))
+        val savedStock2 =
+            stockJpaRepository.save(StockDomainFixture.create(stockId = 0L, productId = savedProduct2.id, 100))
 
         val command = OrderCommandFixture.create(
             userId = savedUser.id,
@@ -174,6 +178,29 @@ class OrderServiceIntegrationTest {
         assertThat(findStock1.quantity).isEqualTo(100)
         val findStock2 = stockJpaRepository.findById(savedStock2.id).get()
         assertThat(findStock2.quantity).isEqualTo(100)
+    }
+
+    @DisplayName("주문 생성이 완료되면 주문을 저장한다.")
+    @Test
+    fun complete() {
+        //given
+        val order = OrderDomainFixture.create(orderId = 0L)
+        val savedOrder = orderJpaRepository.save(order)
+
+        val command = OrderCommandFixture.createCompleted(
+            orderId = savedOrder.id,
+            userId = 1L,
+            totalPrice = 100000
+        )
+
+        //when
+        orderService.complete(command)
+
+        //then
+        val findOrder = orderJpaRepository.findById(savedOrder.id).get()
+        assertThat(findOrder)
+            .extracting("userId", "totalPrice")
+            .containsExactly(1L, 100000)
     }
 
     private fun redisFlushAll() {
