@@ -14,7 +14,7 @@ class OrderSpringEventPublisher(
 
     override fun publish(event: OrderEvent.Completed) {
         applicationEventPublisher.publishEvent(event)
-        kafkaTemplate.send("order_completed", event)
+        kafkaTemplate.send("order.completed", event)
     }
 
     override fun publish(event: OrderEvent.Create) {
