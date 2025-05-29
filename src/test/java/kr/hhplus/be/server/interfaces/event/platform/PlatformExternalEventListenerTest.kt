@@ -12,6 +12,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.springframework.kafka.support.Acknowledgment
 
 @ExtendWith(MockitoExtension::class)
 class PlatformExternalEventListenerTest {
@@ -31,8 +32,10 @@ class PlatformExternalEventListenerTest {
             .given(platformSendService)
             .send(any())
 
+        val acknowledgment = Mockito.mock(Acknowledgment::class.java)
+
         //when
-        platformExternalEventListener.handle(event)
+        platformExternalEventListener.handle(event, acknowledgment)
 
         //then
         Mockito.verify(platformSendService, times(1))

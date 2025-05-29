@@ -50,6 +50,8 @@ class TestcontainersConfiguration {
 
             System.setProperty("spring.data.redis.host", redisContainer.host)
             System.setProperty("spring.data.redis.port", redisContainer.firstMappedPort.toString())
+
+            System.setProperty("spring.kafka.bootstrap-servers", bootstrapServers)
         }
     }
 
