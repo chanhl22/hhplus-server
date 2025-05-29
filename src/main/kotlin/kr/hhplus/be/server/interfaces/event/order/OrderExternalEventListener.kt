@@ -6,14 +6,14 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class OrderEventListener(
+class OrderExternalEventListener(
     private val orderService: OrderService
 ) {
 
     @EventListener
     fun handle(event: PaymentEvent.Completed) {
         println("🔥 이벤트 수신됨: $event")
-        val command = OrderEventMapper.toCommand(event)
+        val command = OrderExternalEventMapper.toCommand(event)
         orderService.complete(command)
     }
 

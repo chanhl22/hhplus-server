@@ -8,14 +8,14 @@ import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
-class RankEventListener(
+class RankExternalEventListener(
     private val productRankingService: ProductRankingService
 ) {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handle(event: OrderEvent.Completed) {
-        val command = RankEventMapper.toCommand(event)
+        val command = RankExternalEventMapper.toCommand(event)
         productRankingService.upsertRanking(command)
     }
 

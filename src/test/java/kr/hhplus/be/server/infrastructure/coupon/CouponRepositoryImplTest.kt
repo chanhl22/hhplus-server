@@ -82,8 +82,6 @@ class CouponRepositoryImplTest {
 
         val couponKey = String.format("coupon:%s:requested:users", couponId)
         val quantityKey = String.format("coupon:%s:quantity", couponId)
-        val statusKey = String.format("coupon:%s:user:status", couponId)
-        val activeKey = "coupon:active"
 
         redisTemplate.opsForValue().set(quantityKey, "100")
 
@@ -92,13 +90,9 @@ class CouponRepositoryImplTest {
 
         //then
         val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)
-        val statusValue = redisTemplate.opsForHash<String, String>().get(statusKey, userId.toString())
-        val activeCoupons = redisTemplate.opsForSet().members(activeKey)
         val quantity = redisTemplate.opsForValue().get(quantityKey)
 
         assertThat(couponRequestMembers).contains("1")
-        assertThat(statusValue).isEqualTo("pending")
-        assertThat(activeCoupons).contains("1")
         assertThat(quantity).isEqualTo("100")
     }
 
@@ -156,44 +150,6 @@ class CouponRepositoryImplTest {
 
         // then
         assertThat(result).isEqualTo(NO_STOCK_INFO)
-    }
-
-    @DisplayName("활성화된 쿠폰 목록을 조회한다.")
-    @Test
-    fun findActiveCoupon() {
-        // given
-        val activeKey = "coupon:active"
-        redisTemplate.opsForSet().add(activeKey, "1")
-
-        // when
-        val result = couponRepositoryImpl.findActiveCoupon()
-
-        // then
-        assertThat(result).contains("1")
-    }
-
-    @DisplayName("pending 상태의 유저를 success로 업데이트한다.")
-    @Test
-    fun updateSuccess() {
-        // given
-        val couponId = "1"
-        val statusKey = "coupon:$couponId:user:status"
-        val hashOps = redisTemplate.opsForHash<String, String>()
-
-        val userIds = listOf("1", "2", "3")
-        userIds.forEach { userId ->
-            hashOps.put(statusKey, userId, "pending")
-        }
-
-        // when
-        val result = couponRepositoryImpl.updateSuccess(couponId)
-
-        // then
-        assertThat(result).containsExactlyInAnyOrderElementsOf(userIds)
-        userIds.forEach { userId ->
-            val status = hashOps.get(statusKey, userId)
-            assertThat(status).isEqualTo("success")
-        }
     }
 
     private fun redisFlushAll() {

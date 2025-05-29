@@ -1,12 +1,12 @@
-package kr.hhplus.be.server.interfaces.event.coupon
+package kr.hhplus.be.server.interfaces.event.point
 
-import kr.hhplus.be.server.domain.coupon.CouponCommand
-import kr.hhplus.be.server.domain.product.ProductEvent
+import kr.hhplus.be.server.domain.coupon.CouponEvent
+import kr.hhplus.be.server.domain.point.PointCommand
 
-class CouponEventMapper {
+class PointExternalEventMapper {
     companion object {
-        fun toCommand(event: ProductEvent.Completed): CouponCommand.Use {
-            return CouponCommand.Use(
+        fun toCommand(event: CouponEvent.Completed): PointCommand.Deduct {
+            return PointCommand.Deduct(
                 orderId = event.orderId,
                 userId = event.userId,
                 pointId = event.pointId,
@@ -14,13 +14,15 @@ class CouponEventMapper {
                 couponId = event.couponId,
                 totalPrice = event.totalPrice,
                 productsDetail = event.productsDetail.map {
-                    CouponCommand.OrderedProduct(
+                    PointCommand.OrderedProduct(
                         productId = it.productId,
                         name = it.name,
                         price = it.price,
                         quantity = it.quantity
                     )
-                }
+                },
+                discountType = event.discountType,
+                discountValue = event.discountValue,
             )
         }
     }

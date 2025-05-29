@@ -6,13 +6,13 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class PaymentEventListener(
+class PaymentExternalEventListener(
     private val paymentService: PaymentService
 ) {
 
     @EventListener
     fun handle(event: PointEvent.Completed) {
-        val command = PaymentEventMapper.toCommand(event)
+        val command = PaymentExternalEventMapper.toCommand(event)
         paymentService.process(command)
     }
 

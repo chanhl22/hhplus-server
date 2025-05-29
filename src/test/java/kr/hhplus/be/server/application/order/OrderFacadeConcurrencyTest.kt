@@ -7,6 +7,7 @@ import kr.hhplus.be.server.fixture.product.ProductDomainFixture
 import kr.hhplus.be.server.fixture.stock.StockDomainFixture
 import kr.hhplus.be.server.fixture.user.UserDomainFixture
 import kr.hhplus.be.server.infrastructure.coupon.CouponJpaRepository
+import kr.hhplus.be.server.infrastructure.coupon.UserCouponJpaRepository
 import kr.hhplus.be.server.infrastructure.order.OrderJpaRepository
 import kr.hhplus.be.server.infrastructure.order.OrderProductJpaRepository
 import kr.hhplus.be.server.infrastructure.payment.PaymentJpaRepository
@@ -47,6 +48,9 @@ class OrderFacadeConcurrencyTest {
     private lateinit var couponJpaRepository: CouponJpaRepository
 
     @Autowired
+    private lateinit var userCouponJpaRepository: UserCouponJpaRepository
+
+    @Autowired
     private lateinit var orderJpaRepository: OrderJpaRepository
 
     @Autowired
@@ -69,6 +73,7 @@ class OrderFacadeConcurrencyTest {
         pointJpaRepository.deleteAllInBatch()
         productJpaRepository.deleteAllInBatch()
         stockJpaRepository.deleteAllInBatch()
+        userCouponJpaRepository.deleteAllInBatch()
         couponJpaRepository.deleteAllInBatch()
         orderProductJpaRepository.deleteAllInBatch()
         paymentJpaRepository.deleteAllInBatch()

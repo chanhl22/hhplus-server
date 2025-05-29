@@ -13,6 +13,11 @@ class CouponEvent {
         val discountValue: Int?
     )
 
+    data class Created(
+        val couponId: Long,
+        val userId: Long
+    )
+
     data class OrderedProduct(
         val productId: Long,
         val name: String,

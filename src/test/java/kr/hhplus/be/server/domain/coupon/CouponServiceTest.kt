@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.fixture.coupon.CouponCommandFixture
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
+import kr.hhplus.be.server.fixture.coupon.CouponEventFixture
 import kr.hhplus.be.server.fixture.coupon.UserCouponDomainFixture
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -63,24 +64,19 @@ class CouponServiceTest {
     @Test
     fun issueCoupon() {
         //given
-        BDDMockito.given(couponRepository.findActiveCoupon())
-            .willReturn(setOf("1"))
-
-        BDDMockito.given(couponRepository.updateSuccess(any()))
-            .willReturn(emptyList())
-
         BDDMockito.willDoNothing()
             .given(userCouponRepository)
             .saveAll(any())
 
+        val events = listOf(
+            CouponEventFixture.create(couponId = 1L, userId = 1L),
+            CouponEventFixture.create(couponId = 1L, userId = 2L),
+        )
+
         //when
-        couponService.issueCoupon()
+        couponService.issueCoupon(events)
 
         //then
-        Mockito.verify(couponRepository, times(1))
-            .findActiveCoupon()
-        Mockito.verify(couponRepository, times(1))
-            .updateSuccess(any())
         Mockito.verify(userCouponRepository, times(1))
             .saveAll(any())
     }

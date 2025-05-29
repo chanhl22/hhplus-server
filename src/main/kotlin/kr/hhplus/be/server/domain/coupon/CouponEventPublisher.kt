@@ -4,4 +4,6 @@ interface CouponEventPublisher {
 
     fun publish(event: CouponEvent.Completed)
 
+    fun publish(event: CouponEvent.Created)
+
 }
