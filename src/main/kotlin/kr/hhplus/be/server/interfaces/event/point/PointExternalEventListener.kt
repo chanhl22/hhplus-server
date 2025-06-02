@@ -6,13 +6,13 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class PointEventListener(
+class PointExternalEventListener(
     private val pointService: PointService
 ) {
 
     @EventListener
     fun handle(event: CouponEvent.Completed) {
-        val command = PointEventMapper.toCommand(event)
+        val command = PointExternalEventMapper.toCommand(event)
         pointService.use(command)
     }
 

@@ -3,7 +3,7 @@ package kr.hhplus.be.server.interfaces.event.order
 import kr.hhplus.be.server.domain.order.OrderCommand
 import kr.hhplus.be.server.domain.payment.PaymentEvent
 
-class OrderEventMapper {
+class OrderExternalEventMapper {
     companion object {
         fun toCommand(event: PaymentEvent.Completed): OrderCommand.Completed {
             return OrderCommand.Completed(

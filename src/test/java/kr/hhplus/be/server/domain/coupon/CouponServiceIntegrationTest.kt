@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.fixture.coupon.CouponCommandFixture
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
+import kr.hhplus.be.server.fixture.coupon.CouponEventFixture
 import kr.hhplus.be.server.fixture.coupon.UserCouponDomainFixture
 import kr.hhplus.be.server.fixture.point.PointDomainFixture
 import kr.hhplus.be.server.fixture.user.UserDomainFixture
@@ -10,6 +11,7 @@ import kr.hhplus.be.server.infrastructure.coupon.UserCouponJpaRepository
 import kr.hhplus.be.server.infrastructure.point.PointJpaRepository
 import kr.hhplus.be.server.infrastructure.user.UserJpaRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.groups.Tuple
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -70,21 +72,15 @@ class CouponServiceIntegrationTest {
 
         val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
         val quantityKey = String.format("coupon:%s:quantity", savedCoupon.id)
-        val statusKey = String.format("coupon:%s:user:status", savedCoupon.id)
-        val activeKey = "coupon:active"
 
         //when
         couponService.reserveFirstCome(savedCoupon.id, savedUser.id)
 
         //then
         val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)
-        val statusValue = redisTemplate.opsForHash<String, String>().get(statusKey, savedUser.id.toString())
-        val activeCoupons = redisTemplate.opsForSet().members(activeKey)
         val quantity = redisTemplate.opsForValue().get(quantityKey)
 
         assertThat(couponRequestMembers).contains(savedUser.id.toString())
-        assertThat(statusValue).isEqualTo("pending")
-        assertThat(activeCoupons).contains(savedCoupon.id.toString())
         assertThat(quantity).isEqualTo("100")
     }
 
@@ -92,30 +88,31 @@ class CouponServiceIntegrationTest {
     @Test
     fun issueCoupon() {
         //given
-        val user = UserDomainFixture.create(userId = 0L)
-        val savedUser = userJpaRepository.save(user)
+        val user1 = UserDomainFixture.create(userId = 0L)
+        val savedUser1 = userJpaRepository.save(user1)
+
+        val user2 = UserDomainFixture.create(userId = 0L)
+        val savedUser2 = userJpaRepository.save(user2)
 
         val coupon = CouponDomainFixture.create(couponId = 0L)
         val savedCoupon = couponJpaRepository.save(coupon)
 
-        val activeKey = "coupon:active"
-        val statusKey = String.format("coupon:%s:user:status", savedCoupon.id)
-
-        redisTemplate.opsForSet().add(activeKey, savedCoupon.id.toString())
-        redisTemplate.opsForHash<String, String>().put(statusKey, savedUser.id.toString(), "pending")
-
+        val events = listOf(
+            CouponEventFixture.create(couponId = savedCoupon.id, userId = savedUser1.id),
+            CouponEventFixture.create(couponId = savedCoupon.id, userId = savedUser2.id)
+        )
 
         //when
-        couponService.issueCoupon()
+        couponService.issueCoupon(events)
 
         //then
-        val userCouponResult = userCouponJpaRepository.findByCouponId(savedCoupon.id)
-        assertThat(userCouponResult)
+        val findUserCoupon = userCouponJpaRepository.findAll()
+        assertThat(findUserCoupon).hasSize(2)
             .extracting("userId", "couponId", "isUsed")
-            .containsExactly(savedUser.id, savedCoupon.id, false)
-
-        val statusValue = redisTemplate.opsForHash<String, String>().get(statusKey, savedUser.id.toString())
-        assertThat(statusValue).isEqualTo("success")
+            .containsAnyOf(
+                Tuple.tuple(savedUser1.id, savedCoupon.id, false),
+                Tuple.tuple(savedUser2.id, savedCoupon.id, false)
+            )
     }
 
     @DisplayName("쿠폰을 사용한다.")
