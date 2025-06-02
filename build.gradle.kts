@@ -57,6 +57,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation("org.redisson:redisson-spring-boot-starter:3.45.1")
 
+	// Kafka
+	implementation("org.springframework.kafka:spring-kafka")
+
 	// Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 
@@ -70,6 +73,8 @@ dependencies {
 	testImplementation("org.testcontainers:mysql")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("org.testcontainers:kafka")
+
 }
 
 tasks.withType<Test> {

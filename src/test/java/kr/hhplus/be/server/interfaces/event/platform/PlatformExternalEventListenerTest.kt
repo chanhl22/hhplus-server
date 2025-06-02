@@ -12,15 +12,16 @@ import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.springframework.kafka.support.Acknowledgment
 
 @ExtendWith(MockitoExtension::class)
-class PlatformOrderEventListenerTest {
+class PlatformExternalEventListenerTest {
 
     @Mock
     private lateinit var platformSendService: PlatformSendService
 
     @InjectMocks
-    private lateinit var platformOrderEventListener: PlatformOrderEventListener
+    private lateinit var platformExternalEventListener: PlatformExternalEventListener
 
     @DisplayName("데이터 플랫폼에 전송한다.")
     @Test
@@ -31,8 +32,10 @@ class PlatformOrderEventListenerTest {
             .given(platformSendService)
             .send(any())
 
+        val acknowledgment = Mockito.mock(Acknowledgment::class.java)
+
         //when
-        platformOrderEventListener.handle(event)
+        platformExternalEventListener.handle(event, acknowledgment)
 
         //then
         Mockito.verify(platformSendService, times(1))

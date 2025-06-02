@@ -3,7 +3,7 @@ package kr.hhplus.be.server.interfaces.event.platform
 import kr.hhplus.be.server.domain.order.OrderEvent
 import kr.hhplus.be.server.domain.platform.PlatformCommand
 
-class PlatformOrderEventMapper {
+class PlatformExternalEventMapper {
     companion object {
         fun toCommand(event: OrderEvent.Completed): PlatformCommand.Payload {
             return PlatformCommand.Payload(
