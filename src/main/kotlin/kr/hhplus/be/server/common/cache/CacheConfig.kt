@@ -24,7 +24,6 @@ class CacheConfig(
     @Value("\${spring.data.redis.port}") private val port: Int
 ) {
 
-    @Bean
     fun redisObjectMapper(): ObjectMapper {
         val objectMapper = ObjectMapper()
         objectMapper.registerModule(KotlinModule.Builder().build())

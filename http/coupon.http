@@ -1,0 +1,8 @@
+### 쿠폰 요청
+POST localhost:8080/coupon/reserve
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "couponId": 1
+}
