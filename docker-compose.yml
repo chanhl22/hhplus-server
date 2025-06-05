@@ -27,6 +27,38 @@ services:
       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@127.0.0.1:9093
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
+  influxdb:
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=k6
+
+  grafana:
+    image: grafana/grafana:11.6.1
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana:/var/lib/grafana
+
+  k6:
+    image: grafana/k6
+    volumes:
+      - ./data/k6:/scripts
+    depends_on:
+      - influxdb
+    environment:
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+
 networks:
   default:
     driver: bridge
+
+volumes:
+  influxdb:
+  grafana:
