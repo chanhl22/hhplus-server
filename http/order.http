@@ -1,0 +1,12 @@
+### 주문
+POST localhost:8080/order?userId=1
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "productId": 1,
+      "quantity": 2
+    }
+  ]
+}
