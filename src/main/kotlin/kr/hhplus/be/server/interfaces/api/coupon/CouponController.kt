@@ -31,4 +31,15 @@ class CouponController(
         return ResponseEntity.ok(domain)
     }
 
+    /**
+     * 비관적 락을 이용한 쿠폰 발급
+     */
+    @PostMapping("/coupon/issue")
+    fun issueCouponFirstCome(
+        @RequestBody @Valid request: CouponRequest.FirstComeIssue
+    ): ResponseEntity<CouponResponse.IssueCouponFirstCome> {
+        val result = couponService.issueCoupon(request.couponId, request.userId)
+        return ResponseEntity.ok(CouponResponse.of(result))
+    }
+
 }
