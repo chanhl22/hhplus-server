@@ -67,9 +67,9 @@ class CouponServiceConcurrencyTest {
 
         //then
         val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
-        val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)!!
+        val size = redisTemplate.opsForZSet().zCard(couponKey)!!
 
-        assertThat(couponRequestMembers.size).isEqualTo(100)
+        assertThat(size).isEqualTo(100)
     }
 
     @DisplayName("동시에 동일한 쿠폰을 발급 받을 수 없다.")
@@ -98,9 +98,9 @@ class CouponServiceConcurrencyTest {
 
         //then
         val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
-        val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)!!
+        val size = redisTemplate.opsForZSet().zCard(couponKey)!!
 
-        assertThat(couponRequestMembers.size).isEqualTo(1)
+        assertThat(size).isEqualTo(1)
     }
 
     @DisplayName("쿠폰 수량이 없다면 발급 받을 수 없다.")
@@ -129,9 +129,9 @@ class CouponServiceConcurrencyTest {
 
         //then
         val couponKey = String.format("coupon:%s:requested:users", savedCoupon.id)
-        val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)!!
+        val size = redisTemplate.opsForZSet().zCard(couponKey)!!
 
-        assertThat(couponRequestMembers.size).isEqualTo(0)
+        assertThat(size).isEqualTo(0)
     }
 
     private fun redisFlushAll() {

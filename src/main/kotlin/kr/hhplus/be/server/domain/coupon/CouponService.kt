@@ -91,4 +91,16 @@ class CouponService(
         return "SUCCESS"
     }
 
+    @Transactional
+    fun issueCoupon(couponId: Long, userId: Long): Coupon {
+        val coupon = couponRepository.findWithPessimisticLock(couponId)
+            .publish()
+            .deduct()
+        val userCoupon = coupon.issueTo(userId)
+
+        val issuedCoupon = couponRepository.save(coupon)
+        userCouponRepository.save(userCoupon)
+        return issuedCoupon
+    }
+
 }

@@ -3,6 +3,7 @@ package kr.hhplus.be.server.infrastructure.coupon
 import kr.hhplus.be.server.domain.coupon.CouponReserveStatus.ALREADY_REQUESTED
 import kr.hhplus.be.server.domain.coupon.CouponReserveStatus.NO_STOCK_INFO
 import kr.hhplus.be.server.domain.coupon.CouponReserveStatus.OUT_OF_STOCK
+import kr.hhplus.be.server.domain.coupon.CouponReserveStatus.SUCCESS
 import kr.hhplus.be.server.domain.coupon.DiscountType
 import kr.hhplus.be.server.fixture.coupon.CouponDomainFixture
 import org.assertj.core.api.Assertions.assertThat
@@ -80,20 +81,21 @@ class CouponRepositoryImplTest {
         val couponId = 1L
         val userId = 1L
 
-        val couponKey = String.format("coupon:%s:requested:users", couponId)
+        val queueKey = String.format("coupon:%s:requested:users", couponId)
         val quantityKey = String.format("coupon:%s:quantity", couponId)
 
         redisTemplate.opsForValue().set(quantityKey, "100")
 
         //when
-        couponRepositoryImpl.reserveFirstCome(couponId, userId)
+        val result = couponRepositoryImpl.reserveFirstCome(couponId, userId)
 
         //then
-        val couponRequestMembers = redisTemplate.opsForSet().members(couponKey)
+        val size = redisTemplate.opsForZSet().zCard(queueKey)
         val quantity = redisTemplate.opsForValue().get(quantityKey)
 
-        assertThat(couponRequestMembers).contains("1")
-        assertThat(quantity).isEqualTo("100")
+        assertThat(result).isEqualTo(SUCCESS)
+        assertThat(size).isEqualTo(1)
+        assertThat(quantity?.toInt()).isEqualTo(99)
     }
 
     @DisplayName("쿠폰 발급 요청 수가 수량보다 많으면 저장하지 않고 재고 부족을 반환한다.")
@@ -101,13 +103,9 @@ class CouponRepositoryImplTest {
     fun overStock() {
         // given
         val couponId = 2L
-        val couponKey = "coupon:$couponId:requested:users"
         val quantityKey = "coupon:$couponId:quantity"
 
-        redisTemplate.opsForValue().set(quantityKey, "1")
-
-        // 요청자 1명 미리 등록
-        redisTemplate.opsForSet().add(couponKey, "existing_user")
+        redisTemplate.opsForValue().set(quantityKey, "0")
 
         // when
         val result = couponRepositoryImpl.reserveFirstCome(couponId, 999L)
@@ -122,11 +120,11 @@ class CouponRepositoryImplTest {
         // given
         val couponId = 3L
         val userId = 123L
-        val couponKey = "coupon:$couponId:requested:users"
+        val queueKey = "coupon:$couponId:requested:users"
         val quantityKey = "coupon:$couponId:quantity"
 
         redisTemplate.opsForValue().set(quantityKey, "10")
-        redisTemplate.opsForSet().add(couponKey, userId.toString())
+        redisTemplate.opsForZSet().add(queueKey, userId.toString(), System.currentTimeMillis().toDouble())
 
         // when
         val result = couponRepositoryImpl.reserveFirstCome(couponId, userId)

@@ -5,4 +5,10 @@ class CouponRequest {
         val userId: Long,
         val couponId: Long
     )
+
+    data class FirstComeIssue(
+        val userId: Long,
+        val couponId: Long
+    )
+
 }

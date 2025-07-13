@@ -35,13 +35,13 @@ class CouponRepositoryImpl(
     override fun reserveFirstCome(couponId: Long, userId: Long): CouponReserveStatus {
         val couponKey = createKey(COUPON_REQUEST_KEY, couponId)
         val quantityKey = createKey(COUPON_QUANTITY_KEY, couponId)
+        val timestamp = System.currentTimeMillis().toString()
 
         val luaScript = getLuaScript()
         val result = redisTemplate.execute(
             DefaultRedisScript(luaScript, Long::class.java),
             listOf(couponKey, quantityKey),
-            userId.toString(),
-            couponId.toString()
+            userId.toString(), timestamp
         )
 
         return CouponReserveStatus.from(result.toInt())
@@ -50,29 +50,30 @@ class CouponRepositoryImpl(
     private fun getLuaScript(): String {
         return """
             local userId = ARGV[1]
-            local couponId = ARGV[2]
+            local timestamp = tonumber(ARGV[2])
+            local queueKey = KEYS[1]
+            local stockKey = KEYS[2]
         
             -- 중복 요청 체크
-            if redis.call("SISMEMBER", KEYS[1], userId) == 1 then
+            if redis.call("ZSCORE", queueKey, userId) then
                 return 0 -- 이미 요청한 유저
             end
         
             -- 재고 확인
-            local stock = tonumber(redis.call("GET", KEYS[2]) or "-1")
-            if stock < 0 then
-                return -2 -- 재고 정보 없음
+            local stock = tonumber(redis.call("GET", stockKey))
+            if not stock then
+                return -2  -- 재고 없음
             end
         
-            -- 현재 요청 수와 비교
-            local requestedCount = redis.call("SCARD", KEYS[1])
-            if (stock - requestedCount) <= 0 then
-                return -1 -- 재고 부족
+            -- 재고 감소
+            local newStock = redis.call("DECR", stockKey)
+            if newStock < 0 then
+                return -1  -- 재고 부족
             end
         
-            -- 요청 등록 및 상태 저장
-            redis.call("SADD", KEYS[1], userId)
-            
-            return 1
+            -- 대기열에 추가
+            redis.call("ZADD", queueKey, timestamp, userId)
+            return 1  -- 성공
         """.trimIndent()
     }
 
@@ -88,7 +89,7 @@ class CouponRepositoryImpl(
 
     override fun registerQuantityKey(couponId: Long, remainingQuantity: Int) {
         val quantityKey = createKey(COUPON_QUANTITY_KEY, couponId)
-        redisTemplate.opsForValue().set(quantityKey, remainingQuantity.toString())
+        redisTemplate.opsForValue().setIfAbsent(quantityKey, remainingQuantity.toString())
     }
 
     private fun createKey(key: String, couponId: Any): String {
