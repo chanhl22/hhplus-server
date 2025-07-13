@@ -12,6 +12,16 @@ services:
     volumes:
       - ./data/mysql/:/var/lib/mysql
 
+  redis:
+    image: redis:7.4.3
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
   kafka:
     image: public.ecr.aws/bitnami/kafka:3.5.1
     ports:
